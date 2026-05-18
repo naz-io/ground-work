@@ -47,6 +47,8 @@ This project is designed to showcase:
 ## Architecture Decisions
 ### Local-first foundation
 The app starts with local persistence before any remote sync. This keeps the first version focused on reliable state and data flow instead of prematurely introducing backend complexity.
+### Domain-first modeling
+The app starts with a small domain model before introducing Room or UI implementation details. `Note`, `NoteId`, and `NoteStatus` describe the core app concept independently from persistence, navigation, or Compose. The repository contract defines how the rest of the app will access notes without depending directly on the database layer.
 ### Room as future source of truth
 Even before sync exists, Room is treated as the durable source for app data. The UI reads app state through repositories and ViewModels rather than directly from the database.
 
