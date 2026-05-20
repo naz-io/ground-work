@@ -8,6 +8,6 @@ import androidx.room.RoomDatabase
     version = 1,
     exportSchema = true,
 )
-abstract class GroundworkDatabase : RoomDatabase() {
+abstract class GroundWorkDatabase : RoomDatabase() {
     abstract fun fieldNoteDao(): FieldNoteDao
 }
