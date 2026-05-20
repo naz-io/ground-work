@@ -1,10 +1,10 @@
 package com.nabadi.groundwork.domain.model
 
-data class Note(
-    val id: NoteId,
+data class FieldNote(
+    val id: FieldNoteId,
     val title: String,
     val body: String,
-    val status: NoteStatus,
+    val status: FieldNoteStatus,
     val createdAt: Long,
     val updatedAt: Long,
 )

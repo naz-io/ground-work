@@ -1,6 +1,6 @@
 package com.nabadi.groundwork.domain.model
 
-enum class NoteStatus {
+enum class FieldNoteStatus {
     DRAFT,
     ACTIVE,
     ARCHIVED,
