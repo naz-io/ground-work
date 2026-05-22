@@ -4,9 +4,9 @@ import com.nabadi.groundwork.data.local.FieldNoteDao
 import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
 import com.nabadi.groundwork.domain.repository.FieldNoteRepository
-import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
 class OfflineFirstFieldNoteRepository @Inject constructor(
     private val fieldNoteDao: FieldNoteDao
