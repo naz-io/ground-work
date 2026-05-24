@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">GroundWork</string>
+    <string name="field_notes_list_title">Field Notes:</string>
 </resources>

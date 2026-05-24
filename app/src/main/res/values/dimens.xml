@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="spacing_screen">16dp</dimen>
+    <dimen name="spacing_list_item">8dp</dimen>
+    <dimen name="spacing_card_content">16dp</dimen>
+    <dimen name="padding_card">4dp</dimen>
+</resources>
