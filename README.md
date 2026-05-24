@@ -24,7 +24,9 @@ This project is designed to showcase:
 - Scope control: sync, conflict resolution, job sites, and attachments are delayed until the local foundation is stable
 - A roadmap that grows complexity intentionally instead of adding features randomly
 
-## Current Version
+## Current Progress
+
+Git tags are created only for stable checkpoints. The first tagged checkpoint is `v0.3.0`, representing the first end-to-end local architecture slice: Room → Repository → Hilt → ViewModel → Compose UI.
 
 ### v0.1 — Project Setup
 - Created Android project
@@ -163,7 +165,7 @@ Future performance work may include:
 - Recomposition checks
 - Search responsiveness
 - Baseline Profile setup
-- Macro-benchmark coverage for startup and list scrolling
+- Macrobenchmark coverage for startup and list scrolling
 
 ## Roadmap
 
