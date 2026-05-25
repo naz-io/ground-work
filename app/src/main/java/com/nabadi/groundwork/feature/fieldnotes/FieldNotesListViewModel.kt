@@ -12,21 +12,21 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class FieldNotesViewModel @Inject constructor(
+class FieldNotesListViewModel @Inject constructor(
     fieldNoteRepository: FieldNoteRepository
 ) : ViewModel() {
 
-    val uiState: StateFlow<FieldNotesUiState> =
+    val uiState: StateFlow<FieldNotesListUiState> =
         fieldNoteRepository.observeFieldNotes()
             .map { fieldNotes ->
-                FieldNotesUiState(
+                FieldNotesListUiState(
                     isLoading = false,
                     fieldNotes = fieldNotes,
                 )
             }
             .catch {
                 emit(
-                    FieldNotesUiState(
+                    FieldNotesListUiState(
                         isLoading = false,
                         errorMessage = "Unable to load field notes."
                     )
@@ -35,7 +35,7 @@ class FieldNotesViewModel @Inject constructor(
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = FieldNotesUiState()
+                initialValue = FieldNotesListUiState()
             )
 
 }

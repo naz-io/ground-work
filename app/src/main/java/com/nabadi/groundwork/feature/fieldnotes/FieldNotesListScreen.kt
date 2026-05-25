@@ -26,7 +26,7 @@ import com.nabadi.groundwork.ui.theme.GroundWorkTheme
 
 @Composable
 fun FieldNotesListScreen(
-    uiState: FieldNotesUiState,
+    uiState: FieldNotesListUiState,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -138,7 +138,7 @@ private fun ErrorState(
 @Composable
 fun FieldNotesListScreenPreview_Loading() {
     GroundWorkTheme {
-        FieldNotesListScreen(uiState = FieldNotesUiState(isLoading = true))
+        FieldNotesListScreen(uiState = FieldNotesListUiState(isLoading = true))
     }
 }
 
@@ -147,7 +147,7 @@ fun FieldNotesListScreenPreview_Loading() {
 fun FieldNotesListScreenPreview_Content() {
     GroundWorkTheme {
         FieldNotesListScreen(
-            uiState = FieldNotesUiState(
+            uiState = FieldNotesListUiState(
                 fieldNotes = previewFieldNotes,
                 isLoading = false,
             )
@@ -160,7 +160,7 @@ fun FieldNotesListScreenPreview_Content() {
 fun FieldNotesListScreenPreview_Empty() {
     GroundWorkTheme {
         FieldNotesListScreen(
-            uiState = FieldNotesUiState(
+            uiState = FieldNotesListUiState(
                 fieldNotes = emptyList(),
                 isLoading = false,
             )
@@ -173,7 +173,7 @@ fun FieldNotesListScreenPreview_Empty() {
 fun FieldNotesListScreenPreview_Error() {
     GroundWorkTheme {
         FieldNotesListScreen(
-            uiState = FieldNotesUiState(
+            uiState = FieldNotesListUiState(
                 errorMessage = "oh! Error!",
                 isLoading = false,
             )
