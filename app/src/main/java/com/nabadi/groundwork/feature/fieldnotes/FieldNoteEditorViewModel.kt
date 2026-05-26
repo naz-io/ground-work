@@ -23,13 +23,13 @@ class FieldNoteEditorViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(FieldNoteEditorUiState())
     val uiState: StateFlow<FieldNoteEditorUiState> = _uiState.asStateFlow()
 
-    fun onTitleChanged(title: String) {
+    fun onTitleChange(title: String) {
         _uiState.update { currentState ->
             currentState.copy(title = title)
         }
     }
 
-    fun onBodyChanged(body: String) {
+    fun onBodyChange(body: String) {
         _uiState.update { currentState ->
             currentState.copy(body = body)
         }
