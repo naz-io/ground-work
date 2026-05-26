@@ -9,11 +9,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun FieldNotesListRoute(
     modifier: Modifier = Modifier,
+    onAddFieldNoteClick: () -> Unit,
     viewModel: FieldNotesListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     FieldNotesListScreen(
         uiState = uiState,
+        onAddFieldNoteClick = onAddFieldNoteClick,
         modifier = modifier
     )
 }

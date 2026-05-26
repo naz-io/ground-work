@@ -35,8 +35,9 @@ class FieldNoteEditorViewModel @Inject constructor(
         }
     }
 
-    fun saveFieldNote() {
+    fun saveFieldNote(onSaved: () -> Unit) {
         val currentState = _uiState.value
+        if (currentState.isSaving) return
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true, errorMessage = null) }
@@ -47,7 +48,7 @@ class FieldNoteEditorViewModel @Inject constructor(
                 fieldNoteRepository.saveFieldNote(
                     FieldNote(
                         id = FieldNoteId(UUID.randomUUID().toString()),
-                        title = currentState.title.ifBlank { "(untitled)" },
+                        title = currentState.title.ifBlank { "(untitled field note)" },
                         body = currentState.body,
                         status = FieldNoteStatus.ACTIVE,
                         createdAt = now,
@@ -56,11 +57,12 @@ class FieldNoteEditorViewModel @Inject constructor(
                 )
             }.onSuccess {
                 _uiState.update { FieldNoteEditorUiState() }
+                onSaved()
             }.onFailure {
                 _uiState.update {
                     it.copy(
                         isSaving = false,
-                        errorMessage = "Unable to save field note"
+                        errorMessage = "Unable to save field note.",
                     )
                 }
             }

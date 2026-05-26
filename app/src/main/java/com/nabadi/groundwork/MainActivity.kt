@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.nabadi.groundwork.feature.fieldnotes.FieldNoteEditorRoute
+import com.nabadi.groundwork.navigation.GroundWorkNavHost
 import com.nabadi.groundwork.ui.theme.GroundWorkTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -20,9 +20,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             GroundWorkTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    FieldNoteEditorRoute(
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    GroundWorkNavHost(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
