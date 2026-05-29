@@ -1,58 +1,102 @@
 package com.nabadi.groundwork.ui.theme
 
-import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+private val GroundWorkLightColorScheme = lightColorScheme(
+    primary = GroundWorkBurntOrange,
+    onPrimary = GroundWorkSurface,
+    primaryContainer = GroundWorkSafetyOrange,
+    onPrimaryContainer = GroundWorkOrangeDark,
+
+    secondary = GroundWorkSteel,
+    onSecondary = GroundWorkSurface,
+    secondaryContainer = GroundWorkSteelContainer,
+    onSecondaryContainer = GroundWorkSteelDark,
+
+    tertiary = GroundWorkCharcoal,
+    onTertiary = GroundWorkSurface,
+    tertiaryContainer = GroundWorkSurfaceHighest,
+    onTertiaryContainer = GroundWorkInk,
+
+    background = GroundWorkBackground,
+    onBackground = GroundWorkInk,
+
+    surface = GroundWorkSurface,
+    onSurface = GroundWorkInk,
+    surfaceVariant = GroundWorkSurfaceHighest,
+    onSurfaceVariant = GroundWorkOutline,
+
+    outline = GroundWorkOutline,
+    outlineVariant = GroundWorkOutlineVariant,
+
+    error = GroundWorkError,
+    onError = GroundWorkSurface,
+    errorContainer = GroundWorkErrorContainer,
+    onErrorContainer = GroundWorkOnErrorContainer,
+
+    inverseSurface = GroundWorkCharcoal,
+    inverseOnSurface = GroundWorkInkInverse,
+    inversePrimary = GroundWorkOrangeLight,
+
+    surfaceTint = GroundWorkBurntOrange,
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+private val GroundWorkDarkColorScheme = darkColorScheme(
+    primary = GroundWorkOrangeLight,
+    onPrimary = GroundWorkOrangeDark,
+    primaryContainer = GroundWorkBurntOrange,
+    onPrimaryContainer = GroundWorkOrangeContainer,
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    secondary = GroundWorkSteelContainer,
+    onSecondary = GroundWorkInk,
+    secondaryContainer = GroundWorkSteelDark,
+    onSecondaryContainer = GroundWorkSteelContainer,
+
+    tertiary = GroundWorkSurfaceHighest,
+    onTertiary = GroundWorkInk,
+    tertiaryContainer = GroundWorkCharcoal,
+    onTertiaryContainer = GroundWorkSurfaceHighest,
+
+    background = GroundWorkInk,
+    onBackground = GroundWorkInkInverse,
+
+    surface = GroundWorkCharcoal,
+    onSurface = GroundWorkInkInverse,
+    surfaceVariant = GroundWorkSteelDark,
+    onSurfaceVariant = GroundWorkSteelContainer,
+
+    outline = GroundWorkOutlineVariant,
+    outlineVariant = GroundWorkOutline,
+
+    error = GroundWorkErrorContainer,
+    onError = GroundWorkOnErrorContainer,
+    errorContainer = GroundWorkError,
+    onErrorContainer = GroundWorkErrorContainer,
+
+    inverseSurface = GroundWorkInkInverse,
+    inverseOnSurface = GroundWorkInk,
+    inversePrimary = GroundWorkBurntOrange,
+
+    surfaceTint = GroundWorkOrangeLight,
 )
 
 @Composable
 fun GroundWorkTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+        darkTheme -> GroundWorkDarkColorScheme
+        else -> GroundWorkLightColorScheme
     }
 
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        content = content
+        content = content,
     )
 }
