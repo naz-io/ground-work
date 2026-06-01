@@ -10,6 +10,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun FieldNoteEditorRoute(
     modifier: Modifier = Modifier,
     onFieldNoteSaved: () -> Unit,
+    onBackClick: () -> Unit,
     viewModel: FieldNoteEditorViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -19,6 +20,7 @@ fun FieldNoteEditorRoute(
         onTitleChange = viewModel::onTitleChange,
         onBodyChange = viewModel::onBodyChange,
         onSaveClick = { viewModel.saveFieldNote(onSaved = onFieldNoteSaved) },
+        onBackClick = onBackClick,
         modifier = modifier,
     )
 }

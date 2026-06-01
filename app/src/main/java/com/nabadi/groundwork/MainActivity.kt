@@ -19,9 +19,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             GroundWorkTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    GroundWorkNavHost(modifier = Modifier.padding(innerPadding))
-                }
+                GroundWorkNavHost(
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
     }

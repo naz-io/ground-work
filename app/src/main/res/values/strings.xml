@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">GroundWork</string>
-    <string name="field_notes_list_title">Field Notes:</string>
+
     <!-- Field notes list screen -->
+    <string name="field_notes_list_title">Field Notes</string>
     <string name="field_notes_list_add">Add field note</string>
     <string name="field_notes_list_untitled">(untitled)</string>
     <string name="field_notes_list_empty">No field notes yet.</string>
