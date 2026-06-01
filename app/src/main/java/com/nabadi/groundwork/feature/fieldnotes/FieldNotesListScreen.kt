@@ -58,8 +58,8 @@ fun FieldNotesListScreen(
                 Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(dimensionResource(id = R.dimen.padding_card_content)),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_card_content)),
+                    .padding(dimensionResource(id = R.dimen.spacing_screen)),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_screen_section)),
         ) {
             Text(
                 text = stringResource(R.string.field_notes_list_title),
@@ -293,7 +293,6 @@ private fun FieldNoteCardPreview() {
     GroundWorkTheme {
         FieldNoteCard(
             fieldNote = previewFieldNotes.first(),
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.spacing_screen))
         )
     }
 }
@@ -304,7 +303,6 @@ private fun FieldNoteCardPreview_Dark() {
     GroundWorkTheme(darkTheme = true) {
         FieldNoteCard(
             fieldNote = previewFieldNotes.first(),
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.spacing_screen))
         )
     }
 }
@@ -315,7 +313,6 @@ private fun ErrorStatePreview() {
     GroundWorkTheme {
         ErrorState(
             errorMessage = "Could not connect to the server.",
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.spacing_screen))
         )
     }
 }
@@ -326,7 +323,6 @@ private fun ErrorStatePreview_Dark() {
     GroundWorkTheme(darkTheme = true) {
         ErrorState(
             errorMessage = "Could not connect to the server.",
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.spacing_screen))
         )
     }
 }
