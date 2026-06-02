@@ -17,6 +17,8 @@
     <string name="field_note_editor_body_label">Field Note &amp; Observations</string>
     <string name="field_note_editor_body_hint">Start typing field observations&#8230;</string>
     <string name="field_note_editor_save">Save</string>
+    <string name="field_note_editor_discard">Discard</string>
+    <string name="field_note_editor_delete">Delete</string>
 
     <!-- Field note status labels -->
     <string name="field_note_status_active">Active</string>

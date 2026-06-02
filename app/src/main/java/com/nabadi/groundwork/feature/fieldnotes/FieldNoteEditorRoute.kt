@@ -8,9 +8,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
 fun FieldNoteEditorRoute(
+    onEditorFinished: () -> Unit,
     modifier: Modifier = Modifier,
-    onFieldNoteSaved: () -> Unit,
-    onBackClick: () -> Unit,
     viewModel: FieldNoteEditorViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -19,8 +18,15 @@ fun FieldNoteEditorRoute(
         uiState = uiState,
         onTitleChange = viewModel::onTitleChange,
         onBodyChange = viewModel::onBodyChange,
-        onSaveClick = { viewModel.saveFieldNote(onSaved = onFieldNoteSaved) },
-        onBackClick = onBackClick,
+        onSaveClick = { viewModel.saveFieldNote(onSaved = onEditorFinished) },
+        onDestructiveActionClick = {
+            if (uiState.isEditing) {
+                viewModel.deleteFieldNote(onDeleted = onEditorFinished)
+            } else {
+                viewModel.discardDraft(onDiscarded = onEditorFinished)
+            }
+        },
+        onBackClick = onEditorFinished,
         modifier = modifier,
     )
 }

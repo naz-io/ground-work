@@ -6,12 +6,13 @@ data class FieldNoteEditorUiState(
     val isEditing: Boolean = false,
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
+    val isDeleting: Boolean = false,
     val isLocalDraft: Boolean = true,
     val errorMessage: String? = null,
 ) {
+    val isBusy: Boolean
+        get() = isLoading || isSaving || isDeleting
+
     val canSave: Boolean
-        get() = !isLoading
-                && !isSaving
-                && (title.isNotBlank() || body.isNotBlank())
-                && errorMessage == null
+        get() = !isBusy && (title.isNotBlank() || body.isNotBlank())
 }

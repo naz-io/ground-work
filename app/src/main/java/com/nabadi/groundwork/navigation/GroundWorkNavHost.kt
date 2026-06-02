@@ -41,10 +41,7 @@ fun GroundWorkNavHost(modifier: Modifier = Modifier) {
             ),
         ) {
             FieldNoteEditorRoute(
-                onFieldNoteSaved = {
-                    navController.popBackStack()
-                },
-                onBackClick = {
+                onEditorFinished = {
                     navController.popBackStack()
                 },
             )

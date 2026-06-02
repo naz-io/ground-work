@@ -1,6 +1,7 @@
 package com.nabadi.groundwork.feature.fieldnotes
 
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -22,12 +22,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,6 +41,7 @@ fun FieldNoteEditorScreen(
     onTitleChange: (String) -> Unit,
     onBodyChange: (String) -> Unit,
     onSaveClick: () -> Unit,
+    onDestructiveActionClick: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -55,9 +56,12 @@ fun FieldNoteEditorScreen(
         },
         bottomBar = {
             FieldNoteEditorBottomBar(
+                isEditing = uiState.isEditing,
                 isSaving = uiState.isSaving,
                 canSave = uiState.canSave,
                 onSaveClick = onSaveClick,
+                isDeleting = uiState.isDeleting,
+                onDestructiveActionClick = onDestructiveActionClick,
             )
         },
     ) { innerPadding ->
@@ -127,31 +131,64 @@ private fun FieldNoteEditorTopBar(
 
 @Composable
 private fun FieldNoteEditorBottomBar(
+    isEditing: Boolean,
     isSaving: Boolean,
     canSave: Boolean,
     onSaveClick: () -> Unit,
+    isDeleting: Boolean,
+    onDestructiveActionClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    BottomAppBar(
-        modifier = modifier,
-        containerColor = Color.Transparent,
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surface,
     ) {
-        Button(
-            onClick = onSaveClick,
-            enabled = canSave && !isSaving,
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = dimensionResource(R.dimen.padding_bottom_action_horizontal))
-                .height(dimensionResource(R.dimen.height_primary_action_button)),
+                .padding(
+                    horizontal = dimensionResource(R.dimen.padding_bottom_action_horizontal),
+                    vertical = dimensionResource(R.dimen.spacing_list_item),
+                ),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
         ) {
-            if (isSaving) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(dimensionResource(R.dimen.size_button_progress_indicator)),
-                    strokeWidth = 2.dp,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                )
-            } else {
-                Text(text = stringResource(R.string.field_note_editor_save))
+            Button(
+                onClick = onSaveClick,
+                enabled = canSave && !isSaving && !isDeleting,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(dimensionResource(R.dimen.height_primary_action_button)),
+            ) {
+                if (isSaving) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(dimensionResource(R.dimen.size_button_progress_indicator)),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                    )
+                } else {
+                    Text(text = stringResource(R.string.field_note_editor_save))
+                }
+            }
+            Button(
+                onClick = onDestructiveActionClick,
+                enabled = !isSaving && !isDeleting,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(dimensionResource(R.dimen.height_primary_action_button)),
+            ) {
+                if (isDeleting) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(dimensionResource(R.dimen.size_button_progress_indicator)),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                    )
+                } else {
+                    if (isEditing) {
+                        Text(text = stringResource(R.string.field_note_editor_delete))
+                    } else {
+                        Text(text = stringResource(R.string.field_note_editor_discard))
+                    }
+                }
             }
         }
     }
@@ -239,6 +276,7 @@ private fun FieldNoteEditorScreenPreview_EmptyDraft() {
             onBodyChange = {},
             onBackClick = {},
             onSaveClick = {},
+            onDestructiveActionClick = {},
         )
     }
 }
@@ -257,6 +295,7 @@ private fun FieldNoteEditorScreenPreview_DarkMode_Empty() {
             onBodyChange = {},
             onBackClick = {},
             onSaveClick = {},
+            onDestructiveActionClick = {},
         )
     }
 }
@@ -271,6 +310,7 @@ private fun FieldNoteEditorScreenPreview_FilledDraft() {
             onBodyChange = {},
             onBackClick = {},
             onSaveClick = {},
+            onDestructiveActionClick = {},
         )
     }
 }
@@ -289,6 +329,7 @@ private fun FieldNoteEditorScreenPreview_DarkMode_Filled() {
             onBodyChange = {},
             onBackClick = {},
             onSaveClick = {},
+            onDestructiveActionClick = {},
         )
     }
 }
@@ -303,6 +344,7 @@ private fun FieldNoteEditorScreenPreview_Saving() {
             onBodyChange = {},
             onBackClick = {},
             onSaveClick = {},
+            onDestructiveActionClick = {},
         )
     }
 }
@@ -321,6 +363,7 @@ private fun FieldNoteEditorScreenPreview_DarkMode_Saving() {
             onBodyChange = {},
             onBackClick = {},
             onSaveClick = {},
+            onDestructiveActionClick = {},
         )
     }
 }
@@ -335,6 +378,7 @@ private fun FieldNoteEditorScreenPreview_Error() {
             onBodyChange = {},
             onBackClick = {},
             onSaveClick = {},
+            onDestructiveActionClick = {},
         )
     }
 }
@@ -353,6 +397,41 @@ private fun FieldNoteEditorScreenPreview_DarkMode_Error() {
             onBodyChange = {},
             onBackClick = {},
             onSaveClick = {},
+            onDestructiveActionClick = {},
+        )
+    }
+}
+
+@Preview(name = "Editing", showBackground = true)
+@Composable
+private fun FieldNoteEditorScreenPreview_Editing() {
+    GroundWorkTheme {
+        FieldNoteEditorScreen(
+            uiState = editingPreviewState,
+            onTitleChange = {},
+            onBodyChange = {},
+            onBackClick = {},
+            onSaveClick = {},
+            onDestructiveActionClick = {},
+        )
+    }
+}
+
+@Preview(
+    name = "Dark Mode - Editing",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+private fun FieldNoteEditorScreenPreview_DarkMode_Editing() {
+    GroundWorkTheme {
+        FieldNoteEditorScreen(
+            uiState = editingPreviewState,
+            onTitleChange = {},
+            onBodyChange = {},
+            onBackClick = {},
+            onSaveClick = {},
+            onDestructiveActionClick = {},
         )
     }
 }
@@ -387,4 +466,11 @@ private val errorPreviewState = FieldNoteEditorUiState(
     isSaving = false,
     isLocalDraft = true,
     errorMessage = "Unable to save field note.",
+)
+
+private val editingPreviewState = FieldNoteEditorUiState(
+    title = "North gate safety check",
+    body = "Loose temporary fencing reported near the north access point.",
+    isEditing = true,
+    isLocalDraft = false,
 )

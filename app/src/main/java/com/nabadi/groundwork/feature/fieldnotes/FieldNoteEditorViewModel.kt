@@ -39,22 +39,28 @@ class FieldNoteEditorViewModel @Inject constructor(
 
     fun onTitleChange(title: String) {
         _uiState.update { currentState ->
-            currentState.copy(title = title)
+            currentState.copy(
+                title = title,
+                errorMessage = null,
+            )
         }
     }
 
     fun onBodyChange(body: String) {
         _uiState.update { currentState ->
-            currentState.copy(body = body)
+            currentState.copy(
+                body = body,
+                errorMessage = null,
+            )
         }
     }
 
     fun saveFieldNote(onSaved: () -> Unit) {
+        if (_uiState.value.isBusy) return
         val currentState = _uiState.value
-        if (currentState.isSaving || currentState.isLoading) return
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isSaving = true, errorMessage = null) }
+            updateSavingState(isSaving = true)
 
             runCatching {
                 val existingNote = existingFieldNote
@@ -63,7 +69,7 @@ class FieldNoteEditorViewModel @Inject constructor(
                 fieldNoteRepository.saveFieldNote(
                     FieldNote(
                         id = existingNote?.id ?: FieldNoteId(UUID.randomUUID().toString()),
-                        title = currentState.title.ifBlank { "(untitled field note)" },
+                        title = currentState.title.ifBlank { "Untitled field note" },
                         body = currentState.body,
                         status = existingNote?.status ?: FieldNoteStatus.ACTIVE,
                         createdAt = existingNote?.createdAt ?: now,
@@ -74,19 +80,47 @@ class FieldNoteEditorViewModel @Inject constructor(
                 _uiState.update { FieldNoteEditorUiState() }
                 onSaved()
             }.onFailure {
-                _uiState.update {
-                    it.copy(
-                        isSaving = false,
-                        errorMessage = "Unable to save field note.",
-                    )
-                }
+                updateSavingState(
+                    isSaving = false,
+                    errorMessage = "Unable to save field note.",
+                )
             }
         }
     }
 
+    fun deleteFieldNote(onDeleted: () -> Unit) {
+        if (_uiState.value.isBusy) return
+
+        viewModelScope.launch {
+            updateDeletingState(isDeleting = true)
+
+            runCatching {
+                val existingNote = existingFieldNote
+                    ?: error("Cannot delete a field note that has not been saved.")
+
+                fieldNoteRepository.deleteFieldNote(id = existingNote.id)
+            }.onSuccess {
+                _uiState.update { FieldNoteEditorUiState() }
+                onDeleted()
+            }.onFailure {
+                updateDeletingState(
+                    isDeleting = false,
+                    errorMessage = "Unable to delete field note.",
+                )
+            }
+        }
+    }
+
+    fun discardDraft(onDiscarded: () -> Unit) {
+        if (_uiState.value.isBusy) return
+
+        _uiState.update { FieldNoteEditorUiState() }
+        onDiscarded()
+    }
+
     private fun loadFieldNote(id: FieldNoteId) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            updateLoadingState(isLoading = true)
 
             runCatching {
                 fieldNoteRepository.getFieldNote(id)
@@ -112,14 +146,48 @@ class FieldNoteEditorViewModel @Inject constructor(
                     }
                 }
             }.onFailure {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = "Unable to load field note.",
-                    )
-                }
-
+                updateLoadingState(
+                    isLoading = false,
+                    errorMessage = "Unable to load field note.",
+                )
             }
+        }
+    }
+
+
+    private fun updateLoadingState(
+        isLoading: Boolean,
+        errorMessage: String? = null,
+    ) {
+        _uiState.update {
+            it.copy(
+                isLoading = isLoading,
+                errorMessage = errorMessage,
+            )
+        }
+    }
+
+    private fun updateSavingState(
+        isSaving: Boolean,
+        errorMessage: String? = null,
+    ) {
+        _uiState.update {
+            it.copy(
+                isSaving = isSaving,
+                errorMessage = errorMessage,
+            )
+        }
+    }
+
+    private fun updateDeletingState(
+        isDeleting: Boolean,
+        errorMessage: String? = null,
+    ) {
+        _uiState.update {
+            it.copy(
+                isDeleting = isDeleting,
+                errorMessage = errorMessage,
+            )
         }
     }
 }
