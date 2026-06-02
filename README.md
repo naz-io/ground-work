@@ -55,7 +55,14 @@ Git tags are created only for stable checkpoints. The first tagged checkpoint is
 - Connected the field notes route from `MainActivity`
 
 ### v0.4 — Create and Edit Field Notes
-- Not implemented yet
+- Added `FieldNoteEditorUiState` and `FieldNoteEditorViewModel`
+- Added a Stitch-inspired `FieldNoteEditorScreen` with top bar, local draft/status card, title input, observations input, error state, and bottom save action
+- Added editor previews for empty, filled, saving, error, and dark-mode states
+- Added FAB entry point from the field notes list
+- Added navigation between the list and editor screens
+- Added create flow for saving new field notes locally
+- Added edit flow for opening an existing field note, loading its title/body, and saving updates without creating duplicates
+- Preserved `createdAt` when editing existing notes and updated `updatedAt` on save
 
 ### v0.5 — Search and Filtering
 - Not implemented yet
@@ -129,11 +136,15 @@ The first Compose screen separates the ViewModel-connected route from the statel
 - Hilt provides the database, DAO, and repository dependencies
 - `FieldNotesViewModel` observes the repository and exposes `StateFlow<FieldNotesUiState>`
 - `FieldNotesListScreen` renders loading, empty, error, and content states
+- `FieldNoteEditorScreen` supports creating and editing field notes
+- Field note cards can open existing notes for editing
+- New field notes can be saved locally and shown in the list
+- Existing field notes can be updated without duplicating the note
 - Preview data reflects the field-operations product direction
 
 ## What Is Intentionally Not Built Yet
 
-- Creating, editing, and deleting field notes from the UI
+- Deleting field notes from the UI
 - Search and filtering
 - Job/site management
 - Real sync
@@ -146,7 +157,7 @@ The first Compose screen separates the ViewModel-connected route from the statel
 
 ## Testing Strategy
 
-Testing has not been added yet. The first tests will be introduced after the create/edit flow is implemented so the app has meaningful behavior to verify.
+Testing has not been added yet. Now that the create/edit flow exists, the next testing pass should cover mapper behavior, repository behavior with an in-memory Room database, and ViewModel state transitions for create/edit flows.
 
 Planned first tests:
 - Mapper tests for `FieldNoteEntity` ↔ `FieldNote`
@@ -175,6 +186,8 @@ Future performance work may include:
 - Edit existing field notes
 - Delete field notes
 - Validate/fallback untitled notes
+
+Current v0.4 status: create and edit are implemented; delete remains next.
 
 ### v0.5 — Search and filtering
 - Search field notes
