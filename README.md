@@ -54,7 +54,7 @@ Git tags are created only for stable checkpoints. The first tagged checkpoint is
 - Added `FieldNoteCard` for rendering field note previews
 - Connected the field notes route from `MainActivity`
 
-### v0.4 — Create and Edit Field Notes
+### v0.4 — Create, Edit, and Delete Field Notes
 - Added `FieldNoteEditorUiState` and `FieldNoteEditorViewModel`
 - Added a Stitch-inspired `FieldNoteEditorScreen` with top bar, local draft/status card, title input, observations input, error state, and bottom save action
 - Added editor previews for empty, filled, saving, error, and dark-mode states
@@ -62,6 +62,8 @@ Git tags are created only for stable checkpoints. The first tagged checkpoint is
 - Added navigation between the list and editor screens
 - Added create flow for saving new field notes locally
 - Added edit flow for opening an existing field note, loading its title/body, and saving updates without creating duplicates
+- Added delete flow for removing existing field notes from the editor
+- Added discard flow for abandoning unsaved drafts without touching persisted data
 - Preserved `createdAt` when editing existing notes and updated `updatedAt` on save
 
 ### v0.5 — Search and Filtering
@@ -140,11 +142,12 @@ The first Compose screen separates the ViewModel-connected route from the statel
 - Field note cards can open existing notes for editing
 - New field notes can be saved locally and shown in the list
 - Existing field notes can be updated without duplicating the note
+- Existing field notes can be deleted from the editor
+- Unsaved drafts can be discarded without creating or deleting persisted field notes
 - Preview data reflects the field-operations product direction
 
 ## What Is Intentionally Not Built Yet
 
-- Deleting field notes from the UI
 - Search and filtering
 - Job/site management
 - Real sync
@@ -157,7 +160,7 @@ The first Compose screen separates the ViewModel-connected route from the statel
 
 ## Testing Strategy
 
-Testing has not been added yet. Now that the create/edit flow exists, the next testing pass should cover mapper behavior, repository behavior with an in-memory Room database, and ViewModel state transitions for create/edit flows.
+Testing has not been added yet. Now that the create/edit/delete flow exists, the next testing pass should cover mapper behavior, repository behavior with an in-memory Room database, and ViewModel state transitions for create, edit, delete, and discard flows.
 
 Planned first tests:
 - Mapper tests for `FieldNoteEntity` ↔ `FieldNote`
@@ -179,15 +182,6 @@ Future performance work may include:
 - Macrobenchmark coverage for startup and list scrolling
 
 ## Roadmap
-
-### v0.4 — Create and edit field notes
-- Add field note editor UI
-- Save new field notes
-- Edit existing field notes
-- Delete field notes
-- Validate/fallback untitled notes
-
-Current v0.4 status: create and edit are implemented; delete remains next.
 
 ### v0.5 — Search and filtering
 - Search field notes
