@@ -36,6 +36,7 @@ import com.nabadi.groundwork.ui.theme.GroundWorkTheme
 fun FieldNotesListScreen(
     uiState: FieldNotesListUiState,
     onAddFieldNoteClick: () -> Unit,
+    onFieldNoteClick: (FieldNoteId) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val shouldShowAddButton = !uiState.isLoading && uiState.errorMessage == null
@@ -81,6 +82,7 @@ fun FieldNotesListScreen(
                     uiState.fieldNotes.isEmpty() -> EmptyState()
                     else -> FieldNotesContent(
                         fieldNotes = uiState.fieldNotes,
+                        onFieldNoteClick = onFieldNoteClick,
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
@@ -99,6 +101,7 @@ private fun LoadingState(
 @Composable
 private fun FieldNotesContent(
     fieldNotes: List<FieldNote>,
+    onFieldNoteClick: (FieldNoteId) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -113,7 +116,10 @@ private fun FieldNotesContent(
             key = { it.id.value },
             contentType = { "FieldNote" },
         ) { fieldNote ->
-            FieldNoteCard(fieldNote = fieldNote)
+            FieldNoteCard(
+                fieldNote = fieldNote,
+                onClick = { onFieldNoteClick(fieldNote.id) },
+            )
         }
     }
 }
@@ -121,9 +127,11 @@ private fun FieldNotesContent(
 @Composable
 private fun FieldNoteCard(
     fieldNote: FieldNote,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
+        onClick = onClick,
         modifier = modifier.fillMaxWidth(),
     ) {
         Column(
@@ -188,6 +196,7 @@ private fun FieldNotesListScreenPreview_Loading() {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(isLoading = true),
             onAddFieldNoteClick = {},
+            onFieldNoteClick = {},
         )
     }
 }
@@ -199,6 +208,7 @@ private fun FieldNotesListScreenPreview_Loading_Dark() {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(isLoading = true),
             onAddFieldNoteClick = {},
+            onFieldNoteClick = {},
         )
     }
 }
@@ -213,6 +223,7 @@ private fun FieldNotesListScreenPreview_Content() {
                 isLoading = false,
             ),
             onAddFieldNoteClick = {},
+            onFieldNoteClick = {},
         )
     }
 }
@@ -227,6 +238,7 @@ private fun FieldNotesListScreenPreview_Content_Dark() {
                 isLoading = false,
             ),
             onAddFieldNoteClick = {},
+            onFieldNoteClick = {},
         )
     }
 }
@@ -241,6 +253,7 @@ private fun FieldNotesListScreenPreview_Empty() {
                 isLoading = false,
             ),
             onAddFieldNoteClick = {},
+            onFieldNoteClick = {},
         )
     }
 }
@@ -255,6 +268,7 @@ private fun FieldNotesListScreenPreview_Empty_Dark() {
                 isLoading = false,
             ),
             onAddFieldNoteClick = {},
+            onFieldNoteClick = {},
         )
     }
 }
@@ -269,6 +283,7 @@ private fun FieldNotesListScreenPreview_Error() {
                 isLoading = false,
             ),
             onAddFieldNoteClick = {},
+            onFieldNoteClick = {},
         )
     }
 }
@@ -279,10 +294,11 @@ private fun FieldNotesListScreenPreview_Error_Dark() {
     GroundWorkTheme(darkTheme = true) {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(
-                errorMessage = "oh! Error!",
+                errorMessage = "Could not connect to the server.",
                 isLoading = false,
             ),
             onAddFieldNoteClick = {},
+            onFieldNoteClick = {}
         )
     }
 }
@@ -293,6 +309,7 @@ private fun FieldNoteCardPreview() {
     GroundWorkTheme {
         FieldNoteCard(
             fieldNote = previewFieldNotes.first(),
+            onClick = {}
         )
     }
 }
@@ -303,6 +320,7 @@ private fun FieldNoteCardPreview_Dark() {
     GroundWorkTheme(darkTheme = true) {
         FieldNoteCard(
             fieldNote = previewFieldNotes.first(),
+            onClick = {}
         )
     }
 }

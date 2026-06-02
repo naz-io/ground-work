@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Screen layout -->
     <dimen name="spacing_screen">16dp</dimen>
     <dimen name="spacing_screen_horizontal">24dp</dimen>
     <dimen name="spacing_screen_section">16dp</dimen>
+
+    <!-- Lists -->
     <dimen name="spacing_list_item">8dp</dimen>
     <dimen name="spacing_fab_clearance">64dp</dimen>
+
+    <!-- Cards -->
     <dimen name="padding_card_content">16dp</dimen>
     <dimen name="spacing_card_content">4dp</dimen>
+
+    <!-- Forms -->
     <dimen name="spacing_form_section">24dp</dimen>
+
+    <!-- Bottom actions -->
+    <dimen name="padding_bottom_action_horizontal">24dp</dimen>
+    <dimen name="height_primary_action_button">56dp</dimen>
+    <dimen name="size_button_progress_indicator">24dp</dimen>
 </resources>

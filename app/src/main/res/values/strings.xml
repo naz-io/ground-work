@@ -9,13 +9,14 @@
     <string name="field_notes_list_error">Error loading field notes: %1$s</string>
 
     <!-- Field note editor screen -->
-    <string name="field_note_editor_title">New Field Note</string>
-    <string name="field_note_editor_save">Save</string>
+    <string name="field_note_editor_new_title">New Field Note</string>
+    <string name="field_note_editor_edit_title">Edit Field Note</string>
+    <string name="field_note_editor_draft">Local Draft\nChanges will be saved locally on this device.</string>
     <string name="field_note_editor_title_label">Note Title</string>
     <string name="field_note_editor_title_hint">e.g., Generator Inspection 04</string>
     <string name="field_note_editor_body_label">Field Note &amp; Observations</string>
     <string name="field_note_editor_body_hint">Start typing field observations&#8230;</string>
-    <string name="field_note_editor_draft">Local Draft</string>
+    <string name="field_note_editor_save">Save</string>
 
     <!-- Field note status labels -->
     <string name="field_note_status_active">Active</string>

@@ -49,6 +49,7 @@ fun FieldNoteEditorScreen(
         containerColor = MaterialTheme.colorScheme.surface,
         topBar = {
             FieldNoteEditorTopBar(
+                isEditing = uiState.isEditing,
                 onBackClick = onBackClick,
             )
         },
@@ -93,13 +94,20 @@ fun FieldNoteEditorScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FieldNoteEditorTopBar(
+    isEditing: Boolean,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     TopAppBar(
         title = {
             Text(
-                text = stringResource(R.string.field_note_editor_title),
+                text = stringResource(
+                    if (isEditing) {
+                        R.string.field_note_editor_edit_title
+                    } else {
+                        R.string.field_note_editor_new_title
+                    }
+                ),
                 style = MaterialTheme.typography.headlineSmall,
             )
         },
@@ -133,11 +141,12 @@ private fun FieldNoteEditorBottomBar(
             enabled = canSave && !isSaving,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = dimensionResource(R.dimen.padding_bottom_action_horizontal))
+                .height(dimensionResource(R.dimen.height_primary_action_button)),
         ) {
             if (isSaving) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier.size(dimensionResource(R.dimen.size_button_progress_indicator)),
                     strokeWidth = 2.dp,
                     color = MaterialTheme.colorScheme.onPrimary,
                 )
@@ -161,7 +170,7 @@ private fun DraftStatusCard(
             ),
         ) {
             Row(
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(dimensionResource(R.dimen.padding_card_content)),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
@@ -234,7 +243,11 @@ private fun FieldNoteEditorScreenPreview_EmptyDraft() {
     }
 }
 
-@Preview(name = "Dark Mode - Empty", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(
+    name = "Dark Mode - Empty",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 private fun FieldNoteEditorScreenPreview_DarkMode_Empty() {
     GroundWorkTheme {
@@ -262,7 +275,11 @@ private fun FieldNoteEditorScreenPreview_FilledDraft() {
     }
 }
 
-@Preview(name = "Dark Mode - Filled", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(
+    name = "Dark Mode - Filled",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 private fun FieldNoteEditorScreenPreview_DarkMode_Filled() {
     GroundWorkTheme {
@@ -290,7 +307,11 @@ private fun FieldNoteEditorScreenPreview_Saving() {
     }
 }
 
-@Preview(name = "Dark Mode - Saving", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(
+    name = "Dark Mode - Saving",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 private fun FieldNoteEditorScreenPreview_DarkMode_Saving() {
     GroundWorkTheme {
@@ -318,7 +339,11 @@ private fun FieldNoteEditorScreenPreview_Error() {
     }
 }
 
-@Preview(name = "Dark Mode - Error", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(
+    name = "Dark Mode - Error",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 private fun FieldNoteEditorScreenPreview_DarkMode_Error() {
     GroundWorkTheme {
