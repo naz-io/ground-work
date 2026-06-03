@@ -1,5 +1,6 @@
 package com.nabadi.groundwork.feature.fieldnotes
 
+import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,23 +10,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import com.nabadi.groundwork.R
 import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
@@ -35,6 +40,7 @@ import com.nabadi.groundwork.ui.theme.GroundWorkTheme
 @Composable
 fun FieldNotesListScreen(
     uiState: FieldNotesListUiState,
+    onStatusFilterChange: (FieldNoteStatus?) -> Unit,
     onAddFieldNoteClick: () -> Unit,
     onFieldNoteClick: (FieldNoteId) -> Unit,
     modifier: Modifier = Modifier,
@@ -47,8 +53,8 @@ fun FieldNotesListScreen(
             if (shouldShowAddButton) {
                 FloatingActionButton(onClick = onAddFieldNoteClick) {
                     Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.field_notes_list_add),
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = stringResource(R.string.field_notes_list_add_content_description),
                     )
                 }
             }
@@ -67,6 +73,7 @@ fun FieldNotesListScreen(
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.primary,
             )
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -75,12 +82,16 @@ fun FieldNotesListScreen(
             ) {
                 when {
                     uiState.isLoading -> LoadingState()
-                    uiState.errorMessage != null -> ErrorState(
-                        errorMessage = uiState.errorMessage,
-                    )
+                    uiState.isError -> uiState.errorMessage?.let {
+                        ErrorState(
+                            errorMessage = it,
+                        )
+                    }
 
-                    uiState.fieldNotes.isEmpty() -> EmptyState()
+                    uiState.isFiltering.not() && uiState.fieldNotes.isEmpty() -> EmptyState()
                     else -> FieldNotesContent(
+                        selectedStatus = uiState.selectedStatus,
+                        onStatusFilterChange = onStatusFilterChange,
                         fieldNotes = uiState.fieldNotes,
                         onFieldNoteClick = onFieldNoteClick,
                         modifier = Modifier.fillMaxSize(),
@@ -100,6 +111,8 @@ private fun LoadingState(
 
 @Composable
 private fun FieldNotesContent(
+    selectedStatus: FieldNoteStatus?,
+    onStatusFilterChange: (FieldNoteStatus?) -> Unit,
     fieldNotes: List<FieldNote>,
     onFieldNoteClick: (FieldNoteId) -> Unit,
     modifier: Modifier = Modifier,
@@ -111,15 +124,73 @@ private fun FieldNotesContent(
             bottom = dimensionResource(R.dimen.spacing_fab_clearance),
         ),
     ) {
-        items(
-            items = fieldNotes,
-            key = { it.id.value },
-            contentType = { "FieldNote" },
-        ) { fieldNote ->
-            FieldNoteCard(
-                fieldNote = fieldNote,
-                onClick = { onFieldNoteClick(fieldNote.id) },
-            )
+        item {
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
+            ) {
+                item {
+                    FilterChip(
+                        selected = selectedStatus == null,
+                        onClick = { onStatusFilterChange(null) },
+                        label = {
+                            Text(text = stringResource(R.string.field_notes_list_filter_all))
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            labelColor = MaterialTheme.colorScheme.onSurface,
+                        ),
+                    )
+                }
+                items(
+                    items = FieldNoteStatus.entries,
+                    key = { it },
+                    contentType = { "FilterOption" },
+                ) { statusFilter ->
+                    FilterChip(
+                        selected = selectedStatus == statusFilter,
+                        onClick = { onStatusFilterChange(statusFilter) },
+                        label = {
+                            Text(
+                                text = stringResource(statusFilter.labelResId),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            labelColor = MaterialTheme.colorScheme.onSurface,
+                        ),
+                    )
+                }
+            }
+        }
+        if (fieldNotes.isEmpty()) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillParentMaxSize()
+                        .padding(dimensionResource(R.dimen.padding_card_content)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    EmptyFilteredState()
+                }
+            }
+        } else {
+            items(
+                items = fieldNotes,
+                key = { it.id.value },
+                contentType = { "FieldNote" },
+            ) { fieldNote ->
+                FieldNoteCard(
+                    fieldNote = fieldNote,
+                    onClick = { onFieldNoteClick(fieldNote.id) },
+                )
+            }
         }
     }
 }
@@ -178,6 +249,16 @@ private fun EmptyState(
 }
 
 @Composable
+private fun EmptyFilteredState(
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = stringResource(R.string.field_notes_list_empty_filtered),
+        modifier = modifier,
+    )
+}
+
+@Composable
 private fun ErrorState(
     errorMessage: String,
     modifier: Modifier = Modifier,
@@ -189,31 +270,10 @@ private fun ErrorState(
     )
 }
 
-@Preview(name = "Loading", showBackground = true)
-@Composable
-private fun FieldNotesListScreenPreview_Loading() {
-    GroundWorkTheme {
-        FieldNotesListScreen(
-            uiState = FieldNotesListUiState(isLoading = true),
-            onAddFieldNoteClick = {},
-            onFieldNoteClick = {},
-        )
-    }
-}
-
-@Preview(name = "Dark Loading", showBackground = true)
-@Composable
-private fun FieldNotesListScreenPreview_Loading_Dark() {
-    GroundWorkTheme(darkTheme = true) {
-        FieldNotesListScreen(
-            uiState = FieldNotesListUiState(isLoading = true),
-            onAddFieldNoteClick = {},
-            onFieldNoteClick = {},
-        )
-    }
-}
-
-@Preview(name = "Content", showBackground = true)
+@Preview(
+    name = "Content",
+    showBackground = true,
+)
 @Composable
 private fun FieldNotesListScreenPreview_Content() {
     GroundWorkTheme {
@@ -222,58 +282,151 @@ private fun FieldNotesListScreenPreview_Content() {
                 fieldNotes = previewFieldNotes,
                 isLoading = false,
             ),
+            onStatusFilterChange = {},
             onAddFieldNoteClick = {},
             onFieldNoteClick = {},
         )
     }
 }
 
-@Preview(name = "Dark Content", showBackground = true)
+@Preview(
+    name = "Content - Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
 @Composable
 private fun FieldNotesListScreenPreview_Content_Dark() {
-    GroundWorkTheme(darkTheme = true) {
+    GroundWorkTheme {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(
                 fieldNotes = previewFieldNotes,
                 isLoading = false,
             ),
+            onStatusFilterChange = {},
             onAddFieldNoteClick = {},
             onFieldNoteClick = {},
         )
     }
 }
 
-@Preview(name = "Empty", showBackground = true)
+@Preview(
+    name = "Loading",
+    showBackground = true,
+)
+@Composable
+private fun FieldNotesListScreenPreview_Loading() {
+    GroundWorkTheme {
+        FieldNotesListScreen(
+            uiState = FieldNotesListUiState(isLoading = true),
+            onStatusFilterChange = {},
+            onAddFieldNoteClick = {},
+            onFieldNoteClick = {},
+        )
+    }
+}
+
+@Preview(
+    name = "Loading - Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Composable
+private fun FieldNotesListScreenPreview_Loading_Dark() {
+    GroundWorkTheme {
+        FieldNotesListScreen(
+            uiState = FieldNotesListUiState(isLoading = true),
+            onAddFieldNoteClick = {},
+            onStatusFilterChange = {},
+            onFieldNoteClick = {},
+        )
+    }
+}
+
+@Preview(
+    name = "Empty",
+    showBackground = true,
+)
 @Composable
 private fun FieldNotesListScreenPreview_Empty() {
+    GroundWorkTheme {
+        FieldNotesListScreen(
+            uiState = FieldNotesListUiState(
+                isLoading = false,
+                fieldNotes = emptyList(),
+            ),
+            onStatusFilterChange = {},
+            onAddFieldNoteClick = {},
+            onFieldNoteClick = {},
+        )
+    }
+}
+
+
+@Preview(
+    name = "Empty - Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Composable
+private fun FieldNotesListScreenPreview_Empty_Dark() {
     GroundWorkTheme {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(
                 fieldNotes = emptyList(),
                 isLoading = false,
             ),
+            onStatusFilterChange = {},
             onAddFieldNoteClick = {},
             onFieldNoteClick = {},
         )
     }
 }
 
-@Preview(name = "Dark Empty", showBackground = true)
+@Preview(
+    name = "No Filter Matches",
+    showBackground = true,
+)
 @Composable
-private fun FieldNotesListScreenPreview_Empty_Dark() {
-    GroundWorkTheme(darkTheme = true) {
+private fun FieldNotesListScreenPreview_NoFilterMatches() {
+    GroundWorkTheme {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(
+                selectedStatus = FieldNoteStatus.DRAFT,
                 fieldNotes = emptyList(),
                 isLoading = false,
             ),
+            onStatusFilterChange = {},
             onAddFieldNoteClick = {},
             onFieldNoteClick = {},
         )
     }
 }
 
-@Preview(name = "Error", showBackground = true)
+@Preview(
+    name = "No Filter Matches - Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Composable
+private fun FieldNotesListScreenPreview_NoFilterMatches_Dark() {
+    GroundWorkTheme {
+        FieldNotesListScreen(
+            uiState = FieldNotesListUiState(
+                selectedStatus = FieldNoteStatus.DRAFT,
+                fieldNotes = emptyList(),
+                isLoading = false,
+            ),
+            onStatusFilterChange = {},
+            onAddFieldNoteClick = {},
+            onFieldNoteClick = {},
+        )
+    }
+}
+
+@Preview(
+    name = "Error",
+    showBackground = true,
+)
 @Composable
 private fun FieldNotesListScreenPreview_Error() {
     GroundWorkTheme {
@@ -282,66 +435,137 @@ private fun FieldNotesListScreenPreview_Error() {
                 errorMessage = "Could not connect to the server.",
                 isLoading = false,
             ),
+            onStatusFilterChange = {},
             onAddFieldNoteClick = {},
             onFieldNoteClick = {},
         )
     }
 }
 
-@Preview(name = "Dark Error", showBackground = true)
+@Preview(
+    name = "Error - Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
 @Composable
 private fun FieldNotesListScreenPreview_Error_Dark() {
-    GroundWorkTheme(darkTheme = true) {
+    GroundWorkTheme {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(
                 errorMessage = "Could not connect to the server.",
                 isLoading = false,
             ),
+            onStatusFilterChange = {},
             onAddFieldNoteClick = {},
-            onFieldNoteClick = {}
+            onFieldNoteClick = {},
         )
     }
 }
 
-@Preview(name = "Field Note Card", showBackground = true)
+@Preview(
+    name = "Field Note Card",
+    showBackground = true,
+)
 @Composable
 private fun FieldNoteCardPreview() {
     GroundWorkTheme {
-        FieldNoteCard(
-            fieldNote = previewFieldNotes.first(),
-            onClick = {}
-        )
+        PreviewSurface {
+            FieldNoteCard(
+                fieldNote = previewFieldNotes.first(),
+                onClick = {},
+            )
+        }
     }
 }
 
-@Preview(name = "Field Note Card - Dark", showBackground = true)
+@Preview(
+    name = "Field Note Card - Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
 @Composable
 private fun FieldNoteCardPreview_Dark() {
-    GroundWorkTheme(darkTheme = true) {
-        FieldNoteCard(
-            fieldNote = previewFieldNotes.first(),
-            onClick = {}
-        )
+    GroundWorkTheme {
+        PreviewSurface {
+            FieldNoteCard(
+                fieldNote = previewFieldNotes.first(),
+                onClick = {},
+            )
+        }
     }
 }
 
-@Preview(name = "Error State", showBackground = true)
+@Preview(
+    name = "Error State",
+    showBackground = true,
+)
 @Composable
 private fun ErrorStatePreview() {
     GroundWorkTheme {
-        ErrorState(
-            errorMessage = "Could not connect to the server.",
-        )
+        PreviewSurface {
+            ErrorState(
+                errorMessage = "Could not connect to the server.",
+            )
+        }
     }
 }
 
-@Preview(name = "Error State - Dark", showBackground = true)
+@Preview(
+    name = "Error State - Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
 @Composable
 private fun ErrorStatePreview_Dark() {
-    GroundWorkTheme(darkTheme = true) {
-        ErrorState(
-            errorMessage = "Could not connect to the server.",
-        )
+    GroundWorkTheme {
+        PreviewSurface {
+            ErrorState(
+                errorMessage = "Could not connect to the server.",
+            )
+        }
+    }
+}
+
+@Preview(
+    name = "Empty Filtered State",
+    showBackground = true,
+)
+@Composable
+private fun EmptyFilteredStatePreview() {
+    GroundWorkTheme {
+        PreviewSurface {
+            EmptyFilteredState()
+        }
+    }
+}
+
+@Preview(
+    name = "Empty Filtered State - Dark",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
+@Composable
+private fun EmptyFilteredStatePreview_Dark() {
+    GroundWorkTheme {
+        PreviewSurface {
+            EmptyFilteredState()
+        }
+    }
+}
+
+@Composable
+private fun PreviewSurface(
+    content: @Composable () -> Unit,
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.background,
+    ) {
+        Box(
+            modifier = Modifier.padding(dimensionResource(R.dimen.spacing_screen)),
+        ) {
+            content()
+        }
     }
 }
 

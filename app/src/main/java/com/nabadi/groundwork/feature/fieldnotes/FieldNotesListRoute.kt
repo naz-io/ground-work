@@ -9,17 +9,18 @@ import com.nabadi.groundwork.domain.model.FieldNoteId
 
 @Composable
 fun FieldNotesListRoute(
-    modifier: Modifier = Modifier,
     onFieldNoteClick: (FieldNoteId) -> Unit,
     onAddFieldNoteClick: () -> Unit,
+    modifier: Modifier = Modifier,
     viewModel: FieldNotesListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     FieldNotesListScreen(
         uiState = uiState,
+        onStatusFilterChange = viewModel::onStatusFilterChange,
         onAddFieldNoteClick = onAddFieldNoteClick,
         onFieldNoteClick = onFieldNoteClick,
-        modifier = modifier
+        modifier = modifier,
     )
 }

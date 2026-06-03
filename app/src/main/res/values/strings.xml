@@ -3,10 +3,12 @@
 
     <!-- Field notes list screen -->
     <string name="field_notes_list_title">Field Notes</string>
-    <string name="field_notes_list_add">Add field note</string>
+    <string name="field_notes_list_filter_all">All</string>
+    <string name="field_notes_list_empty_filtered">No field notes match this filter.</string>
     <string name="field_notes_list_untitled">(untitled)</string>
     <string name="field_notes_list_empty">No field notes yet.</string>
     <string name="field_notes_list_error">Error loading field notes: %1$s</string>
+    <string name="field_notes_list_add_content_description">Add field note</string>
 
     <!-- Field note editor screen -->
     <string name="field_note_editor_new_title">New Field Note</string>
