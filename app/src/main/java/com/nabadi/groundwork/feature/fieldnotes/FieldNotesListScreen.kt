@@ -16,11 +16,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -40,12 +42,13 @@ import com.nabadi.groundwork.ui.theme.GroundWorkTheme
 @Composable
 fun FieldNotesListScreen(
     uiState: FieldNotesListUiState,
+    onSearchQueryChange: (String) -> Unit,
     onStatusFilterChange: (FieldNoteStatus?) -> Unit,
     onAddFieldNoteClick: () -> Unit,
     onFieldNoteClick: (FieldNoteId) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val shouldShowAddButton = !uiState.isLoading && uiState.errorMessage == null
+    val shouldShowAddButton = !uiState.isLoading && !uiState.isError
 
     Scaffold(
         modifier = modifier,
@@ -88,9 +91,11 @@ fun FieldNotesListScreen(
                         )
                     }
 
-                    uiState.isFiltering.not() && uiState.fieldNotes.isEmpty() -> EmptyState()
+                    !uiState.hasActiveCriteria && uiState.fieldNotes.isEmpty() -> EmptyFieldNotesState()
                     else -> FieldNotesContent(
                         selectedStatus = uiState.selectedStatus,
+                        searchQuery = uiState.searchQuery,
+                        onSearchQueryChange = onSearchQueryChange,
                         onStatusFilterChange = onStatusFilterChange,
                         fieldNotes = uiState.fieldNotes,
                         onFieldNoteClick = onFieldNoteClick,
@@ -112,6 +117,8 @@ private fun LoadingState(
 @Composable
 private fun FieldNotesContent(
     selectedStatus: FieldNoteStatus?,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
     onStatusFilterChange: (FieldNoteStatus?) -> Unit,
     fieldNotes: List<FieldNote>,
     onFieldNoteClick: (FieldNoteId) -> Unit,
@@ -125,50 +132,19 @@ private fun FieldNotesContent(
         ),
     ) {
         item {
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
-            ) {
-                item {
-                    FilterChip(
-                        selected = selectedStatus == null,
-                        onClick = { onStatusFilterChange(null) },
-                        label = {
-                            Text(text = stringResource(R.string.field_notes_list_filter_all))
-                        },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            labelColor = MaterialTheme.colorScheme.onSurface,
-                        ),
-                    )
-                }
-                items(
-                    items = FieldNoteStatus.entries,
-                    key = { it },
-                    contentType = { "FilterOption" },
-                ) { statusFilter ->
-                    FilterChip(
-                        selected = selectedStatus == statusFilter,
-                        onClick = { onStatusFilterChange(statusFilter) },
-                        label = {
-                            Text(
-                                text = stringResource(statusFilter.labelResId),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            labelColor = MaterialTheme.colorScheme.onSurface,
-                        ),
-                    )
-                }
-            }
+            FieldNotesSearchField(
+                searchQuery = searchQuery,
+                onSearchQueryChange = onSearchQueryChange,
+            )
         }
+
+        item {
+            FieldNotesStatusFilters(
+                selectedStatus = selectedStatus,
+                onStatusFilterChange = onStatusFilterChange,
+            )
+        }
+
         if (fieldNotes.isEmpty()) {
             item {
                 Box(
@@ -177,7 +153,7 @@ private fun FieldNotesContent(
                         .padding(dimensionResource(R.dimen.padding_card_content)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    EmptyFilteredState()
+                    NoMatchingFieldNotesState()
                 }
             }
         } else {
@@ -196,6 +172,84 @@ private fun FieldNotesContent(
 }
 
 @Composable
+private fun FieldNotesSearchField(
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedTextField(
+        value = searchQuery,
+        onValueChange = onSearchQueryChange,
+        modifier = modifier.fillMaxWidth(),
+        label = {
+            Text(text = stringResource(R.string.field_notes_search_label))
+        },
+        singleLine = true,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FieldNotesStatusFilters(
+    selectedStatus: FieldNoteStatus?,
+    onStatusFilterChange: (FieldNoteStatus?) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
+    ) {
+        item {
+            FieldNotesStatusFilterChip(
+                selected = selectedStatus == null,
+                onClick = { onStatusFilterChange(null) },
+                label = stringResource(R.string.field_notes_list_filter_all),
+            )
+        }
+
+        items(
+            items = FieldNoteStatus.entries,
+            key = { it },
+            contentType = { "FilterOption" },
+        ) { statusFilter ->
+            FieldNotesStatusFilterChip(
+                selected = selectedStatus == statusFilter,
+                onClick = { onStatusFilterChange(statusFilter) },
+                label = stringResource(statusFilter.labelResId),
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FieldNotesStatusFilterChip(
+    selected: Boolean,
+    onClick: () -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+) {
+    FilterChip(
+        selected = selected,
+        onClick = onClick,
+        modifier = modifier,
+        label = {
+            Text(
+                text = label,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
+        colors = FilterChipDefaults.filterChipColors(
+            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            containerColor = MaterialTheme.colorScheme.surface,
+            labelColor = MaterialTheme.colorScheme.onSurface,
+        ),
+    )
+}
+
+@Composable
 private fun FieldNoteCard(
     fieldNote: FieldNote,
     onClick: () -> Unit,
@@ -210,7 +264,7 @@ private fun FieldNoteCard(
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_card_content)),
         ) {
             Text(
-                text = fieldNote.title.ifBlank { stringResource(R.string.field_notes_list_untitled) },
+                text = fieldNote.title.ifBlank { stringResource(R.string.field_notes_list_untitled_note_title) },
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
@@ -239,7 +293,7 @@ private val FieldNoteStatus.labelResId: Int
     }
 
 @Composable
-private fun EmptyState(
+private fun EmptyFieldNotesState(
     modifier: Modifier = Modifier,
 ) {
     Text(
@@ -249,11 +303,11 @@ private fun EmptyState(
 }
 
 @Composable
-private fun EmptyFilteredState(
+private fun NoMatchingFieldNotesState(
     modifier: Modifier = Modifier,
 ) {
     Text(
-        text = stringResource(R.string.field_notes_list_empty_filtered),
+        text = stringResource(R.string.field_notes_list_no_matches),
         modifier = modifier,
     )
 }
@@ -282,6 +336,7 @@ private fun FieldNotesListScreenPreview_Content() {
                 fieldNotes = previewFieldNotes,
                 isLoading = false,
             ),
+            onSearchQueryChange = {},
             onStatusFilterChange = {},
             onAddFieldNoteClick = {},
             onFieldNoteClick = {},
@@ -302,6 +357,7 @@ private fun FieldNotesListScreenPreview_Content_Dark() {
                 fieldNotes = previewFieldNotes,
                 isLoading = false,
             ),
+            onSearchQueryChange = {},
             onStatusFilterChange = {},
             onAddFieldNoteClick = {},
             onFieldNoteClick = {},
@@ -318,6 +374,7 @@ private fun FieldNotesListScreenPreview_Loading() {
     GroundWorkTheme {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(isLoading = true),
+            onSearchQueryChange = {},
             onStatusFilterChange = {},
             onAddFieldNoteClick = {},
             onFieldNoteClick = {},
@@ -335,6 +392,7 @@ private fun FieldNotesListScreenPreview_Loading_Dark() {
     GroundWorkTheme {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(isLoading = true),
+            onSearchQueryChange = {},
             onAddFieldNoteClick = {},
             onStatusFilterChange = {},
             onFieldNoteClick = {},
@@ -354,6 +412,7 @@ private fun FieldNotesListScreenPreview_Empty() {
                 isLoading = false,
                 fieldNotes = emptyList(),
             ),
+            onSearchQueryChange = {},
             onStatusFilterChange = {},
             onAddFieldNoteClick = {},
             onFieldNoteClick = {},
@@ -375,6 +434,7 @@ private fun FieldNotesListScreenPreview_Empty_Dark() {
                 fieldNotes = emptyList(),
                 isLoading = false,
             ),
+            onSearchQueryChange = {},
             onStatusFilterChange = {},
             onAddFieldNoteClick = {},
             onFieldNoteClick = {},
@@ -383,7 +443,7 @@ private fun FieldNotesListScreenPreview_Empty_Dark() {
 }
 
 @Preview(
-    name = "No Filter Matches",
+    name = "No Filter/Search Matches",
     showBackground = true,
 )
 @Composable
@@ -391,10 +451,12 @@ private fun FieldNotesListScreenPreview_NoFilterMatches() {
     GroundWorkTheme {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(
+                searchQuery = "Testing",
                 selectedStatus = FieldNoteStatus.DRAFT,
                 fieldNotes = emptyList(),
                 isLoading = false,
             ),
+            onSearchQueryChange = {},
             onStatusFilterChange = {},
             onAddFieldNoteClick = {},
             onFieldNoteClick = {},
@@ -403,7 +465,7 @@ private fun FieldNotesListScreenPreview_NoFilterMatches() {
 }
 
 @Preview(
-    name = "No Filter Matches - Dark",
+    name = "No Filter/Search Matches - Dark",
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
 )
@@ -416,6 +478,7 @@ private fun FieldNotesListScreenPreview_NoFilterMatches_Dark() {
                 fieldNotes = emptyList(),
                 isLoading = false,
             ),
+            onSearchQueryChange = {},
             onStatusFilterChange = {},
             onAddFieldNoteClick = {},
             onFieldNoteClick = {},
@@ -435,6 +498,7 @@ private fun FieldNotesListScreenPreview_Error() {
                 errorMessage = "Could not connect to the server.",
                 isLoading = false,
             ),
+            onSearchQueryChange = {},
             onStatusFilterChange = {},
             onAddFieldNoteClick = {},
             onFieldNoteClick = {},
@@ -455,6 +519,7 @@ private fun FieldNotesListScreenPreview_Error_Dark() {
                 errorMessage = "Could not connect to the server.",
                 isLoading = false,
             ),
+            onSearchQueryChange = {},
             onStatusFilterChange = {},
             onAddFieldNoteClick = {},
             onFieldNoteClick = {},
@@ -527,28 +592,28 @@ private fun ErrorStatePreview_Dark() {
 }
 
 @Preview(
-    name = "Empty Filtered State",
+    name = "Empty Filtered/Searched State",
     showBackground = true,
 )
 @Composable
-private fun EmptyFilteredStatePreview() {
+private fun NoMatchingFieldNotesStatePreview() {
     GroundWorkTheme {
         PreviewSurface {
-            EmptyFilteredState()
+            NoMatchingFieldNotesState()
         }
     }
 }
 
 @Preview(
-    name = "Empty Filtered State - Dark",
+    name = "Empty Filtered/Search State - Dark",
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
 )
 @Composable
-private fun EmptyFilteredStatePreview_Dark() {
+private fun NoMatchingFieldNotesStatePreview_Dark() {
     GroundWorkTheme {
         PreviewSurface {
-            EmptyFilteredState()
+            NoMatchingFieldNotesState()
         }
     }
 }

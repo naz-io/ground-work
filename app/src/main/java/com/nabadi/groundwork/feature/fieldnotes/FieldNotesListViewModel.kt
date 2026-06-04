@@ -18,19 +18,28 @@ class FieldNotesListViewModel @Inject constructor(
     fieldNoteRepository: FieldNoteRepository,
 ) : ViewModel() {
 
+    private val searchQuery = MutableStateFlow("")
     private val selectedStatus = MutableStateFlow<FieldNoteStatus?>(null)
 
     val uiState: StateFlow<FieldNotesListUiState> =
         combine(
             fieldNoteRepository.observeFieldNotes(),
+            searchQuery,
             selectedStatus,
-        ) { fieldNotes, selectedStatus ->
-            val filteredFieldNotes = selectedStatus?.let { status ->
-                fieldNotes.filter { fieldNote -> fieldNote.status == status }
-            } ?: fieldNotes
+        ) { fieldNotes, searchQuery, selectedStatus ->
+            val normalizedSearchQuery = searchQuery.trim()
+            val filteredFieldNotes = fieldNotes.filter { fieldNote ->
+                val matchesStatus = selectedStatus == null || fieldNote.status == selectedStatus
+                val matchesSearchQuery = normalizedSearchQuery.isBlank() ||
+                        fieldNote.title.contains(normalizedSearchQuery, ignoreCase = true) ||
+                        fieldNote.body.contains(normalizedSearchQuery, ignoreCase = true)
+
+                matchesStatus && matchesSearchQuery
+            }
 
             FieldNotesListUiState(
                 isLoading = false,
+                searchQuery = searchQuery,
                 selectedStatus = selectedStatus,
                 fieldNotes = filteredFieldNotes,
             )
@@ -38,6 +47,7 @@ class FieldNotesListViewModel @Inject constructor(
             emit(
                 FieldNotesListUiState(
                     isLoading = false,
+                    searchQuery = searchQuery.value,
                     selectedStatus = selectedStatus.value,
                     errorMessage = "Unable to load field notes.",
                 )
@@ -47,6 +57,10 @@ class FieldNotesListViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = FieldNotesListUiState(),
         )
+
+    fun onSearchQueryChange(query: String) {
+        searchQuery.value = query
+    }
 
     fun onStatusFilterChange(status: FieldNoteStatus?) {
         selectedStatus.value = status

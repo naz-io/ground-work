@@ -18,6 +18,7 @@ fun FieldNotesListRoute(
 
     FieldNotesListScreen(
         uiState = uiState,
+        onSearchQueryChange = viewModel::onSearchQueryChange,
         onStatusFilterChange = viewModel::onStatusFilterChange,
         onAddFieldNoteClick = onAddFieldNoteClick,
         onFieldNoteClick = onFieldNoteClick,
