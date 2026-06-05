@@ -20,6 +20,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -71,10 +72,10 @@ fun FieldNoteEditorScreen(
                 .padding(innerPadding)
                 .padding(horizontal = dimensionResource(R.dimen.spacing_screen_horizontal)),
         ) {
-            DraftStatusCard(
-                isLocalDraft = uiState.isLocalDraft,
-            )
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_form_section)))
+            if (uiState.isLocalDraft) {
+                DraftStatusCard()
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_form_section)))
+            }
 
             FieldNoteTitleField(
                 value = uiState.title,
@@ -169,7 +170,7 @@ private fun FieldNoteEditorBottomBar(
                     Text(text = stringResource(R.string.field_note_editor_save))
                 }
             }
-            Button(
+            OutlinedButton(
                 onClick = onDestructiveActionClick,
                 enabled = !isSaving && !isDeleting,
                 modifier = Modifier
@@ -196,28 +197,26 @@ private fun FieldNoteEditorBottomBar(
 
 @Composable
 private fun DraftStatusCard(
-    isLocalDraft: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    if (isLocalDraft) {
-        Card(
-            modifier = modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            ),
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        ),
+    ) {
+        Row(
+            modifier = Modifier.padding(dimensionResource(R.dimen.padding_card_content)),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                modifier = Modifier.padding(dimensionResource(R.dimen.padding_card_content)),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = stringResource(R.string.field_note_editor_draft),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                )
-            }
+            Text(
+                text = stringResource(R.string.field_note_editor_draft),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+            )
         }
     }
+
 }
 
 @Composable
@@ -266,7 +265,13 @@ private fun FieldNoteEditorErrorMessage(
     )
 }
 
-@Preview(name = "Empty Draft", showBackground = true)
+private const val PREVIEW_API_LEVEL = 35
+
+@Preview(
+    name = "Empty Draft",
+    showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
+)
 @Composable
 private fun FieldNoteEditorScreenPreview_EmptyDraft() {
     GroundWorkTheme {
@@ -284,7 +289,8 @@ private fun FieldNoteEditorScreenPreview_EmptyDraft() {
 @Preview(
     name = "Dark Mode - Empty",
     showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun FieldNoteEditorScreenPreview_DarkMode_Empty() {
@@ -300,7 +306,11 @@ private fun FieldNoteEditorScreenPreview_DarkMode_Empty() {
     }
 }
 
-@Preview(name = "Filled Draft", showBackground = true)
+@Preview(
+    name = "Filled Draft",
+    showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
+)
 @Composable
 private fun FieldNoteEditorScreenPreview_FilledDraft() {
     GroundWorkTheme {
@@ -316,9 +326,10 @@ private fun FieldNoteEditorScreenPreview_FilledDraft() {
 }
 
 @Preview(
-    name = "Dark Mode - Filled",
+    name = "Dark Mode - Filled Draft",
     showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun FieldNoteEditorScreenPreview_DarkMode_Filled() {
@@ -334,7 +345,11 @@ private fun FieldNoteEditorScreenPreview_DarkMode_Filled() {
     }
 }
 
-@Preview(name = "Saving", showBackground = true)
+@Preview(
+    name = "Saving",
+    showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
+)
 @Composable
 private fun FieldNoteEditorScreenPreview_Saving() {
     GroundWorkTheme {
@@ -352,7 +367,8 @@ private fun FieldNoteEditorScreenPreview_Saving() {
 @Preview(
     name = "Dark Mode - Saving",
     showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun FieldNoteEditorScreenPreview_DarkMode_Saving() {
@@ -368,7 +384,11 @@ private fun FieldNoteEditorScreenPreview_DarkMode_Saving() {
     }
 }
 
-@Preview(name = "Error", showBackground = true)
+@Preview(
+    name = "Error",
+    showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
+)
 @Composable
 private fun FieldNoteEditorScreenPreview_Error() {
     GroundWorkTheme {
@@ -386,7 +406,8 @@ private fun FieldNoteEditorScreenPreview_Error() {
 @Preview(
     name = "Dark Mode - Error",
     showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun FieldNoteEditorScreenPreview_DarkMode_Error() {
@@ -402,7 +423,11 @@ private fun FieldNoteEditorScreenPreview_DarkMode_Error() {
     }
 }
 
-@Preview(name = "Editing", showBackground = true)
+@Preview(
+    name = "Editing",
+    showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
+)
 @Composable
 private fun FieldNoteEditorScreenPreview_Editing() {
     GroundWorkTheme {
@@ -420,7 +445,8 @@ private fun FieldNoteEditorScreenPreview_Editing() {
 @Preview(
     name = "Dark Mode - Editing",
     showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun FieldNoteEditorScreenPreview_DarkMode_Editing() {

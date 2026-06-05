@@ -374,9 +374,12 @@ private fun ErrorState(
     )
 }
 
+private const val PREVIEW_API_LEVEL = 35
+
 @Preview(
     name = "Content",
     showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun FieldNotesListScreenPreview_Content() {
@@ -398,6 +401,7 @@ private fun FieldNotesListScreenPreview_Content() {
     name = "Content - Dark",
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun FieldNotesListScreenPreview_Content_Dark() {
@@ -418,6 +422,7 @@ private fun FieldNotesListScreenPreview_Content_Dark() {
 @Preview(
     name = "Loading",
     showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun FieldNotesListScreenPreview_Loading() {
@@ -436,6 +441,7 @@ private fun FieldNotesListScreenPreview_Loading() {
     name = "Loading - Dark",
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun FieldNotesListScreenPreview_Loading_Dark() {
@@ -453,6 +459,7 @@ private fun FieldNotesListScreenPreview_Loading_Dark() {
 @Preview(
     name = "Empty",
     showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun FieldNotesListScreenPreview_Empty() {
@@ -470,11 +477,11 @@ private fun FieldNotesListScreenPreview_Empty() {
     }
 }
 
-
 @Preview(
     name = "Empty - Dark",
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun FieldNotesListScreenPreview_Empty_Dark() {
@@ -495,6 +502,7 @@ private fun FieldNotesListScreenPreview_Empty_Dark() {
 @Preview(
     name = "No Filter/Search Matches",
     showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun FieldNotesListScreenPreview_NoFilterMatches() {
@@ -518,6 +526,7 @@ private fun FieldNotesListScreenPreview_NoFilterMatches() {
     name = "No Filter/Search Matches - Dark",
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun FieldNotesListScreenPreview_NoFilterMatches_Dark() {
@@ -540,6 +549,7 @@ private fun FieldNotesListScreenPreview_NoFilterMatches_Dark() {
 @Preview(
     name = "Error",
     showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun FieldNotesListScreenPreview_Error() {
@@ -561,6 +571,7 @@ private fun FieldNotesListScreenPreview_Error() {
     name = "Error - Dark",
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun FieldNotesListScreenPreview_Error_Dark() {
@@ -581,6 +592,7 @@ private fun FieldNotesListScreenPreview_Error_Dark() {
 @Preview(
     name = "Field Note Card",
     showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun FieldNoteCardPreview() {
@@ -598,6 +610,7 @@ private fun FieldNoteCardPreview() {
     name = "Field Note Card - Dark",
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun FieldNoteCardPreview_Dark() {
@@ -614,6 +627,7 @@ private fun FieldNoteCardPreview_Dark() {
 @Preview(
     name = "Error State",
     showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun ErrorStatePreview() {
@@ -630,6 +644,7 @@ private fun ErrorStatePreview() {
     name = "Error State - Dark",
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun ErrorStatePreview_Dark() {
@@ -645,6 +660,7 @@ private fun ErrorStatePreview_Dark() {
 @Preview(
     name = "Empty Filtered/Searched State",
     showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun NoMatchingFieldNotesStatePreview() {
@@ -661,6 +677,7 @@ private fun NoMatchingFieldNotesStatePreview() {
     name = "Empty Filtered/Search State - Dark",
     showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
+    apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
 private fun NoMatchingFieldNotesStatePreview_Dark() {
