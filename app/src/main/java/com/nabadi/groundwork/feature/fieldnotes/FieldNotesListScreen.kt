@@ -14,6 +14,9 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,6 +24,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -31,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.nabadi.groundwork.R
@@ -153,7 +158,12 @@ private fun FieldNotesContent(
                         .padding(dimensionResource(R.dimen.padding_card_content)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    NoMatchingFieldNotesState()
+                    NoMatchingFieldNotesState(
+                        onClearCriteriaClick = {
+                            onSearchQueryChange("")
+                            onStatusFilterChange(null)
+                        }
+                    )
                 }
             }
         } else {
@@ -184,6 +194,24 @@ private fun FieldNotesSearchField(
         label = {
             Text(text = stringResource(R.string.field_notes_search_label))
         },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Filled.Search,
+                contentDescription = null,
+            )
+        },
+        trailingIcon = {
+            if (searchQuery.isNotBlank()) {
+                IconButton(
+                    onClick = { onSearchQueryChange("") },
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = stringResource(R.string.field_notes_search_clear_content_description),
+                    )
+                }
+            }
+        },
         singleLine = true,
     )
 }
@@ -206,7 +234,6 @@ private fun FieldNotesStatusFilters(
                 label = stringResource(R.string.field_notes_list_filter_all),
             )
         }
-
         items(
             items = FieldNoteStatus.entries,
             key = { it },
@@ -304,12 +331,35 @@ private fun EmptyFieldNotesState(
 
 @Composable
 private fun NoMatchingFieldNotesState(
+    onClearCriteriaClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Text(
-        text = stringResource(R.string.field_notes_list_no_matches),
+    Column(
         modifier = modifier,
-    )
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_screen_section)),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = stringResource(R.string.field_notes_list_no_matches_title),
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        Text(
+            text = stringResource(R.string.field_notes_list_no_matches_description),
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        Button(
+            onClick = onClearCriteriaClick,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                text = stringResource(R.string.field_notes_list_no_matches_action),
+            )
+        }
+    }
 }
 
 @Composable
@@ -474,6 +524,7 @@ private fun FieldNotesListScreenPreview_NoFilterMatches_Dark() {
     GroundWorkTheme {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(
+                searchQuery = "Testing",
                 selectedStatus = FieldNoteStatus.DRAFT,
                 fieldNotes = emptyList(),
                 isLoading = false,
@@ -599,7 +650,9 @@ private fun ErrorStatePreview_Dark() {
 private fun NoMatchingFieldNotesStatePreview() {
     GroundWorkTheme {
         PreviewSurface {
-            NoMatchingFieldNotesState()
+            NoMatchingFieldNotesState(
+                onClearCriteriaClick = {},
+            )
         }
     }
 }
@@ -613,7 +666,9 @@ private fun NoMatchingFieldNotesStatePreview() {
 private fun NoMatchingFieldNotesStatePreview_Dark() {
     GroundWorkTheme {
         PreviewSurface {
-            NoMatchingFieldNotesState()
+            NoMatchingFieldNotesState(
+                onClearCriteriaClick = {},
+            )
         }
     }
 }
