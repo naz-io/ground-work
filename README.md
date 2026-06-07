@@ -66,16 +66,27 @@ Git tags are created only for stable checkpoints. The first tagged checkpoint is
 - Added discard flow for abandoning unsaved drafts without touching persisted data
 - Preserved `createdAt` when editing existing notes and updated `updatedAt` on save
 
-### v0.5 — Search and Filtering
+### v0.5 — Search, Filtering, and First Tests
+- Added status filtering for field notes using Material filter chips
+- Added search by field note title and body
+- Combined search query and status filter state in `FieldNotesViewModel`
+- Added no-match UI for active search/filter criteria
+- Added search UI polish, including leading search icon and clear-search action
+- Added preview coverage for content, loading, empty, error, no-match, and dark-mode states
+- Added mapper tests for `FieldNoteEntity` ↔ `FieldNote`
+- Added `FieldNotesListViewModel` tests for repository data, search, status filtering, combined search/filter behavior, body search, and error state
+- Updated Android build tooling and Gradle wrapper
+
+### v0.6 — Repository Tests and Editor ViewModel Tests
 - Not implemented yet
 
-### v0.6 — Job Sites
+### v0.7 — Job Sites
 - Not implemented yet
 
-### v0.7 — Sync Simulation
+### v0.8 — Sync Simulation
 - Not implemented yet
 
-### v0.8 — Conflict Handling
+### v0.9 — Conflict Handling
 - Not implemented yet
 
 ## MVP Scope
@@ -127,6 +138,10 @@ The first Compose screen separates the ViewModel-connected route from the statel
 
 `FieldNotesViewModel` observes `FieldNoteRepository` rather than reading from Room directly. This preserves the architecture boundary between UI and persistence and keeps the future sync implementation behind the repository contract.
 
+### ViewModel-level search and filtering
+
+Search and status filtering currently run in the list ViewModel over the observed local field notes. This keeps the first search/filter implementation simple, testable, and easy to combine with UI state. DAO-backed search or Room FTS can be introduced later if larger datasets make in-memory filtering inappropriate.
+
 ## What Works Now
 
 - Android project builds successfully
@@ -138,6 +153,10 @@ The first Compose screen separates the ViewModel-connected route from the statel
 - Hilt provides the database, DAO, and repository dependencies
 - `FieldNotesViewModel` observes the repository and exposes `StateFlow<FieldNotesUiState>`
 - `FieldNotesListScreen` renders loading, empty, error, and content states
+- Field notes can be searched by title and body
+- Field notes can be filtered by status
+- Search and status filters can be combined
+- No-match states are shown when active search/filter criteria return no results
 - `FieldNoteEditorScreen` supports creating and editing field notes
 - Field note cards can open existing notes for editing
 - New field notes can be saved locally and shown in the list
@@ -145,10 +164,13 @@ The first Compose screen separates the ViewModel-connected route from the statel
 - Existing field notes can be deleted from the editor
 - Unsaved drafts can be discarded without creating or deleting persisted field notes
 - Preview data reflects the field-operations product direction
+- Mapper tests cover `FieldNoteEntity` ↔ `FieldNote` conversion
+- `FieldNotesListViewModel` tests cover search, filtering, combined criteria, and error state behavior
 
 ## What Is Intentionally Not Built Yet
 
-- Search and filtering
+- Repository tests using an in-memory Room database
+- Editor ViewModel tests for create, edit, delete, and discard flows
 - Job/site management
 - Real sync
 - Sync status UI
@@ -160,19 +182,22 @@ The first Compose screen separates the ViewModel-connected route from the statel
 
 ## Testing Strategy
 
-Testing has not been added yet. Now that the create/edit/delete flow exists, the next testing pass should cover mapper behavior, repository behavior with an in-memory Room database, and ViewModel state transitions for create, edit, delete, and discard flows.
+Testing has started with local unit tests for mapper behavior and `FieldNotesListViewModel` search/filter state. The next testing pass should cover repository behavior with an in-memory Room database and editor ViewModel state transitions for create, edit, delete, and discard flows.
 
-Planned first tests:
+Implemented tests:
 - Mapper tests for `FieldNoteEntity` ↔ `FieldNote`
+- `FieldNotesListViewModel` tests for initial data, search, status filtering, combined search/filter criteria, body search, and error state
+
+Planned next tests:
 - Repository tests using an in-memory Room database
-- ViewModel tests for loading, empty, content, and error states
-- Basic UI tests after the create/edit flow exists
+- `FieldNoteEditorViewModel` tests for create, edit, delete, and discard flows
+- Basic Compose UI tests after core ViewModel/repository behavior is covered
 
 GitHub Actions will be added after these checks pass locally.
 
 ## Performance Notes
 
-Performance work is intentionally delayed until the app has a real list/edit/search flow to measure. Current UI uses stable item keys in `LazyColumn` through `FieldNoteId`, which prepares the list for better item identity as the dataset grows.
+Performance work is intentionally limited while the app is still small. Current UI uses stable item keys in `LazyColumn` through `FieldNoteId`, and search/filtering currently runs in the ViewModel over the observed local field notes. This is acceptable for the current local dataset size; Room FTS or DAO-backed search can be introduced later if the dataset grows enough to justify it.
 
 Future performance work may include:
 - Larger local datasets
@@ -183,34 +208,34 @@ Future performance work may include:
 
 ## Roadmap
 
-### v0.5 — Search and filtering
-- Search field notes
-- Filter by status
-- Empty search state
+### v0.6 — Repository tests and editor ViewModel tests
+- Add repository tests using an in-memory Room database
+- Add editor ViewModel tests for create, edit, delete, and discard flows
+- Add GitHub Actions after local checks are stable
 
-### v0.6 — Job sites
+### v0.7 — Job sites
 - Add `JobSite` model
 - Associate field notes with job sites
 - Job/site list and detail screen
 
-### v0.7 — Offline sync simulation
+### v0.8 — Offline sync simulation
 - Sync queue
 - Pending/failed/synced states
 - Manual retry
 - Fake remote source
 
-### v0.8 — Conflict handling
+### v0.9 — Conflict handling
 - Detect local/remote conflicts
 - Conflict resolution UI
 - Tests for conflict cases
 
-### v0.9 — Attachments and evidence
+### v1.0 — Attachments and evidence
 - Add attachment metadata
 - Local image URI handling
 - Permission handling
 - Storage tradeoffs
 
-### v1.0 — Dashboard and polish
+### v1.1 — Dashboard and polish
 - Operational dashboard
 - Sync summary
 - Performance pass
