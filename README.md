@@ -23,10 +23,11 @@ This project is designed to showcase:
 - Route/screen separation for previewable, stateless Compose UI
 - Scope control: sync, conflict resolution, job sites, and attachments are delayed until the local foundation is stable
 - A roadmap that grows complexity intentionally instead of adding features randomly
+- Local unit tests for mappers, DAOs, repositories, and ViewModels
 
 ## Current Progress
 
-Git tags are created only for stable checkpoints. The first tagged checkpoint is `v0.3.0`, representing the first end-to-end local architecture slice: Room → Repository → Hilt → ViewModel → Compose UI.
+Git tags are created only for stable checkpoints. The current checkpoint is `v0.6.0`, representing the local field notes foundation with create/edit/delete, search/filtering, DAO tests, repository tests, and ViewModel tests.
 
 ### v0.1 — Project Setup
 - Created Android project
@@ -77,8 +78,11 @@ Git tags are created only for stable checkpoints. The first tagged checkpoint is
 - Added `FieldNotesListViewModel` tests for repository data, search, status filtering, combined search/filter behavior, body search, and error state
 - Updated Android build tooling and Gradle wrapper
 
-### v0.6 — Repository Tests and Editor ViewModel Tests
-- Not implemented yet
+### v0.6 — Local Unit Tests
+- Added DAO tests for inserting, observing, loading, deleting, searching, and ordering field notes
+- Added in-memory Room database coverage for DAO and repository behavior
+- Added repository tests using an in-memory Room database
+- Added `FieldNoteEditorViewModel` tests for create, edit, delete, and discard flows
 
 ### v0.7 — Job Sites
 - Not implemented yet
@@ -142,6 +146,10 @@ The first Compose screen separates the ViewModel-connected route from the statel
 
 Search and status filtering currently run in the list ViewModel over the observed local field notes. This keeps the first search/filter implementation simple, testable, and easy to combine with UI state. DAO-backed search or Room FTS can be introduced later if larger datasets make in-memory filtering inappropriate.
 
+### Testable local foundation before sync
+
+DAO, repository, and ViewModel tests are added before sync simulation.
+
 ## What Works Now
 
 - Android project builds successfully
@@ -165,6 +173,7 @@ Search and status filtering currently run in the list ViewModel over the observe
 - Unsaved drafts can be discarded without creating or deleting persisted field notes
 - Preview data reflects the field-operations product direction
 - Mapper tests cover `FieldNoteEntity` ↔ `FieldNote` conversion
+- DAO tests cover local Room persistence, search, deletion, and ordering behavior
 - `FieldNotesListViewModel` tests cover search, filtering, combined criteria, and error state behavior
 
 ## What Is Intentionally Not Built Yet
@@ -182,10 +191,11 @@ Search and status filtering currently run in the list ViewModel over the observe
 
 ## Testing Strategy
 
-Testing has started with local unit tests for mapper behavior and `FieldNotesListViewModel` search/filter state. The next testing pass should cover repository behavior with an in-memory Room database and editor ViewModel state transitions for create, edit, delete, and discard flows.
+Testing currently covers the local field notes foundation at the mapper, DAO, repository, and ViewModel layers. The next testing pass should cover repository behavior with an in-memory Room database and editor ViewModel state transitions for create, edit, delete, and discard flows.
 
 Implemented tests:
 - Mapper tests for `FieldNoteEntity` ↔ `FieldNote`
+- DAO tests using an in-memory Room database
 - `FieldNotesListViewModel` tests for initial data, search, status filtering, combined search/filter criteria, body search, and error state
 
 Planned next tests:
@@ -204,7 +214,7 @@ Future performance work may include:
 - Recomposition checks
 - Search responsiveness
 - Baseline Profile setup
-- Macrobenchmark coverage for startup and list scrolling
+- Macro-benchmark coverage for startup and list scrolling
 
 ## Roadmap
 
