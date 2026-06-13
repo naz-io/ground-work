@@ -27,7 +27,7 @@ This project is designed to showcase:
 
 ## Current Progress
 
-Git tags are created only for stable checkpoints. The current checkpoint is `v0.6.0`, representing the local field notes foundation with create/edit/delete, search/filtering, DAO tests, repository tests, and ViewModel tests.
+Git tags are created only for stable checkpoints. The current checkpoint is `v0.6.1`, representing the local field notes foundation with create/edit/delete, search/filtering, DAO tests, repository tests, ViewModel tests, and CI workflow.
 
 ### v0.1 — Project Setup
 - Created Android project
@@ -83,6 +83,13 @@ Git tags are created only for stable checkpoints. The current checkpoint is `v0.
 - Added in-memory Room database coverage for DAO and repository behavior
 - Added repository tests using an in-memory Room database
 - Added `FieldNoteEditorViewModel` tests for create, edit, delete, and discard flows
+
+### v0.6.1 — CI and Test Workflow Polish
+- Added GitHub Actions workflow for Android CI
+- Added local unit test job for `testDebugUnitTest`
+- Added debug build job through `assembleDebug`
+- Added instrumented Android test job for `connectedDebugAndroidTest`
+- Verified DAO, repository, and ViewModel tests run in CI
 
 ### v0.7 — Job Sites
 - Not implemented yet
