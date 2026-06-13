@@ -7,8 +7,8 @@ on:
   pull_request:
 
 jobs:
-  build:
-    name: Build and test
+  unit-tests:
+    name: Unit tests and debug build
     runs-on: ubuntu-latest
 
     steps:
@@ -32,3 +32,32 @@ jobs:
 
       - name: Assemble debug build
         run: ./gradlew assembleDebug
+
+  android-tests:
+    name: Instrumented Android tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make Gradle executable
+        run: chmod +x ./gradlew
+
+      - name: Run instrumented tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          script: ./gradlew connectedDebugAndroidTest
