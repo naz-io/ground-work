@@ -3,9 +3,8 @@ package com.nabadi.groundwork.feature.fieldnotes
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.nabadi.groundwork.MainDispatcherRule
+import com.nabadi.groundwork.TestFieldNote.fieldNote
 import com.nabadi.groundwork.data.repository.FakeFieldNoteRepository
-import com.nabadi.groundwork.domain.model.FieldNote
-import com.nabadi.groundwork.domain.model.FieldNoteId
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -20,8 +19,8 @@ class FieldNotesListViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private lateinit var viewModel: FieldNotesListViewModel
     private val repository = FakeFieldNoteRepository()
+    private lateinit var viewModel: FieldNotesListViewModel
 
     @Before
     fun setup() {
@@ -31,8 +30,18 @@ class FieldNotesListViewModelTest {
     @Test
     fun `uiState initially emits data from repository`() = runTest {
         val fieldNotes = listOf(
-            createFieldNote("1", "Title 1", "Body 1", FieldNoteStatus.ACTIVE),
-            createFieldNote("2", "Title 2", "Body 2", FieldNoteStatus.ARCHIVED),
+            fieldNote(
+                id = "1",
+                title = "Title 1",
+                body = "Body 1",
+                status = FieldNoteStatus.ACTIVE
+            ),
+            fieldNote(
+                id = "2",
+                title = "Title 2",
+                body = "Body 2",
+                status = FieldNoteStatus.ARCHIVED
+            ),
         )
         repository.setFieldNotes(fieldNotes)
 
@@ -46,15 +55,25 @@ class FieldNotesListViewModelTest {
     @Test
     fun `onSearchQueryChange updates searchQuery and filters fieldNotes`() = runTest {
         val fieldNotes = listOf(
-            createFieldNote("1", "Apple", "Body 1", FieldNoteStatus.ACTIVE),
-            createFieldNote("2", "Banana", "Body 2", FieldNoteStatus.ACTIVE),
+            fieldNote(
+                id = "1",
+                title = "Apple",
+                body = "Body 1",
+                status = FieldNoteStatus.ACTIVE
+            ),
+            fieldNote(
+                id = "2",
+                title = "Banana",
+                body = "Body 2",
+                status = FieldNoteStatus.ACTIVE
+            ),
         )
         repository.setFieldNotes(fieldNotes)
 
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onSearchQueryChange("App")
+            viewModel.onSearchQueryChange(query = "App")
 
             val filteredState = awaitItem()
             assertEquals("App", filteredState.searchQuery)
@@ -66,15 +85,25 @@ class FieldNotesListViewModelTest {
     @Test
     fun `onStatusFilterChange updates selectedStatus and filters fieldNotes`() = runTest {
         val fieldNotes = listOf(
-            createFieldNote("1", "Title 1", "Body 1", FieldNoteStatus.ACTIVE),
-            createFieldNote("2", "Title 2", "Body 2", FieldNoteStatus.DRAFT),
+            fieldNote(
+                id = "1",
+                title = "Title 1",
+                body = "Body 1",
+                status = FieldNoteStatus.ACTIVE
+            ),
+            fieldNote(
+                id = "2",
+                title = "Title 2",
+                body = "Body 2",
+                status = FieldNoteStatus.DRAFT
+            ),
         )
         repository.setFieldNotes(fieldNotes)
 
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onStatusFilterChange(FieldNoteStatus.DRAFT)
+            viewModel.onStatusFilterChange(status = FieldNoteStatus.DRAFT)
 
             val filteredState = awaitItem()
             assertEquals(FieldNoteStatus.DRAFT, filteredState.selectedStatus)
@@ -86,19 +115,34 @@ class FieldNotesListViewModelTest {
     @Test
     fun `combined search and status filter works correctly`() = runTest {
         val notes = listOf(
-            createFieldNote("1", "Apple", "Body 1", FieldNoteStatus.ACTIVE),
-            createFieldNote("2", "Apple Pie", "Body 2", FieldNoteStatus.DRAFT),
-            createFieldNote("3", "Banana", "Body 3", FieldNoteStatus.ACTIVE),
+            fieldNote(
+                id = "1",
+                title = "Apple",
+                body = "Body 1",
+                status = FieldNoteStatus.ACTIVE
+            ),
+            fieldNote(
+                id = "2",
+                title = "Apple Pie",
+                body = "Body 2",
+                status = FieldNoteStatus.DRAFT
+            ),
+            fieldNote(
+                id = "3",
+                title = "Banana",
+                body = "Body 3",
+                status = FieldNoteStatus.ACTIVE
+            ),
         )
         repository.setFieldNotes(notes)
 
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onSearchQueryChange("Apple")
+            viewModel.onSearchQueryChange(query = "Apple")
             awaitItem()
 
-            viewModel.onStatusFilterChange(FieldNoteStatus.DRAFT)
+            viewModel.onStatusFilterChange(status = FieldNoteStatus.DRAFT)
             val finalState = awaitItem()
 
             assertEquals(1, finalState.fieldNotes.size)
@@ -112,13 +156,13 @@ class FieldNotesListViewModelTest {
     @Test
     fun `search query filters notes by body`() = runTest {
         val fieldNotes = listOf(
-            createFieldNote(
+            fieldNote(
                 id = "field-note-001",
                 title = "North gate safety check",
                 body = "Loose temporary fencing reported near the north access point.",
                 status = FieldNoteStatus.ACTIVE,
             ),
-            createFieldNote(
+            fieldNote(
                 id = "field-note-002",
                 title = "Pump room inspection",
                 body = "Pressure gauge needs follow-up.",
@@ -130,7 +174,7 @@ class FieldNotesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onSearchQueryChange("fencing")
+            viewModel.onSearchQueryChange(query = "fencing")
 
             val finalState = awaitItem()
 
@@ -167,18 +211,4 @@ class FieldNotesListViewModelTest {
         }
         return item
     }
-
-    private fun createFieldNote(
-        id: String,
-        title: String,
-        body: String,
-        status: FieldNoteStatus,
-    ) = FieldNote(
-        id = FieldNoteId(id),
-        title = title,
-        body = body,
-        status = status,
-        createdAt = 0L,
-        updatedAt = 0L,
-    )
 }

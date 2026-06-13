@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 
-class FakeFieldNoteRepository() : FieldNoteRepository {
+class FakeFieldNoteRepository : FieldNoteRepository {
 
     private val fieldNotesFlow = MutableStateFlow<Map<FieldNoteId, FieldNote>>(emptyMap())
     private var shouldThrowError = false
