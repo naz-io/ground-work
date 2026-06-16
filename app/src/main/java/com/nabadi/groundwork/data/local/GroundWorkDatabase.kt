@@ -4,10 +4,15 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [FieldNoteEntity::class],
+    entities = [
+        FieldNoteEntity::class,
+        JobSiteEntity::class
+    ],
     version = 1,
     exportSchema = true,
 )
 abstract class GroundWorkDatabase : RoomDatabase() {
     abstract fun fieldNoteDao(): FieldNoteDao
+
+    abstract fun jobSiteDao(): JobSiteDao
 }

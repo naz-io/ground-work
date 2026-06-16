@@ -2,6 +2,7 @@ package com.nabadi.groundwork.domain.model
 
 data class FieldNote(
     val id: FieldNoteId,
+    val jobSiteId: JobSiteId?,
     val title: String,
     val body: String,
     val status: FieldNoteStatus,

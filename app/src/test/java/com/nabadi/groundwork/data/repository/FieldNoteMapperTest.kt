@@ -4,6 +4,7 @@ import com.nabadi.groundwork.data.local.FieldNoteEntity
 import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
+import com.nabadi.groundwork.domain.model.JobSiteId
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -12,6 +13,7 @@ class FieldNoteMapperTest {
     fun `toDomain maps FieldNoteEntity to domain model`() {
         val entity = FieldNoteEntity(
             id = "field-note-001",
+            jobSiteId = "job-site-001",
             title = "North gate safety check",
             body = "Loose temporary fencing reported near the north access point.",
             status = "ACTIVE",
@@ -21,6 +23,7 @@ class FieldNoteMapperTest {
         val fieldNote = entity.toDomain()
 
         assertEquals(FieldNoteId("field-note-001"), fieldNote.id)
+        assertEquals(JobSiteId("job-site-001"), fieldNote.jobSiteId)
         assertEquals("North gate safety check", fieldNote.title)
         assertEquals(
             "Loose temporary fencing reported near the north access point.",
@@ -35,6 +38,7 @@ class FieldNoteMapperTest {
     fun `toEntity maps domain model to FieldNoteEntity`() {
         val fieldNote = FieldNote(
             id = FieldNoteId("field-note-001"),
+            jobSiteId = JobSiteId("job-site-001"),
             title = "North gate safety check",
             body = "Loose temporary fencing reported near the north access point.",
             status = FieldNoteStatus.ACTIVE,
@@ -45,6 +49,7 @@ class FieldNoteMapperTest {
         val entity = fieldNote.toEntity()
 
         assertEquals("field-note-001", entity.id)
+        assertEquals("job-site-001", entity.jobSiteId)
         assertEquals("North gate safety check", entity.title)
         assertEquals("Loose temporary fencing reported near the north access point.", entity.body)
         assertEquals("ACTIVE", entity.status)
@@ -56,6 +61,7 @@ class FieldNoteMapperTest {
     fun `toEntity maps archived status to entity status value`() {
         val fieldNote = FieldNote(
             id = FieldNoteId("field-note-002"),
+            jobSiteId = JobSiteId("job-site-002"),
             title = "Archived equipment note",
             body = "Resolved generator inspection note.",
             status = FieldNoteStatus.ARCHIVED,

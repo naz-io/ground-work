@@ -69,6 +69,7 @@ class FieldNoteEditorViewModel @Inject constructor(
                 fieldNoteRepository.saveFieldNote(
                     FieldNote(
                         id = existingNote?.id ?: FieldNoteId(UUID.randomUUID().toString()),
+                        jobSiteId = existingNote?.jobSiteId,
                         title = currentState.title.ifBlank { "Untitled field note" },
                         body = currentState.body,
                         status = existingNote?.status ?: FieldNoteStatus.ACTIVE,

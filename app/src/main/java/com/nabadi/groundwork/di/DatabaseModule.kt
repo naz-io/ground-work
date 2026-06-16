@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.nabadi.groundwork.data.local.FieldNoteDao
 import com.nabadi.groundwork.data.local.GroundWorkDatabase
+import com.nabadi.groundwork.data.local.JobSiteDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,13 +25,20 @@ object DatabaseModule {
             context = context,
             klass = GroundWorkDatabase::class.java,
             name = "groundwork.db"
-        ).build()
+        )
+            .build()
 
     @Provides
     fun provideFieldNoteDao(
         database: GroundWorkDatabase
     ): FieldNoteDao =
         database.fieldNoteDao()
+
+    @Provides
+    fun provideJobSiteDao(
+        database: GroundWorkDatabase
+    ): JobSiteDao =
+        database.jobSiteDao()
 }
 
 
