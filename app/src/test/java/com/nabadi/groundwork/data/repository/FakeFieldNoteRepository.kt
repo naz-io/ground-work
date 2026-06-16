@@ -2,6 +2,7 @@ package com.nabadi.groundwork.data.repository
 
 import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
+import com.nabadi.groundwork.domain.model.JobSiteId
 import com.nabadi.groundwork.domain.repository.FieldNoteRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,12 +14,27 @@ class FakeFieldNoteRepository : FieldNoteRepository {
     private val fieldNotesFlow = MutableStateFlow<Map<FieldNoteId, FieldNote>>(emptyMap())
     private var shouldThrowError = false
 
-    override fun observeFieldNotes(): Flow<List<FieldNote>> {
-        return fieldNotesFlow.map {
+    override fun observeFieldNotes(): Flow<List<FieldNote>> =
+        fieldNotesFlow.map { fieldNotes ->
             if (shouldThrowError) throw Exception("Test Error")
-            it.values.toList()
+            fieldNotes.values.sortedByDescending { it.updatedAt }
         }
-    }
+
+    override fun observeFieldNotesForJobSite(jobSiteId: JobSiteId): Flow<List<FieldNote>> =
+        fieldNotesFlow.map { fieldNotes ->
+            if (shouldThrowError) throw Exception("Test Error")
+            fieldNotes.values
+                .filter { it.jobSiteId == jobSiteId }
+                .sortedByDescending { it.updatedAt }
+        }
+
+    override fun observeUnassignedFieldNotes(): Flow<List<FieldNote>> =
+        fieldNotesFlow.map { fieldNotes ->
+            if (shouldThrowError) throw Exception("Test Error")
+            fieldNotes.values
+                .filter { it.jobSiteId == null }
+                .sortedByDescending { it.updatedAt }
+        }
 
     override suspend fun getFieldNote(id: FieldNoteId): FieldNote? {
         if (shouldThrowError) throw Exception("Test Error")
