@@ -4,12 +4,12 @@ import com.nabadi.groundwork.data.local.FieldNoteEntity
 import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
-import com.nabadi.groundwork.domain.model.JobSiteId
+import com.nabadi.groundwork.domain.model.SiteId
 
 fun FieldNoteEntity.toDomain(): FieldNote =
     FieldNote(
         id = FieldNoteId(id),
-        jobSiteId = jobSiteId?.let { JobSiteId(it) },
+        siteId = siteId?.let { SiteId(it) },
         title = title,
         body = body,
         status = FieldNoteStatus.valueOf(status),
@@ -20,7 +20,7 @@ fun FieldNoteEntity.toDomain(): FieldNote =
 fun FieldNote.toEntity(): FieldNoteEntity =
     FieldNoteEntity(
         id = id.value,
-        jobSiteId = jobSiteId?.value,
+        siteId = siteId?.value,
         title = title,
         body = body,
         status = status.name,

@@ -1,9 +1,9 @@
 package com.nabadi.groundwork.di
 
 import com.nabadi.groundwork.data.repository.OfflineFirstFieldNoteRepository
-import com.nabadi.groundwork.data.repository.OfflineFirstJobSiteRepository
+import com.nabadi.groundwork.data.repository.OfflineFirstSiteRepository
 import com.nabadi.groundwork.domain.repository.FieldNoteRepository
-import com.nabadi.groundwork.domain.repository.JobSiteRepository
+import com.nabadi.groundwork.domain.repository.SiteRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -22,7 +22,7 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindJobSiteRepository(
-        repository: OfflineFirstJobSiteRepository,
-    ): JobSiteRepository
+    abstract fun bindSiteRepository(
+        repository: OfflineFirstSiteRepository,
+    ): SiteRepository
 }

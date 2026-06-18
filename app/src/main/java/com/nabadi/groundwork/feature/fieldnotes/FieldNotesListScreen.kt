@@ -42,7 +42,7 @@ import com.nabadi.groundwork.R
 import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
-import com.nabadi.groundwork.domain.model.JobSiteId
+import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.ui.theme.GroundWorkTheme
 
 @Composable
@@ -711,7 +711,7 @@ private val previewFieldNotes = listOf(
     FieldNote(
         id = FieldNoteId("field-note-001"),
         title = "North gate safety check",
-        jobSiteId = JobSiteId("job-site-north-warehouse"),
+        siteId = SiteId("site-north-warehouse"),
         body = "Loose temporary fencing reported near the north access point. Needs follow-up before the evening shift.",
         status = FieldNoteStatus.ACTIVE,
         createdAt = 1_734_220_800_000L,
@@ -719,7 +719,7 @@ private val previewFieldNotes = listOf(
     ),
     FieldNote(
         id = FieldNoteId("field-note-002"),
-        jobSiteId = JobSiteId("job-site-east-trailer"),
+        siteId = SiteId("site-east-trailer"),
         title = "Generator maintenance log",
         body = "Fuel level checked. Backup generator started successfully during manual test. Next inspection due tomorrow morning.",
         status = FieldNoteStatus.DRAFT,
@@ -728,7 +728,7 @@ private val previewFieldNotes = listOf(
     ),
     FieldNote(
         id = FieldNoteId("field-note-003"),
-        jobSiteId = null,
+        siteId = null,
         title = "",
         body = "Material delivery arrived without the updated packing list. Confirm quantities before marking the delivery as accepted.",
         status = FieldNoteStatus.ACTIVE,
@@ -737,7 +737,7 @@ private val previewFieldNotes = listOf(
     ),
     FieldNote(
         id = FieldNoteId("field-note-004"),
-        jobSiteId = JobSiteId("job-site-west-corridor"),
+        siteId = SiteId("site-west-corridor"),
         title = "Water damage photo review",
         body = "Initial inspection complete. Evidence photos should be attached once local attachment support is implemented.",
         status = FieldNoteStatus.ARCHIVED,
@@ -746,7 +746,7 @@ private val previewFieldNotes = listOf(
     ),
     FieldNote(
         id = FieldNoteId("field-note-005"),
-        jobSiteId = JobSiteId("job-site-south-stairwell"),
+        siteId = SiteId("site-south-stairwell"),
         title = "South stairwell lighting issue",
         body = "Two bulbs are out on the second landing. Visibility is poor after sunset and should be fixed before night operations.",
         status = FieldNoteStatus.ACTIVE,
@@ -755,7 +755,7 @@ private val previewFieldNotes = listOf(
     ),
     FieldNote(
         id = FieldNoteId("field-note-006"),
-        jobSiteId = JobSiteId("job-site-loading-bay"),
+        siteId = SiteId("site-loading-bay"),
         title = "Cracked concrete near loading bay",
         body = "Surface crack observed near bay three. No immediate trip hazard, but the area should be monitored after the next freeze-thaw cycle.",
         status = FieldNoteStatus.ACTIVE,
@@ -764,7 +764,7 @@ private val previewFieldNotes = listOf(
     ),
     FieldNote(
         id = FieldNoteId("field-note-007"),
-        jobSiteId = null,
+        siteId = null,
         title = "Incomplete toolbox talk record",
         body = "Morning crew completed the safety briefing, but the attendance sheet is missing two signatures. Follow up with the site supervisor.",
         status = FieldNoteStatus.DRAFT,
@@ -773,7 +773,7 @@ private val previewFieldNotes = listOf(
     ),
     FieldNote(
         id = FieldNoteId("field-note-008"),
-        jobSiteId = JobSiteId("job-site-west-fence"),
+        siteId = SiteId("site-west-fence"),
         title = "Temporary drainage channel",
         body = "Drainage channel is working after yesterday's rainfall. Minor pooling remains beside the west fence line.",
         status = FieldNoteStatus.ACTIVE,
@@ -782,7 +782,7 @@ private val previewFieldNotes = listOf(
     ),
     FieldNote(
         id = FieldNoteId("field-note-009"),
-        jobSiteId = null,
+        siteId = null,
         title = "Noise complaint follow-up",
         body = "Neighbouring property reported early morning equipment noise. Confirmed work began within permitted hours, but crew was reminded to avoid unnecessary idling.",
         status = FieldNoteStatus.ARCHIVED,
@@ -791,16 +791,16 @@ private val previewFieldNotes = listOf(
     ),
     FieldNote(
         id = FieldNoteId("field-note-010"),
+        siteId = SiteId("site-east-trailer"),
         title = "PPE storage cabinet",
         body = "Gloves and safety glasses are running low in the east trailer. Restock before the next full crew shift.",
         status = FieldNoteStatus.ACTIVE,
         createdAt = 1_733_522_400_000L,
         updatedAt = 1_733_526_000_000L,
-        jobSiteId = JobSiteId("job-site-east-trailer"),
     ),
     FieldNote(
         id = FieldNoteId("field-note-011"),
-        jobSiteId = null,
+        siteId = null,
         title = "",
         body = "Short note with no title to verify the fallback title renders correctly inside a long scrolling list.",
         status = FieldNoteStatus.DRAFT,
@@ -809,7 +809,7 @@ private val previewFieldNotes = listOf(
     ),
     FieldNote(
         id = FieldNoteId("field-note-012"),
-        jobSiteId = JobSiteId("job-site-main-lobby"),
+        siteId = SiteId("site-main-lobby"),
         title = "Elevator access delay",
         body = "Service elevator was unavailable for approximately twenty minutes while another contractor moved equipment. No work was blocked, but schedule impact should be tracked.",
         status = FieldNoteStatus.ACTIVE,
@@ -818,7 +818,7 @@ private val previewFieldNotes = listOf(
     ),
     FieldNote(
         id = FieldNoteId("field-note-013"),
-        jobSiteId = null,
+        siteId = null,
         title = "Paint sample approval",
         body = "Client approved the warmer grey sample for the corridor walls. Update finish schedule before procurement.",
         status = FieldNoteStatus.ARCHIVED,
@@ -827,7 +827,7 @@ private val previewFieldNotes = listOf(
     ),
     FieldNote(
         id = FieldNoteId("field-note-014"),
-        jobSiteId = JobSiteId("job-site-west-corridor"),
+        siteId = SiteId("site-west-corridor"),
         title = "Very long observation title for west corridor temporary access, loose floor protection, fallen caution signage, and cable routing review",
         body = "This note intentionally has a longer body to test how the card handles multiple lines of field text. The west corridor had several small issues: protective floor covering was loose near the entrance, one caution sign had fallen behind stored materials, and the temporary lighting cable crossed too close to the pedestrian route. None of these items stopped work, but they should be corrected before the next inspection round. This body should wrap across several lines in the preview so the card can be checked for spacing, readability, vertical rhythm, and whether the status label still feels attached to the note rather than floating too far away from the main content.",
         status = FieldNoteStatus.ACTIVE,
@@ -836,7 +836,7 @@ private val previewFieldNotes = listOf(
     ),
     FieldNote(
         id = FieldNoteId("field-note-015"),
-        jobSiteId = null,
+        siteId = null,
         title = "Missing label on chemical container",
         body = "Unlabelled container found in the storage area. It has been isolated until contents are confirmed and proper labelling is added.",
         status = FieldNoteStatus.ACTIVE,
@@ -845,7 +845,7 @@ private val previewFieldNotes = listOf(
     ),
     FieldNote(
         id = FieldNoteId("field-note-016"),
-        jobSiteId = JobSiteId("job-site-parking-lot"),
+        siteId = SiteId("site-parking-lot"),
         title = "Parking lot ice patch",
         body = "Small ice patch observed near the employee entrance. Salt applied at 8:15 AM. Recheck before lunch.",
         status = FieldNoteStatus.ARCHIVED,
@@ -854,7 +854,7 @@ private val previewFieldNotes = listOf(
     ),
     FieldNote(
         id = FieldNoteId("field-note-017"),
-        jobSiteId = null,
+        siteId = null,
         title = "Draft note for follow-up call with supplier about delayed replacement parts, temporary heating unit availability, and revised delivery timing",
         body = "Need to call supplier about delayed replacement parts for the temporary heating unit. Ask whether the replacement control module is already in transit, whether there is an alternative compatible part in local inventory, and whether the revised delivery window affects weekend work. Also confirm who is responsible for notifying the night crew if temporary heat is still unavailable by Friday afternoon.",
         status = FieldNoteStatus.DRAFT,
@@ -863,7 +863,7 @@ private val previewFieldNotes = listOf(
     ),
     FieldNote(
         id = FieldNoteId("field-note-018"),
-        jobSiteId = JobSiteId("job-site-east-entrance"),
+        siteId = SiteId("site-east-entrance"),
         title = "Inspection route changed",
         body = "Started inspection from the east entrance instead of the main lobby because of active material movement near reception.",
         status = FieldNoteStatus.ACTIVE,
@@ -872,7 +872,7 @@ private val previewFieldNotes = listOf(
     ),
     FieldNote(
         id = FieldNoteId("field-note-019"),
-        jobSiteId = null,
+        siteId = null,
         title = "Old scaffold tag removed",
         body = "Expired scaffold tag removed and replaced after inspection. Crew notified that only the updated tagged access point should be used.",
         status = FieldNoteStatus.ARCHIVED,
@@ -881,7 +881,7 @@ private val previewFieldNotes = listOf(
     ),
     FieldNote(
         id = FieldNoteId("field-note-020"),
-        jobSiteId = JobSiteId("job-site-mechanical-room"),
+        siteId = SiteId("site-mechanical-room"),
         title = "Final cleanup reminder for mechanical room floor before site handoff",
         body = "Before leaving site, confirm that loose fasteners, packaging, and offcuts are removed from the mechanical room floor. Check under the temporary workbench, behind the stacked duct sections, around the west wall conduit run, and beside the storage cabinet where small metal pieces tend to collect. This is intentionally verbose preview content to test how the last item behaves near the floating action button and whether enough bottom padding exists when the final card has a tall body.",
         status = FieldNoteStatus.ACTIVE,
@@ -890,7 +890,7 @@ private val previewFieldNotes = listOf(
     ),
     FieldNote(
         id = FieldNoteId("field-note-021"),
-        jobSiteId = null,
+        siteId = null,
         title = "Extremely long archived note title used only for Compose preview stress testing when a real field note title becomes much longer than expected",
         body = "Archived inspection record kept for visual regression testing. The title is intentionally too long because real users do not respect ideal UI constraints. This preview helps verify that the card still looks acceptable when the title wraps to two or three lines, the body also wraps, and the status label remains readable without awkward clipping or crowded spacing.",
         status = FieldNoteStatus.ARCHIVED,
@@ -899,7 +899,7 @@ private val previewFieldNotes = listOf(
     ),
     FieldNote(
         id = FieldNoteId("field-note-022"),
-        jobSiteId = null,
+        siteId = null,
         title = "",
         body = "This is a very long body attached to an empty title. It exists to test the untitled fallback together with a large amount of body text. The note should still show the fallback title clearly, and the long paragraph below it should not make the fallback feel like an accidental label. If this looks bad, the card probably needs stronger title styling, a status chip, or a more deliberate content hierarchy.",
         status = FieldNoteStatus.DRAFT,

@@ -1,9 +1,9 @@
-package com.nabadi.groundwork.feature.jobsites
+package com.nabadi.groundwork.feature.sites
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nabadi.groundwork.domain.model.JobSitePriority
-import com.nabadi.groundwork.domain.model.JobSiteStatus
-import com.nabadi.groundwork.domain.repository.JobSiteRepository
+import com.nabadi.groundwork.domain.model.SitePriority
+import com.nabadi.groundwork.domain.model.SiteStatus
+import com.nabadi.groundwork.domain.repository.SiteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -14,65 +14,65 @@ import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
-class JobSitesListViewModel @Inject constructor(
-    jobSiteRepository: JobSiteRepository,
+class SitesListViewModel @Inject constructor(
+    siteRepository: SiteRepository,
 ) : ViewModel() {
     private val searchQuery = MutableStateFlow("")
-    private val selectedStatus = MutableStateFlow<JobSiteStatus?>(null)
-    private val selectedPriority = MutableStateFlow<JobSitePriority?>(null)
+    private val selectedStatus = MutableStateFlow<SiteStatus?>(null)
+    private val selectedPriority = MutableStateFlow<SitePriority?>(null)
 
-    val uiState: StateFlow<JobSitesListUiState> =
+    val uiState: StateFlow<SitesListUiState> =
         combine(
-            jobSiteRepository.observeJobSites(),
+            siteRepository.observeSites(),
             searchQuery,
             selectedStatus,
             selectedPriority,
-        ) { jobSites, searchQuery, selectedStatus, selectedPriority ->
+        ) { sites, searchQuery, selectedStatus, selectedPriority ->
             val normalizedSearchQuery = searchQuery.trim()
-            val filteredJobSites = jobSites.filter { jobSite ->
-                val matchesStatus = selectedStatus == null || jobSite.status == selectedStatus
+            val filteredSites = sites.filter { site ->
+                val matchesStatus = selectedStatus == null || site.status == selectedStatus
                 val matchesPriority =
-                    selectedPriority == null || jobSite.priority == selectedPriority
+                    selectedPriority == null || site.priority == selectedPriority
                 val matchesSearchQuery = normalizedSearchQuery.isBlank() ||
-                        jobSite.name.contains(normalizedSearchQuery, ignoreCase = true) ||
-                        jobSite.description.contains(normalizedSearchQuery, ignoreCase = true) ||
-                        jobSite.location.contains(normalizedSearchQuery, ignoreCase = true)
+                        site.name.contains(normalizedSearchQuery, ignoreCase = true) ||
+                        site.description.contains(normalizedSearchQuery, ignoreCase = true) ||
+                        site.location.contains(normalizedSearchQuery, ignoreCase = true)
 
                 matchesStatus && matchesPriority && matchesSearchQuery
             }
 
-            JobSitesListUiState(
+            SitesListUiState(
                 isLoading = false,
                 searchQuery = searchQuery,
                 selectedStatus = selectedStatus,
                 selectedPriority = selectedPriority,
-                jobSites = filteredJobSites,
+                sites = filteredSites,
             )
         }.catch {
             emit(
-                JobSitesListUiState(
+                SitesListUiState(
                     isLoading = false,
                     searchQuery = searchQuery.value,
                     selectedStatus = selectedStatus.value,
                     selectedPriority = selectedPriority.value,
-                    errorMessage = "Unable to load job sites.",
+                    errorMessage = "Unable to load sites.",
                 )
             )
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
-            initialValue = JobSitesListUiState(),
+            initialValue = SitesListUiState(),
         )
 
     fun onSearchQueryChange(query: String) {
         searchQuery.value = query
     }
 
-    fun onStatusFilterChange(status: JobSiteStatus?) {
+    fun onStatusFilterChange(status: SiteStatus?) {
         selectedStatus.value = status
     }
 
-    fun onPriorityFilterChange(priority: JobSitePriority?) {
+    fun onPriorityFilterChange(priority: SitePriority?) {
         selectedPriority.value = priority
     }
 

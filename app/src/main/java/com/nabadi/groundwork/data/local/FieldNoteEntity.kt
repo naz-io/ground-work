@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "field_notes")
 data class FieldNoteEntity(
     @PrimaryKey val id: String,
-    val jobSiteId: String?,
+    val siteId: String?,
     val title: String,
     val body: String,
     val status: String,

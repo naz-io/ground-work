@@ -3,8 +3,8 @@ package com.nabadi.groundwork.data.local
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "job_sites")
-data class JobSiteEntity(
+@Entity(tableName = "sites")
+data class SiteEntity(
     @PrimaryKey val id: String,
     val name: String,
     val description: String,

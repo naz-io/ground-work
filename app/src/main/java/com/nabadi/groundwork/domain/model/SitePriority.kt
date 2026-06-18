@@ -1,6 +1,6 @@
 package com.nabadi.groundwork.domain.model
 
-enum class JobSitePriority {
+enum class SitePriority {
     LOW,
     NORMAL,
     HIGH,

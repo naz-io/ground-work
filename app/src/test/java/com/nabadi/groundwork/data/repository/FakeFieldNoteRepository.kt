@@ -2,7 +2,7 @@ package com.nabadi.groundwork.data.repository
 
 import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
-import com.nabadi.groundwork.domain.model.JobSiteId
+import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.repository.FieldNoteRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,11 +20,11 @@ class FakeFieldNoteRepository : FieldNoteRepository {
             fieldNotes.values.sortedByDescending { it.updatedAt }
         }
 
-    override fun observeFieldNotesForJobSite(jobSiteId: JobSiteId): Flow<List<FieldNote>> =
+    override fun observeFieldNotesForSite(siteId: SiteId): Flow<List<FieldNote>> =
         fieldNotesFlow.map { fieldNotes ->
             if (shouldThrowError) throw Exception("Test Error")
             fieldNotes.values
-                .filter { it.jobSiteId == jobSiteId }
+                .filter { it.siteId == siteId }
                 .sortedByDescending { it.updatedAt }
         }
 
@@ -32,7 +32,7 @@ class FakeFieldNoteRepository : FieldNoteRepository {
         fieldNotesFlow.map { fieldNotes ->
             if (shouldThrowError) throw Exception("Test Error")
             fieldNotes.values
-                .filter { it.jobSiteId == null }
+                .filter { it.siteId == null }
                 .sortedByDescending { it.updatedAt }
         }
 

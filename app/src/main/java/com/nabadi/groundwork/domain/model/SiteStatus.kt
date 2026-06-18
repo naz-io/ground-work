@@ -1,6 +1,6 @@
 package com.nabadi.groundwork.domain.model
 
-enum class JobSiteStatus {
+enum class SiteStatus {
     ACTIVE,
     COMPLETED,
     ARCHIVED,

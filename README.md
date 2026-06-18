@@ -2,7 +2,7 @@
 
 GroundWork is an offline-first Android app for field operations teams working in low-connectivity environments.
 
-The long-term product direction includes job/site management, field notes, reports, local sync visibility, and conflict-aware offline workflows. The current implementation intentionally starts smaller: a local-first field notes foundation.
+The long-term product direction includes site management, field notes, reports, local sync visibility, and conflict-aware offline workflows. The current implementation intentionally starts smaller: a local-first field notes foundation.
 
 ## Project Goal
 
@@ -10,7 +10,7 @@ The goal of this project is not to build another generic notes app. The goal is 
 
 The first version focuses on getting the local foundation right: creating, editing, deleting, listing, and searching field notes using a clean Compose UI, a Room-backed data layer, ViewModel-managed state, and a repository contract between the domain and data layers.
 
-Future versions will extend this foundation with job/site management, sync simulation, retry handling, conflict resolution, attachments, and performance/testing work. These are intentionally delayed until the local model and state flow are stable.
+Future versions will extend this foundation with site management, sync simulation, retry handling, conflict resolution, attachments, and performance/testing work. These are intentionally delayed until the local model and state flow are stable.
 
 ## Seniority Signals
 
@@ -21,7 +21,7 @@ This project is designed to showcase:
 - Explicit UI state modeling with ViewModels and Compose
 - Repository-driven data access instead of direct database access from UI
 - Route/screen separation for previewable, stateless Compose UI
-- Scope control: sync, conflict resolution, job sites, and attachments are delayed until the local foundation is stable
+- Scope control: sync, conflict resolution, sites, and attachments are delayed until the local foundation is stable
 - A roadmap that grows complexity intentionally instead of adding features randomly
 - Local unit tests for mappers, DAOs, repositories, and ViewModels
 
@@ -91,7 +91,7 @@ Git tags are created only for stable checkpoints. The current checkpoint is `v0.
 - Added instrumented Android test job for `connectedDebugAndroidTest`
 - Verified DAO, repository, and ViewModel tests run in CI
 
-### v0.7 — Job Sites
+### v0.7 — Sites
 - Not implemented yet
 
 ### v0.8 — Sync Simulation
@@ -108,7 +108,7 @@ Git tags are created only for stable checkpoints. The current checkpoint is `v0.
 - Model UI state explicitly in ViewModels
 - Keep composables mostly stateless
 - Keep Room entities separate from domain models
-- Build architecture that can support job sites and sync later
+- Build architecture that can support sites and sync later
 
 ### Out of scope for v1
 - Real backend
@@ -135,11 +135,11 @@ The app starts with a small domain model before introducing Room or UI implement
 
 Even before sync exists, Room is treated as the durable source for app data. The UI reads app state through repositories and ViewModels rather than directly from the database.
 
-### Field notes before job sites
+### Field notes before sites
 
-Field notes are the smallest useful slice of the larger GroundWork concept. They allow the project to demonstrate local persistence, editing flows, list/detail UI, search, and state handling without prematurely introducing job/site modeling, backend sync, GPS, maps, or media attachments.
+Field notes are the smallest useful slice of the larger GroundWork concept. They allow the project to demonstrate local persistence, editing flows, list/detail UI, search, and state handling without prematurely introducing site modeling, backend sync, GPS, maps, or media attachments.
 
-The app is structured so field notes can later belong to job sites and participate in sync workflows.
+The app is structured so field notes can later belong to sites and participate in sync workflows.
 
 ### Route and screen separation
 
@@ -187,7 +187,7 @@ DAO, repository, and ViewModel tests are added before sync simulation.
 
 - Repository tests using an in-memory Room database
 - Editor ViewModel tests for create, edit, delete, and discard flows
-- Job/site management
+- Site management
 - Real sync
 - Sync status UI
 - Conflict resolution
@@ -230,10 +230,10 @@ Future performance work may include:
 - Add editor ViewModel tests for create, edit, delete, and discard flows
 - Add GitHub Actions after local checks are stable
 
-### v0.7 — Job sites
-- Add `JobSite` model
-- Associate field notes with job sites
-- Job/site list and detail screen
+### v0.7 — Sites
+- Add `Site` model
+- Associate field notes with sites
+- Site list and detail screen
 
 ### v0.8 — Offline sync simulation
 - Sync queue
@@ -264,9 +264,9 @@ Future performance work may include:
 
 Sync is a major part of the long-term app direction, but it is intentionally delayed. The first priority is to make the local source of truth, repository boundary, and UI state flow correct before introducing remote state, retries, or conflict handling.
 
-### Delaying job sites
+### Delaying sites
 
-Job sites are part of the final product direction, but field notes are implemented first because they are the smallest useful slice of the app. This avoids building a large domain model before the basic local workflow is proven.
+Sites are part of the final product direction, but field notes are implemented first because they are the smallest useful slice of the app. This avoids building a large domain model before the basic local workflow is proven.
 
 ### Avoiding premature modularization
 

@@ -10,10 +10,10 @@ interface FieldNoteDao {
     @Query("SELECT * FROM field_notes ORDER BY updatedAt DESC")
     fun observeFieldNotes(): Flow<List<FieldNoteEntity>>
 
-    @Query("SELECT * FROM field_notes WHERE jobSiteId = :jobSiteId ORDER BY updatedAt DESC")
-    fun observeFieldNotesForJobSite(jobSiteId: String): Flow<List<FieldNoteEntity>>
+    @Query("SELECT * FROM field_notes WHERE siteId = :siteId ORDER BY updatedAt DESC")
+    fun observeFieldNotesForSite(siteId: String): Flow<List<FieldNoteEntity>>
 
-    @Query("SELECT * FROM field_notes WHERE jobSiteId IS NULL ORDER BY updatedAt DESC")
+    @Query("SELECT * FROM field_notes WHERE siteId IS NULL ORDER BY updatedAt DESC")
     fun observeUnassignedFieldNotes(): Flow<List<FieldNoteEntity>>
 
     @Query("SELECT * FROM field_notes WHERE id = :id")

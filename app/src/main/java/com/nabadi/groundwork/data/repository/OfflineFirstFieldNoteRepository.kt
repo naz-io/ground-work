@@ -4,7 +4,7 @@ import com.nabadi.groundwork.data.local.FieldNoteDao
 import com.nabadi.groundwork.data.local.FieldNoteEntity
 import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
-import com.nabadi.groundwork.domain.model.JobSiteId
+import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.repository.FieldNoteRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -18,8 +18,8 @@ class OfflineFirstFieldNoteRepository @Inject constructor(
         fieldNoteDao.observeFieldNotes()
             .toDomainFlow()
 
-    override fun observeFieldNotesForJobSite(jobSiteId: JobSiteId): Flow<List<FieldNote>> =
-        fieldNoteDao.observeFieldNotesForJobSite(jobSiteId.value)
+    override fun observeFieldNotesForSite(siteId: SiteId): Flow<List<FieldNote>> =
+        fieldNoteDao.observeFieldNotesForSite(siteId.value)
             .toDomainFlow()
 
     override fun observeUnassignedFieldNotes(): Flow<List<FieldNote>> =
