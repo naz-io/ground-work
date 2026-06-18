@@ -17,12 +17,6 @@ class OfflineFirstJobSiteRepository @Inject constructor(
     override fun observeJobSites(): Flow<List<JobSite>> =
         jobSiteDao.observeJobSites().toDomainFlow()
 
-    override fun observeJobSitesByStatus(status: JobSiteStatus): Flow<List<JobSite>> =
-        jobSiteDao.observeJobSitesByStatus(status.name).toDomainFlow()
-
-    override fun observeJobSitesByPriority(priority: JobSitePriority): Flow<List<JobSite>> =
-        jobSiteDao.observeJobSitesByPriority(priority.name).toDomainFlow()
-
     override suspend fun getJobSite(id: JobSiteId): JobSite? =
         jobSiteDao.getJobSite(id.value)?.toDomain()
 

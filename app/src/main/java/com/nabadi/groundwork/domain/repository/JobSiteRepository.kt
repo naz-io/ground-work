@@ -9,10 +9,6 @@ import kotlinx.coroutines.flow.Flow
 interface JobSiteRepository {
     fun observeJobSites(): Flow<List<JobSite>>
 
-    fun observeJobSitesByStatus(status: JobSiteStatus): Flow<List<JobSite>>
-
-    fun observeJobSitesByPriority(priority: JobSitePriority): Flow<List<JobSite>>
-
     suspend fun getJobSite(id: JobSiteId): JobSite?
 
     suspend fun saveJobSite(jobSite: JobSite)

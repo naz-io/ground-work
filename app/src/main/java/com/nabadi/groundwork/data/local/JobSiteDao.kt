@@ -10,12 +10,6 @@ interface JobSiteDao {
     @Query("SELECT * FROM job_sites ORDER BY updatedAt DESC")
     fun observeJobSites(): Flow<List<JobSiteEntity>>
 
-    @Query("SELECT * FROM job_sites WHERE status = :status ORDER BY updatedAt DESC")
-    fun observeJobSitesByStatus(status: String): Flow<List<JobSiteEntity>>
-
-    @Query("SELECT * FROM job_sites WHERE priority = :priority ORDER BY updatedAt DESC")
-    fun observeJobSitesByPriority(priority: String): Flow<List<JobSiteEntity>>
-
     @Query("SELECT * FROM job_sites WHERE id = :id")
     suspend fun getJobSite(id: String): JobSiteEntity?
 
