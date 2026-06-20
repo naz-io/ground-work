@@ -57,14 +57,18 @@ fun SitesListScreen(
     onAddSiteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val shouldShowAddButton = !uiState.isLoading && !uiState.isError
+
     Scaffold(
         modifier = modifier,
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddSiteClick) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = stringResource(R.string.sites_list_add_content_description),
-                )
+            if (shouldShowAddButton) {
+                FloatingActionButton(onClick = onAddSiteClick) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = stringResource(R.string.sites_list_add_content_description),
+                    )
+                }
             }
         },
     ) { paddingValues ->
@@ -93,7 +97,7 @@ fun SitesListScreen(
                         ErrorState(errorMessage = stringResource(R.string.sites_list_error, it))
                     }
 
-                    uiState.sites.isEmpty() -> EmptySitesState()
+                    uiState.isEmpty -> EmptySitesState()
                     else -> SitesContent(
                         sites = uiState.sites,
                         onOpenSiteClick = onOpenSiteClick,
@@ -435,6 +439,55 @@ private fun Long.relativeTimeLabel(nowMillis: Long = System.currentTimeMillis())
 private const val PREVIEW_API_LEVEL = 35
 
 @Preview(
+    name = "Content",
+    showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
+)
+@Composable
+fun SitesListScreenPreview_Content() {
+    GroundWorkTheme {
+        SitesListScreen(
+            uiState = SitesListUiState(
+                isLoading = false,
+                sites = previewSites,
+            ),
+            onSearchQueryChange = {},
+            onStatusFilterChange = {},
+            onPriorityFilterChange = {},
+            onClearCriteriaClick = {},
+            onOpenSiteClick = {},
+            onEditSiteClick = {},
+            onAddSiteClick = {},
+        )
+    }
+}
+
+@Preview(
+    name = "Content - Dark Mode",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    apiLevel = PREVIEW_API_LEVEL,
+)
+@Composable
+fun SitesListScreenPreview_Content_Dark() {
+    GroundWorkTheme {
+        SitesListScreen(
+            uiState = SitesListUiState(
+                isLoading = false,
+                sites = previewSites,
+            ),
+            onSearchQueryChange = {},
+            onStatusFilterChange = {},
+            onPriorityFilterChange = {},
+            onClearCriteriaClick = {},
+            onOpenSiteClick = {},
+            onEditSiteClick = {},
+            onAddSiteClick = {},
+        )
+    }
+}
+
+@Preview(
     name = "Loading",
     showBackground = true,
     apiLevel = PREVIEW_API_LEVEL,
@@ -563,55 +616,6 @@ fun SitesListScreenPreview_Error_Dark() {
             uiState = SitesListUiState(
                 isLoading = false,
                 errorMessage = "Could not load sites.",
-            ),
-            onSearchQueryChange = {},
-            onStatusFilterChange = {},
-            onPriorityFilterChange = {},
-            onClearCriteriaClick = {},
-            onOpenSiteClick = {},
-            onEditSiteClick = {},
-            onAddSiteClick = {},
-        )
-    }
-}
-
-@Preview(
-    name = "Content",
-    showBackground = true,
-    apiLevel = PREVIEW_API_LEVEL,
-)
-@Composable
-fun SitesListScreenPreview_Content() {
-    GroundWorkTheme {
-        SitesListScreen(
-            uiState = SitesListUiState(
-                isLoading = false,
-                sites = previewSites,
-            ),
-            onSearchQueryChange = {},
-            onStatusFilterChange = {},
-            onPriorityFilterChange = {},
-            onClearCriteriaClick = {},
-            onOpenSiteClick = {},
-            onEditSiteClick = {},
-            onAddSiteClick = {},
-        )
-    }
-}
-
-@Preview(
-    name = "Content - Dark Mode",
-    showBackground = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    apiLevel = PREVIEW_API_LEVEL,
-)
-@Composable
-fun SitesListScreenPreview_Content_Dark() {
-    GroundWorkTheme {
-        SitesListScreen(
-            uiState = SitesListUiState(
-                isLoading = false,
-                sites = previewSites,
             ),
             onSearchQueryChange = {},
             onStatusFilterChange = {},
