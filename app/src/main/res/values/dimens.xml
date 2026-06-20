@@ -12,6 +12,18 @@
     <!-- Cards -->
     <dimen name="padding_card_content">16dp</dimen>
     <dimen name="spacing_card_content">4dp</dimen>
+    <dimen name="border_card_strong">2dp</dimen>
+
+    <!-- Card metadata -->
+    <dimen name="padding_card_metadata_vertical">12dp</dimen>
+    <dimen name="spacing_metadata_item">16dp</dimen>
+
+    <!-- Icons -->
+    <dimen name="padding_trailing_action_end">4dp</dimen>
+    <dimen name="spacing_icon_text">4dp</dimen>
+    <dimen name="spacing_chip">8dp</dimen>
+    <dimen name="size_icon_small">16dp</dimen>
+    <dimen name="size_icon_action_touch_target">48dp</dimen>
 
     <!-- Forms -->
     <dimen name="spacing_form_section">24dp</dimen>

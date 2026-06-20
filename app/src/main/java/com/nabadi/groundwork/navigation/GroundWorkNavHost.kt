@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.nabadi.groundwork.feature.fieldnotes.FieldNoteEditorRoute
 import com.nabadi.groundwork.feature.fieldnotes.FieldNotesListRoute
+import com.nabadi.groundwork.feature.sites.SitesListRoute
 
 @Composable
 fun GroundWorkNavHost(modifier: Modifier = Modifier) {
@@ -44,6 +45,13 @@ fun GroundWorkNavHost(modifier: Modifier = Modifier) {
                 onEditorFinished = {
                     navController.popBackStack()
                 },
+            )
+        }
+
+        composable(route = GroundWorkRoute.SITES_LIST) {
+            SitesListRoute(
+                onSiteClick = {},
+                onAddSiteClick = {},
             )
         }
     }

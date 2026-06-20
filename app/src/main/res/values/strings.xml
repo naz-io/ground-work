@@ -31,5 +31,25 @@
     <string name="field_note_status_draft">Draft</string>
     <string name="field_note_status_archived">Archived</string>
 
+    <!-- Sites list screen -->
+    <string name="sites_list_title">Sites</string>
+    <string name="sites_list_site_actions">Site actions</string>
+    <string name="sites_list_site_updated_label">Updated: %1$s</string>
+    <string name="sites_list_site_notes_count">Notes: %1$d</string>
+    <string name="sites_list_empty_sites_message">No sites found.</string>
+    <string name="sites_list_error">Error loading sites: %1$s</string>
+    <string name="sites_list_add_content_description">Add Site</string>
+
+    <!-- Site status labels -->
+    <string name="site_status_active">ACTIVE</string>
+    <string name="site_status_completed">COMPLETED</string>
+    <string name="site_status_archived">ARCHIVED</string>
+
+    <!-- Site priority labels -->
+    <string name="site_priority_low">LOW</string>
+    <string name="site_priority_normal">NORMAL</string>
+    <string name="site_priority_high">HIGH</string>
+    <string name="site_priority_urgent">URGENT</string>
+
     <string name="content_description_back">Back</string>
 </resources>
