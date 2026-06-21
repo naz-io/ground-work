@@ -192,7 +192,13 @@ private fun SiteEditorBottomBar(
                         color = MaterialTheme.colorScheme.onPrimary,
                     )
                 } else {
-                    Text(text = stringResource(R.string.site_editor_save))
+                    Text(
+                        text =
+                            if (isEditing)
+                                stringResource(R.string.site_editor_save_changes)
+                            else
+                                stringResource(R.string.site_editor_save)
+                    )
                 }
             }
 

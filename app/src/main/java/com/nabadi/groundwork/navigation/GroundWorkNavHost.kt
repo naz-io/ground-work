@@ -2,10 +2,10 @@ package com.nabadi.groundwork.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.nabadi.groundwork.feature.fieldnotes.FieldNoteEditorRoute
 import com.nabadi.groundwork.feature.fieldnotes.FieldNotesListRoute
@@ -13,9 +13,10 @@ import com.nabadi.groundwork.feature.sites.SiteEditorRoute
 import com.nabadi.groundwork.feature.sites.SitesListRoute
 
 @Composable
-fun GroundWorkNavHost(modifier: Modifier = Modifier) {
-    val navController = rememberNavController()
-
+fun GroundWorkNavHost(
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
+) {
     NavHost(
         navController = navController,
         startDestination = GroundWorkRoute.SITES_LIST,

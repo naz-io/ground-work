@@ -4,9 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.ui.Modifier
-import com.nabadi.groundwork.navigation.GroundWorkNavHost
 import com.nabadi.groundwork.ui.theme.GroundWorkTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -17,9 +14,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             GroundWorkTheme {
-                GroundWorkNavHost(
-                    modifier = Modifier.fillMaxSize()
-                )
+                GroundWorkApp()
             }
         }
     }
