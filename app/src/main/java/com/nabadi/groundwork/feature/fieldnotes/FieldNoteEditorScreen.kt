@@ -117,17 +117,22 @@ private fun FieldNoteEditorTopBar(
             )
         },
         navigationIcon = {
-            IconButton(
-                onClick = onBackClick,
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.content_description_back),
-                )
-            }
+            BackButton(onBackClick = onBackClick)
         },
         modifier = modifier,
     )
+}
+
+@Composable
+fun BackButton(onBackClick: () -> Unit) {
+    IconButton(
+        onClick = onBackClick,
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = stringResource(R.string.content_description_back),
+        )
+    }
 }
 
 @Composable

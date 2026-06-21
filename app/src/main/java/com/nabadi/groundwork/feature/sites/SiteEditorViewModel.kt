@@ -1,61 +1,89 @@
-package com.nabadi.groundwork.feature.fieldnotes
+package com.nabadi.groundwork.feature.sites
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.nabadi.groundwork.domain.model.FieldNote
-import com.nabadi.groundwork.domain.model.FieldNoteId
-import com.nabadi.groundwork.domain.model.FieldNoteStatus
-import com.nabadi.groundwork.domain.repository.FieldNoteRepository
+import com.nabadi.groundwork.domain.model.Site
+import com.nabadi.groundwork.domain.model.SiteId
+import com.nabadi.groundwork.domain.model.SitePriority
+import com.nabadi.groundwork.domain.model.SiteStatus
+import com.nabadi.groundwork.domain.repository.SiteRepository
 import com.nabadi.groundwork.navigation.GroundWorkRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.util.UUID
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
+import javax.inject.Inject
 
 @HiltViewModel
-class FieldNoteEditorViewModel @Inject constructor(
-    private val fieldNoteRepository: FieldNoteRepository,
-    savedStateHandle: SavedStateHandle,
+class SiteEditorViewModel @Inject constructor(
+    private val siteRepository: SiteRepository,
+    savedstateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val fieldNoteId: FieldNoteId? =
-        savedStateHandle.get<String>(GroundWorkRoute.FIELD_NOTE_ID_ARG)?.let(::FieldNoteId)
-    private var existingFieldNote: FieldNote? = null
+    private val siteId: SiteId? =
+        savedstateHandle.get<String>(GroundWorkRoute.SITE_ID_ARG)?.let(::SiteId)
+    private var existingSite: Site? = null
 
-    private val _uiState = MutableStateFlow(FieldNoteEditorUiState())
-    val uiState: StateFlow<FieldNoteEditorUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(SiteEditorUiState())
+    val uiState: StateFlow<SiteEditorUiState> = _uiState.asStateFlow()
 
     init {
-        if (fieldNoteId != null) {
+        if (siteId != null) {
             _uiState.update { it.copy(isEditing = true) }
-            loadFieldNote(fieldNoteId)
+            loadSite(siteId)
         }
     }
 
-    fun onTitleChange(title: String) {
+    fun onNameChange(name: String) {
         _uiState.update { currentState ->
             currentState.copy(
-                title = title,
+                name = name,
                 errorMessage = null,
             )
         }
     }
 
-    fun onBodyChange(body: String) {
+    fun onDescriptionChange(description: String) {
         _uiState.update { currentState ->
             currentState.copy(
-                body = body,
+                description = description,
                 errorMessage = null,
             )
         }
     }
 
-    fun saveFieldNote(onSaved: () -> Unit) {
+    fun onLocationChange(location: String) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                location = location,
+                errorMessage = null,
+            )
+        }
+    }
+
+    fun onStatusChange(status: SiteStatus) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                status = status,
+                errorMessage = null,
+            )
+        }
+    }
+
+    fun onPriorityChange(priority: SitePriority) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                priority = priority,
+                errorMessage = null,
+            )
+        }
+    }
+
+    fun saveSite(onSaved: () -> Unit) {
         if (_uiState.value.isBusy) return
         val currentState = _uiState.value
 
@@ -63,83 +91,83 @@ class FieldNoteEditorViewModel @Inject constructor(
             updateSavingState(isSaving = true)
 
             runCatching {
-                val existingNote = existingFieldNote
+                val existingSite = existingSite
                 val now = System.currentTimeMillis()
 
-                fieldNoteRepository.saveFieldNote(
-                    FieldNote(
-                        id = existingNote?.id ?: FieldNoteId(UUID.randomUUID().toString()),
-                        siteId = existingNote?.siteId,
-                        title = currentState.title.ifBlank { "Untitled field note" },
-                        body = currentState.body,
-                        status = existingNote?.status ?: FieldNoteStatus.ACTIVE,
-                        createdAt = existingNote?.createdAt ?: now,
+                siteRepository.saveSite(
+                    Site(
+                        id = existingSite?.id ?: SiteId(UUID.randomUUID().toString()),
+                        name = currentState.name.ifBlank { "Untitled site" },
+                        description = currentState.description,
+                        location = currentState.location,
+                        priority = currentState.priority,
+                        status = currentState.status,
+                        createdAt = existingSite?.createdAt ?: now,
                         updatedAt = now,
                     )
                 )
             }.onSuccess {
-                _uiState.update { FieldNoteEditorUiState() }
+                _uiState.update { SiteEditorUiState() }
                 onSaved()
             }.onFailure {
                 updateSavingState(
                     isSaving = false,
-                    errorMessage = "Unable to save field note.",
+                    errorMessage = "Unable to save site.",
                 )
             }
+
         }
     }
 
-    fun deleteFieldNote(onDeleted: () -> Unit) {
+    fun deleteSite(onDeleted: () -> Unit) {
         if (_uiState.value.isBusy) return
-
         viewModelScope.launch {
             updateDeletingState(isDeleting = true)
-
             runCatching {
-                val existingNote = existingFieldNote
-                    ?: error("Cannot delete a field note that has not been saved.")
+                val existingSite = existingSite
+                    ?: error("Cannot delete a site that has not been saved.")
 
-                fieldNoteRepository.deleteFieldNote(id = existingNote.id)
+                siteRepository.deleteSite(id = existingSite.id)
             }.onSuccess {
-                _uiState.update { FieldNoteEditorUiState() }
+                _uiState.update { SiteEditorUiState() }
                 onDeleted()
             }.onFailure {
                 updateDeletingState(
                     isDeleting = false,
-                    errorMessage = "Unable to delete field note.",
+                    errorMessage = "Unable to delete site.",
                 )
             }
         }
     }
 
-    fun discardDraft(onDiscarded: () -> Unit) {
+    fun discardSite(onDiscarded: () -> Unit) {
         if (_uiState.value.isBusy) return
-
-        _uiState.update { FieldNoteEditorUiState() }
+        _uiState.update { SiteEditorUiState() }
         onDiscarded()
     }
 
-    private fun loadFieldNote(id: FieldNoteId) {
+    private fun loadSite(id: SiteId) {
         viewModelScope.launch {
             updateLoadingState(isLoading = true)
 
             runCatching {
-                fieldNoteRepository.getFieldNote(id)
-            }.onSuccess { fieldNote ->
-                if (fieldNote == null) {
+                siteRepository.getSite(id)
+            }.onSuccess { site ->
+                if (site == null) {
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = "Field note not found.",
+                            errorMessage = "Site not found.",
                             isEditing = false,
                         )
                     }
                 } else {
-                    existingFieldNote = fieldNote
+                    existingSite = site
                     _uiState.update {
                         it.copy(
-                            title = fieldNote.title,
-                            body = fieldNote.body,
+                            name = site.name,
+                            description = site.description,
+                            location = site.location,
                             isEditing = true,
                             isLoading = false,
                             errorMessage = null,
@@ -149,7 +177,7 @@ class FieldNoteEditorViewModel @Inject constructor(
             }.onFailure {
                 updateLoadingState(
                     isLoading = false,
-                    errorMessage = "Unable to load field note.",
+                    errorMessage = "Unable to load site.",
                 )
             }
         }

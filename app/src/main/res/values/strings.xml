@@ -15,7 +15,7 @@
     <string name="field_notes_list_add_content_description">Add field note</string>
 
     <!-- Field note editor screen -->
-    <string name="field_note_editor_new_title">New Field Note</string>
+    <string name="field_note_editor_new_title">Create Field Note</string>
     <string name="field_note_editor_edit_title">Edit Field Note</string>
     <string name="field_note_editor_draft">Local Draft\nChanges will be saved locally on this device.</string>
     <string name="field_note_editor_title_label">Note Title</string>
@@ -39,6 +39,21 @@
     <string name="sites_list_empty_sites_message">No sites found.</string>
     <string name="sites_list_error">Error loading sites: %1$s</string>
     <string name="sites_list_add_content_description">Add Site</string>
+
+    <!-- Field note editor screen -->
+    <string name="site_editor_new_title">Create New Site</string>
+    <string name="site_editor_edit_title">Edit Site</string>
+    <string name="site_editor_name_label">Site Name</string>
+    <string name="site_editor_name_hint">e.g., Generator Maintenance</string>
+    <string name="site_editor_description_label">Description &amp; Technical Notes</string>
+    <string name="site_editor_description_hint">e.g., Generator maintenance log</string>
+    <string name="site_editor_location_label">Location</string>
+    <string name="site_editor_location_hint">e.g., 123 Main Street</string>
+    <string name="site_editor_priority_label">Priority</string>
+    <string name="site_editor_status_label">Status</string>
+    <string name="site_editor_save">SAVE</string>
+    <string name="site_editor_discard">DISCARD</string>
+    <string name="site_editor_delete">DELETE SITE</string>
 
     <!-- Site status labels -->
     <string name="site_status_active">ACTIVE</string>

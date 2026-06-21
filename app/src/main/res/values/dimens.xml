@@ -28,6 +28,9 @@
     <!-- Forms -->
     <dimen name="spacing_form_section">24dp</dimen>
 
+    <!-- Error messages -->
+    <dimen name="height_error_message_area">48dp</dimen>
+
     <!-- Bottom actions -->
     <dimen name="padding_bottom_action_horizontal">24dp</dimen>
     <dimen name="height_primary_action_button">56dp</dimen>

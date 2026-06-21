@@ -9,7 +9,7 @@ import com.nabadi.groundwork.domain.model.SiteId
 
 @Composable
 fun SitesListRoute(
-    onSiteClick: (SiteId) -> Unit,
+    onOpenSiteClick: (SiteId) -> Unit,
     onAddSiteClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SitesListViewModel = hiltViewModel(),
@@ -22,7 +22,7 @@ fun SitesListRoute(
         onStatusFilterChange = viewModel::onStatusFilterChange,
         onPriorityFilterChange = viewModel::onPriorityFilterChange,
         onClearCriteriaClick = viewModel::onClearCriteriaClick,
-        onOpenSiteClick = onSiteClick,
+        onOpenSiteClick = onOpenSiteClick,
         onEditSiteClick = {},
         onAddSiteClick = onAddSiteClick,
         modifier = modifier,
