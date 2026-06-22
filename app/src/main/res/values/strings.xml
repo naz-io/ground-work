@@ -1,18 +1,24 @@
 <resources>
+    <!-- App -->
     <string name="app_name">GroundWork</string>
+
+    <!-- Common -->
+    <string name="content_description_back">Back</string>
 
     <!-- Field notes list screen -->
     <string name="field_notes_list_title">Field Notes</string>
+    <string name="field_notes_list_untitled_note_title">(untitled)</string>
+    <string name="field_notes_list_empty">No field notes yet.</string>
+    <string name="field_notes_list_error">Error loading field notes: %1$s</string>
+    <string name="field_notes_list_add_content_description">Add field note</string>
+
+    <!-- Field notes search and filters -->
     <string name="field_notes_search_label">Search field notes…</string>
     <string name="field_notes_search_clear_content_description">Clear search</string>
     <string name="field_notes_list_filter_all">All</string>
     <string name="field_notes_list_no_matches_title">NO MATCHES FOUND</string>
     <string name="field_notes_list_no_matches_description">We could not find any notes matching your current filters or search query. Try adjusting your criteria or checking for typos.</string>
     <string name="field_notes_list_no_matches_action">CLEAR ALL FILTERS</string>
-    <string name="field_notes_list_untitled_note_title">(untitled)</string>
-    <string name="field_notes_list_empty">No field notes yet.</string>
-    <string name="field_notes_list_error">Error loading field notes: %1$s</string>
-    <string name="field_notes_list_add_content_description">Add field note</string>
 
     <!-- Field note editor screen -->
     <string name="field_note_editor_new_title">Create Field Note</string>
@@ -36,11 +42,21 @@
     <string name="sites_list_site_actions">Site actions</string>
     <string name="sites_list_site_updated_label">Updated: %1$s</string>
     <string name="sites_list_site_notes_count">Notes: %1$d</string>
-    <string name="sites_list_empty_sites_message">No sites found.</string>
+    <string name="sites_list_empty_sites_message">No sites yet.</string>
     <string name="sites_list_error">Error loading sites: %1$s</string>
     <string name="sites_list_add_content_description">Add Site</string>
 
-    <!-- Field note editor screen -->
+    <!-- Sites search and filters -->
+    <string name="sites_search_label">Search sites…</string>
+    <string name="sites_search_clear_content_description">Clear site search</string>
+    <string name="sites_list_filter_all">All</string>
+    <string name="sites_list_filter_status_label">Status: %1$s</string>
+    <string name="sites_list_filter_priority_label">Priority: %1$s</string>
+    <string name="sites_list_no_matches_title">No sites found.</string>
+    <string name="sites_list_no_matches_description">Try changing your search or filters.</string>
+    <string name="sites_list_no_matches_action">Clear search and filters</string>
+
+    <!-- Site editor screen -->
     <string name="site_editor_new_title">Create New Site</string>
     <string name="site_editor_edit_title">Edit Site</string>
     <string name="site_editor_name_label">SITE NAME</string>
@@ -66,6 +82,4 @@
     <string name="site_priority_normal">NORMAL</string>
     <string name="site_priority_high">HIGH</string>
     <string name="site_priority_urgent">URGENT</string>
-
-    <string name="content_description_back">Back</string>
 </resources>

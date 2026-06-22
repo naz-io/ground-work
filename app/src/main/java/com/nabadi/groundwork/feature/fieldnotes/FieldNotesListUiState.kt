@@ -19,6 +19,9 @@ data class FieldNotesListUiState(
     val hasActiveCriteria: Boolean
         get() = isSearching || isFiltering
 
+    val isEmpty: Boolean
+        get() = !isLoading && !isError && !hasActiveCriteria && fieldNotes.isEmpty()
+
     val isError: Boolean
         get() = errorMessage != null
 }

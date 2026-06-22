@@ -327,6 +327,7 @@ private fun EmptyFieldNotesState(
     Text(
         text = stringResource(R.string.field_notes_list_empty),
         modifier = modifier,
+        style = MaterialTheme.typography.bodyMedium,
     )
 }
 

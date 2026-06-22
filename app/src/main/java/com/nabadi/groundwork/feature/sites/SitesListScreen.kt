@@ -21,6 +21,17 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -93,12 +104,25 @@ fun SitesListScreen(
             ) {
                 when {
                     uiState.isLoading -> LoadingState()
-                    uiState.isError -> uiState.errorMessage?.let {
-                        ErrorState(errorMessage = stringResource(R.string.sites_list_error, it))
-                    }
-
-                    uiState.isEmpty -> EmptySitesState()
-                    else -> SitesContent(
+                    uiState.isError -> ErrorState(errorMessage = uiState.errorMessage.orEmpty())
+                    uiState.shouldShowEmptyState -> EmptySitesState()
+                    uiState.shouldShowNoMatchesState -> SitesNoMatchesContent(
+                        selectedStatus = uiState.selectedStatus,
+                        selectedPriority = uiState.selectedPriority,
+                        searchQuery = uiState.searchQuery,
+                        onSearchQueryChange = onSearchQueryChange,
+                        onStatusFilterChange = onStatusFilterChange,
+                        onPriorityFilterChange = onPriorityFilterChange,
+                        onClearCriteriaClick = onClearCriteriaClick,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                    uiState.shouldShowContent -> SitesContent(
+                        selectedStatus = uiState.selectedStatus,
+                        selectedPriority = uiState.selectedPriority,
+                        searchQuery = uiState.searchQuery,
+                        onSearchQueryChange = onSearchQueryChange,
+                        onStatusFilterChange = onStatusFilterChange,
+                        onPriorityFilterChange = onPriorityFilterChange,
                         sites = uiState.sites,
                         onOpenSiteClick = onOpenSiteClick,
                         onEditSiteClick = onEditSiteClick,
@@ -116,15 +140,6 @@ private fun LoadingState(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun ErrorState(errorMessage: String, modifier: Modifier = Modifier) {
-    Text(
-        text = errorMessage,
-        modifier = modifier,
-        color = MaterialTheme.colorScheme.error,
-    )
-}
-
-@Composable
 private fun EmptySitesState(modifier: Modifier = Modifier) {
     Text(
         text = stringResource(R.string.sites_list_empty_sites_message),
@@ -135,15 +150,25 @@ private fun EmptySitesState(modifier: Modifier = Modifier) {
 
 @Composable
 private fun SitesContent(
+    selectedStatus: SiteStatus?,
+    selectedPriority: SitePriority?,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    onStatusFilterChange: (SiteStatus?) -> Unit,
+    onPriorityFilterChange: (SitePriority?) -> Unit,
     sites: List<Site>,
     onOpenSiteClick: (SiteId) -> Unit,
     onEditSiteClick: (SiteId) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyColumn(
+    SitesSearchResultsContent(
+        selectedStatus = selectedStatus,
+        selectedPriority = selectedPriority,
+        searchQuery = searchQuery,
+        onSearchQueryChange = onSearchQueryChange,
+        onStatusFilterChange = onStatusFilterChange,
+        onPriorityFilterChange = onPriorityFilterChange,
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
-        contentPadding = PaddingValues(bottom = dimensionResource(R.dimen.spacing_fab_clearance)),
     ) {
         items(sites, key = { it.id.value }) { site ->
             SiteCard(
@@ -151,6 +176,258 @@ private fun SitesContent(
                 onOpenSiteClick = { onOpenSiteClick(site.id) },
                 onEditSiteClick = { onEditSiteClick(site.id) },
             )
+        }
+    }
+}
+
+
+@Composable
+private fun SitesNoMatchesContent(
+    selectedStatus: SiteStatus?,
+    selectedPriority: SitePriority?,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    onStatusFilterChange: (SiteStatus?) -> Unit,
+    onPriorityFilterChange: (SitePriority?) -> Unit,
+    onClearCriteriaClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SitesSearchResultsContent(
+        selectedStatus = selectedStatus,
+        selectedPriority = selectedPriority,
+        searchQuery = searchQuery,
+        onSearchQueryChange = onSearchQueryChange,
+        onStatusFilterChange = onStatusFilterChange,
+        onPriorityFilterChange = onPriorityFilterChange,
+        modifier = modifier,
+    ) {
+        item {
+            Box(
+                modifier = Modifier
+                    .fillParentMaxSize()
+                    .padding(dimensionResource(R.dimen.padding_card_content)),
+                contentAlignment = Alignment.Center,
+            ) {
+                NoMatchingSitesState(
+                    onClearCriteriaClick = onClearCriteriaClick,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SitesSearchResultsContent(
+    selectedStatus: SiteStatus?,
+    selectedPriority: SitePriority?,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    onStatusFilterChange: (SiteStatus?) -> Unit,
+    onPriorityFilterChange: (SitePriority?) -> Unit,
+    modifier: Modifier = Modifier,
+    resultsContent: LazyListScope.() -> Unit,
+) {
+    LazyColumn(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
+        contentPadding = PaddingValues(bottom = dimensionResource(R.dimen.spacing_fab_clearance)),
+    ) {
+        item {
+            SitesSearchAndFilters(
+                selectedStatus = selectedStatus,
+                selectedPriority = selectedPriority,
+                searchQuery = searchQuery,
+                onSearchQueryChange = onSearchQueryChange,
+                onStatusFilterChange = onStatusFilterChange,
+                onPriorityFilterChange = onPriorityFilterChange,
+            )
+        }
+
+        resultsContent()
+    }
+}
+
+
+@Composable
+private fun SitesSearchAndFilters(
+    selectedStatus: SiteStatus?,
+    selectedPriority: SitePriority?,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    onStatusFilterChange: (SiteStatus?) -> Unit,
+    onPriorityFilterChange: (SitePriority?) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
+    ) {
+        SitesSearchField(
+            searchQuery = searchQuery,
+            onSearchQueryChange = onSearchQueryChange,
+        )
+        SitesFilters(
+            selectedStatus = selectedStatus,
+            selectedPriority = selectedPriority,
+            onStatusFilterChange = onStatusFilterChange,
+            onPriorityFilterChange = onPriorityFilterChange,
+        )
+    }
+}
+
+@Composable
+private fun SitesSearchField(
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedTextField(
+        value = searchQuery,
+        onValueChange = onSearchQueryChange,
+        modifier = modifier.fillMaxWidth(),
+        label = {
+            Text(text = stringResource(R.string.sites_search_label))
+        },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Filled.Search,
+                contentDescription = null,
+            )
+        },
+        trailingIcon = {
+            if (searchQuery.isNotBlank()) {
+                IconButton(
+                    onClick = { onSearchQueryChange("") },
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = stringResource(R.string.sites_search_clear_content_description),
+                    )
+                }
+            }
+        },
+        singleLine = true,
+    )
+}
+
+@Composable
+private fun SitesFilters(
+    selectedStatus: SiteStatus?,
+    selectedPriority: SitePriority?,
+    onStatusFilterChange: (SiteStatus?) -> Unit,
+    onPriorityFilterChange: (SitePriority?) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    LazyRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
+    ) {
+        item {
+            SitesFilterChip(
+                selected = selectedStatus == null && selectedPriority == null,
+                onClick = {
+                    onStatusFilterChange(null)
+                    onPriorityFilterChange(null)
+                },
+                label = stringResource(R.string.sites_list_filter_all),
+            )
+        }
+
+        items(
+            items = SiteStatus.entries,
+            key = { it },
+            contentType = { "SiteStatusFilterOption" },
+        ) { statusFilter ->
+            SitesFilterChip(
+                selected = selectedStatus == statusFilter,
+                onClick = {
+                    onStatusFilterChange(
+                        if (selectedStatus == statusFilter) null else statusFilter
+                    )
+                },
+                label = stringResource(
+                    R.string.sites_list_filter_status_label,
+                    stringResource(statusFilter.labelResId),
+                ),
+            )
+        }
+
+        items(
+            items = SitePriority.entries,
+            key = { it },
+            contentType = { "SitePriorityFilterOption" },
+        ) { priorityFilter ->
+            SitesFilterChip(
+                selected = selectedPriority == priorityFilter,
+                onClick = {
+                    onPriorityFilterChange(
+                        if (selectedPriority == priorityFilter) null else priorityFilter
+                    )
+                },
+                label = stringResource(
+                    R.string.sites_list_filter_priority_label,
+                    stringResource(priorityFilter.labelResId),
+                ),
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SitesFilterChip(
+    selected: Boolean,
+    onClick: () -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+) {
+    FilterChip(
+        selected = selected,
+        onClick = onClick,
+        modifier = modifier,
+        label = {
+            Text(
+                text = label,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
+        colors = FilterChipDefaults.filterChipColors(
+            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            containerColor = MaterialTheme.colorScheme.surface,
+            labelColor = MaterialTheme.colorScheme.onSurface,
+        ),
+    )
+}
+
+@Composable
+private fun NoMatchingSitesState(
+    onClearCriteriaClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_screen_section)),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = stringResource(R.string.sites_list_no_matches_title),
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleMedium,
+        )
+        Text(
+            text = stringResource(R.string.sites_list_no_matches_description),
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        Button(
+            onClick = onClearCriteriaClick,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(text = stringResource(R.string.sites_list_no_matches_action))
         }
     }
 }
@@ -374,6 +651,19 @@ private fun SiteCardMetadata(
     }
 }
 
+
+@Composable
+private fun ErrorState(
+    errorMessage: String,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = stringResource(R.string.sites_list_error, errorMessage),
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.error,
+    )
+}
+
 @get:StringRes
 private val SiteStatus.labelResId: Int
     get() = when (this) {
@@ -475,6 +765,120 @@ fun SitesListScreenPreview_Content_Dark() {
             uiState = SitesListUiState(
                 isLoading = false,
                 sites = previewSites,
+            ),
+            onSearchQueryChange = {},
+            onStatusFilterChange = {},
+            onPriorityFilterChange = {},
+            onClearCriteriaClick = {},
+            onOpenSiteClick = {},
+            onEditSiteClick = {},
+            onAddSiteClick = {},
+        )
+    }
+}
+
+@Preview(
+    name = "Filtered Content",
+    showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
+)
+@Composable
+fun SitesListScreenPreview_FilteredContent() {
+    GroundWorkTheme {
+        SitesListScreen(
+            uiState = SitesListUiState(
+                isLoading = false,
+                searchQuery = "warehouse",
+                selectedStatus = SiteStatus.ACTIVE,
+                selectedPriority = SitePriority.HIGH,
+                sites = previewSites.filter {
+                    it.status == SiteStatus.ACTIVE && it.priority == SitePriority.HIGH
+                },
+            ),
+            onSearchQueryChange = {},
+            onStatusFilterChange = {},
+            onPriorityFilterChange = {},
+            onClearCriteriaClick = {},
+            onOpenSiteClick = {},
+            onEditSiteClick = {},
+            onAddSiteClick = {},
+        )
+    }
+}
+
+@Preview(
+    name = "Filtered Content - Dark Mode",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    apiLevel = PREVIEW_API_LEVEL,
+)
+@Composable
+fun SitesListScreenPreview_FilteredContent_Dark() {
+    GroundWorkTheme {
+        SitesListScreen(
+            uiState = SitesListUiState(
+                isLoading = false,
+                searchQuery = "warehouse",
+                selectedStatus = SiteStatus.ACTIVE,
+                selectedPriority = SitePriority.HIGH,
+                sites = previewSites.filter {
+                    it.status == SiteStatus.ACTIVE && it.priority == SitePriority.HIGH
+                },
+            ),
+            onSearchQueryChange = {},
+            onStatusFilterChange = {},
+            onPriorityFilterChange = {},
+            onClearCriteriaClick = {},
+            onOpenSiteClick = {},
+            onEditSiteClick = {},
+            onAddSiteClick = {},
+        )
+    }
+}
+
+@Preview(
+    name = "No Matches",
+    showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
+)
+@Composable
+fun SitesListScreenPreview_NoMatches() {
+    GroundWorkTheme {
+        SitesListScreen(
+            uiState = SitesListUiState(
+                isLoading = false,
+                searchQuery = "missing site",
+                selectedStatus = SiteStatus.ARCHIVED,
+                selectedPriority = SitePriority.URGENT,
+                sites = emptyList(),
+            ),
+            onSearchQueryChange = {},
+            onStatusFilterChange = {},
+            onPriorityFilterChange = {},
+            onClearCriteriaClick = {},
+            onOpenSiteClick = {},
+            onEditSiteClick = {},
+            onAddSiteClick = {},
+        )
+    }
+}
+
+@Preview(
+    name = "No Matches - Dark Mode",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    apiLevel = PREVIEW_API_LEVEL,
+)
+@Composable
+fun SitesListScreenPreview_NoMatches_Dark() {
+    GroundWorkTheme {
+        SitesListScreen(
+            uiState = SitesListUiState(
+                isLoading = false,
+                searchQuery = "missing site",
+                selectedStatus = SiteStatus.ARCHIVED,
+                selectedPriority = SitePriority.URGENT,
+                sites = emptyList(),
             ),
             onSearchQueryChange = {},
             onStatusFilterChange = {},

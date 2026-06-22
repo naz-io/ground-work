@@ -12,6 +12,9 @@ data class SitesListUiState(
     val sites: List<Site> = emptyList(),
     val errorMessage: String? = null,
 ) {
+    val isError: Boolean
+        get() = errorMessage != null
+
     val isSearching: Boolean
         get() = searchQuery.isNotBlank()
 
@@ -21,12 +24,15 @@ data class SitesListUiState(
     val hasActiveCriteria: Boolean
         get() = isSearching || isFiltering
 
-    val isEmpty: Boolean
-        get() = !isLoading && !isError && !hasActiveCriteria && sites.isEmpty()
+    private val hasNoVisibleSites: Boolean
+        get() = !isLoading && !isError && sites.isEmpty()
 
-    val isNoMatch: Boolean
-        get() = !isLoading && !isError && hasActiveCriteria && sites.isEmpty()
+    val shouldShowEmptyState: Boolean
+        get() = hasNoVisibleSites && !hasActiveCriteria
 
-    val isError: Boolean
-        get() = errorMessage != null
+    val shouldShowNoMatchesState: Boolean
+        get() = hasNoVisibleSites && hasActiveCriteria
+
+    val shouldShowContent: Boolean
+        get() = !isLoading && !isError && (sites.isNotEmpty() || shouldShowNoMatchesState)
 }
