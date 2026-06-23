@@ -4,6 +4,32 @@
 
     <!-- Common -->
     <string name="content_description_back">Back</string>
+    <string name="relative_time_unknown">Unknown</string>
+    <string name="relative_time_just_now">Just now</string>
+    <plurals name="relative_time_minutes_ago">
+        <item quantity="one">%d min ago</item>
+        <item quantity="other">%d min ago</item>
+    </plurals>
+    <plurals name="relative_time_hours_ago">
+        <item quantity="one">%d hour ago</item>
+        <item quantity="other">%d hours ago</item>
+    </plurals>
+    <plurals name="relative_time_days_ago">
+        <item quantity="one">%d day ago</item>
+        <item quantity="other">%d days ago</item>
+    </plurals>
+    <plurals name="relative_time_weeks_ago">
+        <item quantity="one">%d week ago</item>
+        <item quantity="other">%d weeks ago</item>
+    </plurals>
+    <plurals name="relative_time_months_ago">
+        <item quantity="one">%d month ago</item>
+        <item quantity="other">%d months ago</item>
+    </plurals>
+    <plurals name="relative_time_years_ago">
+        <item quantity="one">%d year ago</item>
+        <item quantity="other">%d years ago</item>
+    </plurals>
 
     <!-- Field notes list screen -->
     <string name="field_notes_list_title">Field Notes</string>
@@ -44,7 +70,7 @@
     <string name="sites_list_site_notes_count">Notes: %1$d</string>
     <string name="sites_list_empty_sites_message">No sites yet.</string>
     <string name="sites_list_error">Error loading sites: %1$s</string>
-    <string name="sites_list_add_content_description">Add Site</string>
+    <string name="sites_list_add_content_description">Add site</string>
 
     <!-- Sites search and filters -->
     <string name="sites_search_label">Search sites…</string>

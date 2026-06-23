@@ -1,4 +1,4 @@
-package com.nabadi.groundwork.feature.sites
+package com.nabadi.groundwork.feature.sites.list
 
 import com.nabadi.groundwork.domain.model.Site
 import com.nabadi.groundwork.domain.model.SitePriority

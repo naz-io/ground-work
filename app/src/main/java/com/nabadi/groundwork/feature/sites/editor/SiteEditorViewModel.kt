@@ -1,4 +1,4 @@
-package com.nabadi.groundwork.feature.sites
+package com.nabadi.groundwork.feature.sites.editor
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

@@ -1,4 +1,4 @@
-package com.nabadi.groundwork.feature.sites
+package com.nabadi.groundwork.feature.sites.editor
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +39,15 @@ import com.nabadi.groundwork.R
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
 import com.nabadi.groundwork.feature.fieldnotes.BackButton
+import com.nabadi.groundwork.feature.sites.PREVIEW_API_LEVEL
+import com.nabadi.groundwork.feature.sites.deletingSiteEditorPreviewState
+import com.nabadi.groundwork.feature.sites.editingSiteEditorPreviewState
+import com.nabadi.groundwork.feature.sites.emptySiteEditorPreviewState
+import com.nabadi.groundwork.feature.sites.errorSiteEditorPreviewState
+import com.nabadi.groundwork.feature.sites.filledSiteEditorPreviewState
+import com.nabadi.groundwork.feature.sites.labelResId
+import com.nabadi.groundwork.feature.sites.longContentSiteEditorPreviewState
+import com.nabadi.groundwork.feature.sites.savingSiteEditorPreviewState
 import com.nabadi.groundwork.ui.theme.GroundWorkTheme
 
 @Composable
@@ -72,7 +81,7 @@ fun SiteEditorScreen(
                 isDeleting = uiState.isDeleting,
                 onDestructiveActionClick = onDestructiveActionClick,
             )
-        }
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -80,7 +89,7 @@ fun SiteEditorScreen(
                 .padding(innerPadding)
                 .padding(horizontal = dimensionResource(R.dimen.spacing_screen_horizontal)),
         ) {
-            val areFieldsEnabled = !uiState.isSaving && !uiState.isDeleting
+            val areFieldsEnabled = !uiState.isBusy
             SiteNameField(
                 name = uiState.name,
                 onValueChange = onNameChange,
@@ -193,11 +202,13 @@ private fun SiteEditorBottomBar(
                     )
                 } else {
                     Text(
-                        text =
-                            if (isEditing)
-                                stringResource(R.string.site_editor_save_changes)
-                            else
-                                stringResource(R.string.site_editor_save)
+                        text = stringResource(
+                            if (isEditing) {
+                                R.string.site_editor_save_changes
+                            } else {
+                                R.string.site_editor_save
+                            },
+                        ),
                     )
                 }
             }
@@ -213,7 +224,7 @@ private fun SiteEditorBottomBar(
                     CircularProgressIndicator(
                         modifier = Modifier.size(dimensionResource(R.dimen.size_button_progress_indicator)),
                         strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary,
+                        color = MaterialTheme.colorScheme.primary,
                     )
                 } else {
                     Text(
@@ -230,7 +241,6 @@ private fun SiteEditorBottomBar(
         }
     }
 }
-
 
 @Composable
 private fun SiteNameField(
@@ -434,24 +444,6 @@ private fun SiteEditorErrorMessage(
     }
 }
 
-private val SiteStatus.labelResId: Int
-    get() = when (this) {
-        SiteStatus.ACTIVE -> R.string.site_status_active
-        SiteStatus.COMPLETED -> R.string.site_status_completed
-        SiteStatus.ARCHIVED -> R.string.site_status_archived
-    }
-
-private val SitePriority.labelResId: Int
-    get() = when (this) {
-        SitePriority.LOW -> R.string.site_priority_low
-        SitePriority.NORMAL -> R.string.site_priority_normal
-        SitePriority.HIGH -> R.string.site_priority_high
-        SitePriority.URGENT -> R.string.site_priority_urgent
-    }
-
-
-private const val PREVIEW_API_LEVEL = 35
-
 @Preview(
     name = "Empty Draft",
     showBackground = true,
@@ -461,7 +453,7 @@ private const val PREVIEW_API_LEVEL = 35
 private fun SiteEditorScreenPreview_EmptyDraft() {
     GroundWorkTheme {
         SiteEditorScreen(
-            uiState = emptyDraftPreviewState,
+            uiState = emptySiteEditorPreviewState,
             onNameChange = {},
             onDescriptionChange = {},
             onLocationChange = {},
@@ -484,7 +476,7 @@ private fun SiteEditorScreenPreview_EmptyDraft() {
 private fun SiteEditorScreenPreview_DarkMode_Empty() {
     GroundWorkTheme {
         SiteEditorScreen(
-            uiState = emptyDraftPreviewState,
+            uiState = emptySiteEditorPreviewState,
             onNameChange = {},
             onDescriptionChange = {},
             onLocationChange = {},
@@ -506,7 +498,7 @@ private fun SiteEditorScreenPreview_DarkMode_Empty() {
 private fun SiteEditorScreenPreview_FilledDraft() {
     GroundWorkTheme {
         SiteEditorScreen(
-            uiState = filledDraftPreviewState,
+            uiState = filledSiteEditorPreviewState,
             onNameChange = {},
             onDescriptionChange = {},
             onLocationChange = {},
@@ -529,7 +521,7 @@ private fun SiteEditorScreenPreview_FilledDraft() {
 private fun SiteEditorScreenPreview_DarkMode_FilledDraft() {
     GroundWorkTheme {
         SiteEditorScreen(
-            uiState = filledDraftPreviewState,
+            uiState = filledSiteEditorPreviewState,
             onNameChange = {},
             onDescriptionChange = {},
             onLocationChange = {},
@@ -551,7 +543,7 @@ private fun SiteEditorScreenPreview_DarkMode_FilledDraft() {
 private fun SiteEditorScreenPreview_Saving() {
     GroundWorkTheme {
         SiteEditorScreen(
-            uiState = savingPreviewState,
+            uiState = savingSiteEditorPreviewState,
             onNameChange = {},
             onDescriptionChange = {},
             onLocationChange = {},
@@ -574,7 +566,7 @@ private fun SiteEditorScreenPreview_Saving() {
 private fun SiteEditorScreenPreview_DarkMode_Saving() {
     GroundWorkTheme {
         SiteEditorScreen(
-            uiState = savingPreviewState,
+            uiState = savingSiteEditorPreviewState,
             onNameChange = {},
             onDescriptionChange = {},
             onLocationChange = {},
@@ -596,7 +588,7 @@ private fun SiteEditorScreenPreview_DarkMode_Saving() {
 private fun SiteEditorScreenPreview_Error() {
     GroundWorkTheme {
         SiteEditorScreen(
-            uiState = errorPreviewState,
+            uiState = errorSiteEditorPreviewState,
             onNameChange = {},
             onDescriptionChange = {},
             onLocationChange = {},
@@ -619,7 +611,7 @@ private fun SiteEditorScreenPreview_Error() {
 private fun SiteEditorScreenPreview_DarkMode_Error() {
     GroundWorkTheme {
         SiteEditorScreen(
-            uiState = errorPreviewState,
+            uiState = errorSiteEditorPreviewState,
             onNameChange = {},
             onDescriptionChange = {},
             onLocationChange = {},
@@ -641,7 +633,7 @@ private fun SiteEditorScreenPreview_DarkMode_Error() {
 private fun SiteEditorScreenPreview_Editing() {
     GroundWorkTheme {
         SiteEditorScreen(
-            uiState = editingPreviewState,
+            uiState = editingSiteEditorPreviewState,
             onNameChange = {},
             onDescriptionChange = {},
             onLocationChange = {},
@@ -664,7 +656,7 @@ private fun SiteEditorScreenPreview_Editing() {
 private fun SiteEditorScreenPreview_DarkMode_Editing() {
     GroundWorkTheme {
         SiteEditorScreen(
-            uiState = editingPreviewState,
+            uiState = editingSiteEditorPreviewState,
             onNameChange = {},
             onDescriptionChange = {},
             onLocationChange = {},
@@ -686,7 +678,7 @@ private fun SiteEditorScreenPreview_DarkMode_Editing() {
 private fun SiteEditorScreenPreview_LongContent() {
     GroundWorkTheme {
         SiteEditorScreen(
-            uiState = longContentPreviewState,
+            uiState = longContentSiteEditorPreviewState,
             onNameChange = {},
             onDescriptionChange = {},
             onLocationChange = {},
@@ -709,7 +701,7 @@ private fun SiteEditorScreenPreview_LongContent() {
 private fun SiteEditorScreenPreview_DarkMode_LongContent() {
     GroundWorkTheme {
         SiteEditorScreen(
-            uiState = longContentPreviewState,
+            uiState = longContentSiteEditorPreviewState,
             onNameChange = {},
             onDescriptionChange = {},
             onLocationChange = {},
@@ -722,53 +714,48 @@ private fun SiteEditorScreenPreview_DarkMode_LongContent() {
     }
 }
 
-private val emptyDraftPreviewState = SiteEditorUiState(
-    name = "",
-    location = "",
-    description = "",
-    isSaving = false,
-    isEditing = false,
-)
 
-private val filledDraftPreviewState = SiteEditorUiState(
-    name = "North Warehouse",
-    location = "Sector A · 125 Industrial Road",
-    description = "Main storage facility with recurring loading-bay access issues and damaged pallet racks.",
-    isSaving = false,
-    isEditing = false,
+@Preview(
+    name = "Deleting",
+    showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
 )
+@Composable
+private fun SiteEditorScreenPreview_Deleting() {
+    GroundWorkTheme {
+        SiteEditorScreen(
+            uiState = deletingSiteEditorPreviewState,
+            onNameChange = {},
+            onDescriptionChange = {},
+            onLocationChange = {},
+            onStatusChange = {},
+            onPriorityChange = {},
+            onSaveClick = {},
+            onDestructiveActionClick = {},
+            onBackClick = {},
+        )
+    }
+}
 
-private val savingPreviewState = SiteEditorUiState(
-    name = "River Pump Station",
-    location = "Riverbend Service Road",
-    description = "Pump station with standing water reports, generator checks, and access-road erosion.",
-    isSaving = true,
-    isEditing = false,
+@Preview(
+    name = "Dark Mode - Deleting",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    apiLevel = PREVIEW_API_LEVEL,
 )
-
-private val errorPreviewState = SiteEditorUiState(
-    name = "East Service Tunnel",
-    location = "Transit Yard · East Access",
-    description = "Tunnel inspection route with lighting issues and confined-space safety notes.",
-    isSaving = false,
-    isEditing = false,
-    errorMessage = "Unable to save site.",
-)
-
-private val editingPreviewState = SiteEditorUiState(
-    name = "Pine Creek Bridge",
-    location = "Pine Creek Road · Mile 18",
-    description = "Bridge maintenance zone with temporary fencing, drainage concerns, and weekly inspection notes.",
-    isSaving = false,
-    isEditing = true,
-)
-
-private val longContentPreviewState = SiteEditorUiState(
-    name = "North Warehouse Emergency Overflow Staging Area With Restricted Vehicle Access",
-    location = "Sector A · 125 Industrial Road · Rear service entrance beside loading docks 7 through 12",
-    description = "This site has recurring access issues during morning freight windows, damaged pallet racks near the west wall, temporary fencing around the exterior loading bay, and repeated safety notes from crews about poor lighting, blocked emergency exits, and unclear staging instructions during shift changes.",
-    priority = SitePriority.URGENT,
-    status = SiteStatus.ACTIVE,
-    isSaving = false,
-    isEditing = true,
-)
+@Composable
+private fun SiteEditorScreenPreview_DarkMode_Deleting() {
+    GroundWorkTheme {
+        SiteEditorScreen(
+            uiState = deletingSiteEditorPreviewState,
+            onNameChange = {},
+            onDescriptionChange = {},
+            onLocationChange = {},
+            onStatusChange = {},
+            onPriorityChange = {},
+            onSaveClick = {},
+            onDestructiveActionClick = {},
+            onBackClick = {},
+        )
+    }
+}

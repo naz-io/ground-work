@@ -9,8 +9,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.nabadi.groundwork.feature.fieldnotes.FieldNoteEditorRoute
 import com.nabadi.groundwork.feature.fieldnotes.FieldNotesListRoute
-import com.nabadi.groundwork.feature.sites.SiteEditorRoute
-import com.nabadi.groundwork.feature.sites.SitesListRoute
+import com.nabadi.groundwork.feature.sites.editor.SiteEditorRoute
+import com.nabadi.groundwork.feature.sites.list.SitesListRoute
 
 @Composable
 fun GroundWorkNavHost(

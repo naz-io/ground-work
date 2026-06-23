@@ -1,4 +1,5 @@
-package com.nabadi.groundwork.feature.sites
+package com.nabadi.groundwork.feature.sites.list
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nabadi.groundwork.domain.model.SitePriority
