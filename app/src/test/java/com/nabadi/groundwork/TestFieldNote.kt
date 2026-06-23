@@ -7,13 +7,13 @@ import com.nabadi.groundwork.domain.model.SiteId
 
 object TestFieldNote {
     fun fieldNote(
-        id: String,
+        id: String = "field-note-test",
         siteId: String? = "site-test",
         title: String = "Test Field Note",
         body: String = "This is a test field note.",
         status: FieldNoteStatus = FieldNoteStatus.ACTIVE,
-        createdAt: Long = 0L,
-        updatedAt: Long = 0L,
+        createdAt: Long = 1_000L,
+        updatedAt: Long = 2_000L,
     ): FieldNote = FieldNote(
         id = FieldNoteId(id),
         siteId = siteId?.let { SiteId(it) },

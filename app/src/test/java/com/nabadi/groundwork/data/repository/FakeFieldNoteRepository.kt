@@ -16,13 +16,13 @@ class FakeFieldNoteRepository : FieldNoteRepository {
 
     override fun observeFieldNotes(): Flow<List<FieldNote>> =
         fieldNotesFlow.map { fieldNotes ->
-            if (shouldThrowError) throw Exception("Test Error")
+            if (shouldThrowError) throw IllegalStateException("Test Error")
             fieldNotes.values.sortedByDescending { it.updatedAt }
         }
 
     override fun observeFieldNotesForSite(siteId: SiteId): Flow<List<FieldNote>> =
         fieldNotesFlow.map { fieldNotes ->
-            if (shouldThrowError) throw Exception("Test Error")
+            if (shouldThrowError) throw IllegalStateException("Test Error")
             fieldNotes.values
                 .filter { it.siteId == siteId }
                 .sortedByDescending { it.updatedAt }
@@ -30,24 +30,24 @@ class FakeFieldNoteRepository : FieldNoteRepository {
 
     override fun observeUnassignedFieldNotes(): Flow<List<FieldNote>> =
         fieldNotesFlow.map { fieldNotes ->
-            if (shouldThrowError) throw Exception("Test Error")
+            if (shouldThrowError) throw IllegalStateException("Test Error")
             fieldNotes.values
                 .filter { it.siteId == null }
                 .sortedByDescending { it.updatedAt }
         }
 
     override suspend fun getFieldNote(id: FieldNoteId): FieldNote? {
-        if (shouldThrowError) throw Exception("Test Error")
+        if (shouldThrowError) throw IllegalStateException("Test Error")
         return fieldNotesFlow.value[id]
     }
 
     override suspend fun saveFieldNote(fieldNote: FieldNote) {
-        if (shouldThrowError) throw Exception("Test Error")
+        if (shouldThrowError) throw IllegalStateException("Test Error")
         fieldNotesFlow.update { it + (fieldNote.id to fieldNote) }
     }
 
     override suspend fun deleteFieldNote(id: FieldNoteId) {
-        if (shouldThrowError) throw Exception("Test Error")
+        if (shouldThrowError) throw IllegalStateException("Test Error")
         fieldNotesFlow.update { it - id }
     }
 
