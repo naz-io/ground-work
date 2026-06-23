@@ -1,6 +1,7 @@
 package com.nabadi.groundwork.feature.fieldnotes
 
 import androidx.lifecycle.SavedStateHandle
+import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.nabadi.groundwork.MainDispatcherRule
 import com.nabadi.groundwork.TestFieldNote.fieldNote
@@ -260,10 +261,10 @@ class FieldNoteEditorViewModelTest {
         assertNull(viewModel.uiState.value.errorMessage)
     }
 
-    private suspend fun app.cash.turbine.ReceiveTurbine<FieldNoteEditorUiState>.skipItemsUntilLoaded(): FieldNoteEditorUiState =
+    private suspend fun ReceiveTurbine<FieldNoteEditorUiState>.skipItemsUntilLoaded(): FieldNoteEditorUiState =
         skipItemsUntil { state -> !state.isLoading }
 
-    private suspend fun app.cash.turbine.ReceiveTurbine<FieldNoteEditorUiState>.skipItemsUntil(
+    private suspend fun ReceiveTurbine<FieldNoteEditorUiState>.skipItemsUntil(
         predicate: (FieldNoteEditorUiState) -> Boolean,
     ): FieldNoteEditorUiState {
         var item = awaitItem()

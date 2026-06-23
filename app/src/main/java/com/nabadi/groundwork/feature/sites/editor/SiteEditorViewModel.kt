@@ -21,11 +21,11 @@ import javax.inject.Inject
 @HiltViewModel
 class SiteEditorViewModel @Inject constructor(
     private val siteRepository: SiteRepository,
-    savedstateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val siteId: SiteId? =
-        savedstateHandle.get<String>(GroundWorkRoute.SITE_ID_ARG)?.let(::SiteId)
+        savedStateHandle.get<String>(GroundWorkRoute.SITE_ID_ARG)?.let(::SiteId)
     private var existingSite: Site? = null
 
     private val _uiState = MutableStateFlow(SiteEditorUiState())
@@ -84,8 +84,8 @@ class SiteEditorViewModel @Inject constructor(
     }
 
     fun saveSite(onSaved: () -> Unit) {
-        if (_uiState.value.isBusy) return
         val currentState = _uiState.value
+        if (currentState.isBusy || currentState.name.isBlank()) return
 
         viewModelScope.launch {
             updateSavingState(isSaving = true)
@@ -97,7 +97,7 @@ class SiteEditorViewModel @Inject constructor(
                 siteRepository.saveSite(
                     Site(
                         id = existingSite?.id ?: SiteId(UUID.randomUUID().toString()),
-                        name = currentState.name.ifBlank { "Untitled site" },
+                        name = currentState.name,
                         description = currentState.description,
                         location = currentState.location,
                         priority = currentState.priority,
@@ -107,6 +107,7 @@ class SiteEditorViewModel @Inject constructor(
                     )
                 )
             }.onSuccess {
+                existingSite = null
                 _uiState.update { SiteEditorUiState() }
                 onSaved()
             }.onFailure {
@@ -115,20 +116,20 @@ class SiteEditorViewModel @Inject constructor(
                     errorMessage = "Unable to save site.",
                 )
             }
-
         }
     }
 
     fun deleteSite(onDeleted: () -> Unit) {
-        if (_uiState.value.isBusy) return
+        val currentState = _uiState.value
+        val siteToDelete = existingSite
+        if (currentState.isBusy || siteToDelete == null) return
+
         viewModelScope.launch {
             updateDeletingState(isDeleting = true)
             runCatching {
-                val existingSite = existingSite
-                    ?: error("Cannot delete a site that has not been saved.")
-
-                siteRepository.deleteSite(id = existingSite.id)
+                siteRepository.deleteSite(id = siteToDelete.id)
             }.onSuccess {
+                existingSite = null
                 _uiState.update { SiteEditorUiState() }
                 onDeleted()
             }.onFailure {
@@ -142,6 +143,7 @@ class SiteEditorViewModel @Inject constructor(
 
     fun discardSite(onDiscarded: () -> Unit) {
         if (_uiState.value.isBusy) return
+        existingSite = null
         _uiState.update { SiteEditorUiState() }
         onDiscarded()
     }
@@ -168,6 +170,8 @@ class SiteEditorViewModel @Inject constructor(
                             name = site.name,
                             description = site.description,
                             location = site.location,
+                            priority = site.priority,
+                            status = site.status,
                             isEditing = true,
                             isLoading = false,
                             errorMessage = null,
