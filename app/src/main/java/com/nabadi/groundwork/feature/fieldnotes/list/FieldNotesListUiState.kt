@@ -1,4 +1,4 @@
-package com.nabadi.groundwork.feature.fieldnotes
+package com.nabadi.groundwork.feature.fieldnotes.list
 
 import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteStatus

@@ -7,8 +7,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.nabadi.groundwork.feature.fieldnotes.FieldNoteEditorRoute
-import com.nabadi.groundwork.feature.fieldnotes.FieldNotesListRoute
+import com.nabadi.groundwork.feature.fieldnotes.editor.FieldNoteEditorRoute
+import com.nabadi.groundwork.feature.fieldnotes.list.FieldNotesListRoute
 import com.nabadi.groundwork.feature.sites.editor.SiteEditorRoute
 import com.nabadi.groundwork.feature.sites.list.SitesListRoute
 

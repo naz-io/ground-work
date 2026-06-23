@@ -1,4 +1,4 @@
-package com.nabadi.groundwork.feature.fieldnotes
+package com.nabadi.groundwork.feature.fieldnotes.editor
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -9,13 +9,13 @@ import com.nabadi.groundwork.domain.model.FieldNoteStatus
 import com.nabadi.groundwork.domain.repository.FieldNoteRepository
 import com.nabadi.groundwork.navigation.GroundWorkRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.util.UUID
-import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
+import javax.inject.Inject
 
 @HiltViewModel
 class FieldNoteEditorViewModel @Inject constructor(

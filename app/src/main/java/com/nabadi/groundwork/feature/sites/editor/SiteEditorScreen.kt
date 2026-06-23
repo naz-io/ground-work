@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import com.nabadi.groundwork.R
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
-import com.nabadi.groundwork.feature.fieldnotes.BackButton
 import com.nabadi.groundwork.feature.sites.PREVIEW_API_LEVEL
 import com.nabadi.groundwork.feature.sites.deletingSiteEditorPreviewState
 import com.nabadi.groundwork.feature.sites.editingSiteEditorPreviewState
@@ -48,6 +47,7 @@ import com.nabadi.groundwork.feature.sites.filledSiteEditorPreviewState
 import com.nabadi.groundwork.feature.sites.labelResId
 import com.nabadi.groundwork.feature.sites.longContentSiteEditorPreviewState
 import com.nabadi.groundwork.feature.sites.savingSiteEditorPreviewState
+import com.nabadi.groundwork.ui.components.BackButton
 import com.nabadi.groundwork.ui.theme.GroundWorkTheme
 
 @Composable

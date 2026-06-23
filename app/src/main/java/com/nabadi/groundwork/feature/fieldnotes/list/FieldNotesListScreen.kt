@@ -1,4 +1,4 @@
-package com.nabadi.groundwork.feature.fieldnotes
+package com.nabadi.groundwork.feature.fieldnotes.list
 
 import android.content.res.Configuration
 import androidx.annotation.StringRes
@@ -430,7 +430,9 @@ private fun FieldNotesListScreenPreview_Content_Dark() {
 private fun FieldNotesListScreenPreview_Loading() {
     GroundWorkTheme {
         FieldNotesListScreen(
-            uiState = FieldNotesListUiState(isLoading = true),
+            uiState = FieldNotesListUiState(
+                isLoading = true
+            ),
             onSearchQueryChange = {},
             onStatusFilterChange = {},
             onAddFieldNoteClick = {},
@@ -449,7 +451,9 @@ private fun FieldNotesListScreenPreview_Loading() {
 private fun FieldNotesListScreenPreview_Loading_Dark() {
     GroundWorkTheme {
         FieldNotesListScreen(
-            uiState = FieldNotesListUiState(isLoading = true),
+            uiState = FieldNotesListUiState(
+                isLoading = true
+            ),
             onSearchQueryChange = {},
             onAddFieldNoteClick = {},
             onStatusFilterChange = {},

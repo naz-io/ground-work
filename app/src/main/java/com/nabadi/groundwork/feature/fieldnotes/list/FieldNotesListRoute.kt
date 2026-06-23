@@ -1,4 +1,4 @@
-package com.nabadi.groundwork.feature.fieldnotes
+package com.nabadi.groundwork.feature.fieldnotes.list
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue

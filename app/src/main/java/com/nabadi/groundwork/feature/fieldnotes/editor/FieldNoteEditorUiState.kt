@@ -1,4 +1,4 @@
-package com.nabadi.groundwork.feature.fieldnotes
+package com.nabadi.groundwork.feature.fieldnotes.editor
 
 data class FieldNoteEditorUiState(
     val title: String = "",
