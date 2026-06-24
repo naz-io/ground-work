@@ -62,7 +62,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-30-default-x86_64
+          key: avd-30-default-arm64
 
       - name: Create AVD snapshot
         if: steps.avd-cache.outputs.cache-hit != 'true'
@@ -70,7 +70,7 @@ jobs:
         with:
           api-level: 30
           target: default
-          arch: x86_64
+          arch: arm64-v8a
           profile: pixel_6
           force-avd-creation: false
           emulator-options: -no-window -no-audio -no-boot-anim
@@ -82,7 +82,7 @@ jobs:
         with:
           api-level: 30
           target: default
-          arch: x86_64
+          arch: arm64-v8a
           profile: pixel_6
           force-avd-creation: false
           emulator-options: -no-window -no-audio -no-boot-anim
