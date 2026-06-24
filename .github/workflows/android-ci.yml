@@ -35,7 +35,7 @@ jobs:
 
   android-tests:
     name: Instrumented Android tests
-    runs-on: macos-latest
+    runs-on: macos-13
     timeout-minutes: 45
 
     steps:
