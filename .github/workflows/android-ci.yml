@@ -56,12 +56,13 @@ jobs:
       - name: Run instrumented tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30
-          target: default
-          arch: x86
-          profile: Nexus 6
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
           # Force emulator to bypass the buggy network simulator and window rendering layers
           emulator-options: -no-window -gpu off -no-audio -no-boot-anim
           emulator-boot-timeout: 600
           disable-animations: true
+          disable-linux-hw-accel: true
           script: ./gradlew connectedDebugAndroidTest --stacktrace
