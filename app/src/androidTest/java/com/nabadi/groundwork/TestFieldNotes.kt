@@ -32,8 +32,8 @@ object TestFieldNotes {
         title: String = "Test Field Note",
         body: String = "This is a test field note.",
         status: String = "DRAFT",
-        createdAt: Long = 1L,
-        updatedAt: Long = 2L,
+        createdAt: Long = 1_000L,
+        updatedAt: Long = 2_000L,
     ): FieldNoteEntity = FieldNoteEntity(
         id = id,
         siteId = siteId,
