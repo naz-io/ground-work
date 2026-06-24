@@ -35,7 +35,8 @@ jobs:
 
   android-tests:
     name: Instrumented Android tests
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
+    timeout-minutes: 45
 
     steps:
       - name: Check out code
@@ -60,9 +61,7 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel_6
-          # Force emulator to bypass the buggy network simulator and window rendering layers
-          emulator-options: -no-window -gpu off -no-audio -no-boot-anim
+          emulator-options: -no-window -no-audio -no-boot-anim
           emulator-boot-timeout: 600
           disable-animations: true
-          disable-linux-hw-accel: true
           script: ./gradlew connectedDebugAndroidTest --stacktrace
