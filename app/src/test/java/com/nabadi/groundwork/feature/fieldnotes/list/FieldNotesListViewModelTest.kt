@@ -1,13 +1,11 @@
-package com.nabadi.groundwork.feature.fieldnotes
+package com.nabadi.groundwork.feature.fieldnotes.list
 
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.nabadi.groundwork.MainDispatcherRule
-import com.nabadi.groundwork.TestFieldNote.fieldNote
+import com.nabadi.groundwork.feature.fieldnotes.TestFieldNote.fieldNote
 import com.nabadi.groundwork.data.repository.FakeFieldNoteRepository
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
-import com.nabadi.groundwork.feature.fieldnotes.list.FieldNotesListUiState
-import com.nabadi.groundwork.feature.fieldnotes.list.FieldNotesListViewModel
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

@@ -1,14 +1,12 @@
-package com.nabadi.groundwork.feature.sites
+package com.nabadi.groundwork.feature.sites.list
 
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.nabadi.groundwork.MainDispatcherRule
-import com.nabadi.groundwork.TestSite.site
+import com.nabadi.groundwork.feature.sites.TestSite
 import com.nabadi.groundwork.data.repository.FakeSitesRepository
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
-import com.nabadi.groundwork.feature.sites.list.SitesListUiState
-import com.nabadi.groundwork.feature.sites.list.SitesListViewModel
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -34,8 +32,8 @@ class SitesListViewModelTest {
     @Test
     fun `uiState initially emits data from repository`() = runTest {
         val sites = listOf(
-            site(id = "1", name = "Site 1"),
-            site(id = "2", name = "Site 2"),
+            TestSite.site(id = "1", name = "Site 1"),
+            TestSite.site(id = "2", name = "Site 2"),
         )
         repository.setSites(sites)
 
@@ -49,8 +47,8 @@ class SitesListViewModelTest {
     @Test
     fun `onSearchQueryChange updates searchQuery and filters sites`() = runTest {
         val sites = listOf(
-            site(id = "1", name = "North Warehouse"),
-            site(id = "2", name = "South Yard"),
+            TestSite.site(id = "1", name = "North Warehouse"),
+            TestSite.site(id = "2", name = "South Yard"),
         )
         repository.setSites(sites)
 
@@ -69,12 +67,12 @@ class SitesListViewModelTest {
     @Test
     fun `onStatusFilterChange updates selectedStatus and filters sites`() = runTest {
         val sites = listOf(
-            site(
+            TestSite.site(
                 id = "1",
                 name = "Active site",
                 status = SiteStatus.ACTIVE,
             ),
-            site(
+            TestSite.site(
                 id = "2",
                 name = "Archived site",
                 status = SiteStatus.ARCHIVED,
@@ -97,12 +95,12 @@ class SitesListViewModelTest {
     @Test
     fun `onPriorityFilterChange updates selectedPriority and filters sites`() = runTest {
         val sites = listOf(
-            site(
+            TestSite.site(
                 id = "1",
                 name = "Normal site",
                 priority = SitePriority.NORMAL,
             ),
-            site(
+            TestSite.site(
                 id = "2",
                 name = "Urgent site",
                 priority = SitePriority.URGENT,
@@ -125,19 +123,19 @@ class SitesListViewModelTest {
     @Test
     fun `combined search status and priority filters work correctly`() = runTest {
         val sites = listOf(
-            site(
+            TestSite.site(
                 id = "1",
                 name = "North Warehouse",
                 status = SiteStatus.ACTIVE,
                 priority = SitePriority.URGENT,
             ),
-            site(
+            TestSite.site(
                 id = "2",
                 name = "North Yard",
                 status = SiteStatus.COMPLETED,
                 priority = SitePriority.URGENT,
             ),
-            site(
+            TestSite.site(
                 id = "3",
                 name = "South Warehouse",
                 status = SiteStatus.ACTIVE,
@@ -169,12 +167,12 @@ class SitesListViewModelTest {
     @Test
     fun `search query filters sites by description`() = runTest {
         val sites = listOf(
-            site(
+            TestSite.site(
                 id = "1",
                 name = "North Gate",
                 description = "Loose temporary fencing reported near the north access point.",
             ),
-            site(
+            TestSite.site(
                 id = "2",
                 name = "Pump Room",
                 description = "Pressure gauge needs follow-up.",
@@ -197,12 +195,12 @@ class SitesListViewModelTest {
     @Test
     fun `search query filters sites by location`() = runTest {
         val sites = listOf(
-            site(
+            TestSite.site(
                 id = "1",
                 name = "North Gate",
                 location = "Industrial Road",
             ),
-            site(
+            TestSite.site(
                 id = "2",
                 name = "Pump Room",
                 location = "Riverbend Service Road",
@@ -225,8 +223,8 @@ class SitesListViewModelTest {
     @Test
     fun `search query is case insensitive`() = runTest {
         val sites = listOf(
-            site(id = "1", name = "North Gate Safety Check"),
-            site(id = "2", name = "Pump room inspection"),
+            TestSite.site(id = "1", name = "North Gate Safety Check"),
+            TestSite.site(id = "2", name = "Pump room inspection"),
         )
         repository.setSites(sites)
 
@@ -244,8 +242,8 @@ class SitesListViewModelTest {
     @Test
     fun `blank search query does not filter sites`() = runTest {
         val sites = listOf(
-            site(id = "1", name = "North Warehouse"),
-            site(id = "2", name = "South Yard"),
+            TestSite.site(id = "1", name = "North Warehouse"),
+            TestSite.site(id = "2", name = "South Yard"),
         )
         repository.setSites(sites)
 
@@ -263,8 +261,8 @@ class SitesListViewModelTest {
     @Test
     fun `search query with no matches emits empty sites with active criteria`() = runTest {
         val sites = listOf(
-            site(id = "1", name = "North Warehouse"),
-            site(id = "2", name = "South Yard"),
+            TestSite.site(id = "1", name = "North Warehouse"),
+            TestSite.site(id = "2", name = "South Yard"),
         )
         repository.setSites(sites)
 
@@ -287,7 +285,7 @@ class SitesListViewModelTest {
     fun `repository updates are filtered using current search query`() = runTest {
         repository.setSites(
             listOf(
-                site(id = "1", name = "North Warehouse"),
+                TestSite.site(id = "1", name = "North Warehouse"),
             ),
         )
 
@@ -299,8 +297,8 @@ class SitesListViewModelTest {
 
             repository.setSites(
                 listOf(
-                    site(id = "1", name = "North Warehouse"),
-                    site(id = "2", name = "River Bridge"),
+                    TestSite.site(id = "1", name = "North Warehouse"),
+                    TestSite.site(id = "2", name = "River Bridge"),
                 ),
             )
 
@@ -314,13 +312,13 @@ class SitesListViewModelTest {
     @Test
     fun `onClearCriteriaClick clears search status and priority filters`() = runTest {
         val sites = listOf(
-            site(
+            TestSite.site(
                 id = "1",
                 name = "North Warehouse",
                 status = SiteStatus.ACTIVE,
                 priority = SitePriority.URGENT,
             ),
-            site(
+            TestSite.site(
                 id = "2",
                 name = "South Yard",
                 status = SiteStatus.ARCHIVED,
@@ -354,12 +352,12 @@ class SitesListViewModelTest {
     @Test
     fun `clearing status filter shows all sites that match remaining criteria`() = runTest {
         val sites = listOf(
-            site(
+            TestSite.site(
                 id = "1",
                 name = "Active site",
                 status = SiteStatus.ACTIVE,
             ),
-            site(
+            TestSite.site(
                 id = "2",
                 name = "Archived site",
                 status = SiteStatus.ARCHIVED,
@@ -384,12 +382,12 @@ class SitesListViewModelTest {
     @Test
     fun `clearing priority filter shows all sites that match remaining criteria`() = runTest {
         val sites = listOf(
-            site(
+            TestSite.site(
                 id = "1",
                 name = "Normal site",
                 priority = SitePriority.NORMAL,
             ),
-            site(
+            TestSite.site(
                 id = "2",
                 name = "Urgent site",
                 priority = SitePriority.URGENT,

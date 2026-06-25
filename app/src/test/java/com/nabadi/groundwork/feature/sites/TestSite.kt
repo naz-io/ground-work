@@ -1,4 +1,4 @@
-package com.nabadi.groundwork
+package com.nabadi.groundwork.feature.sites
 
 import com.nabadi.groundwork.domain.model.Site
 import com.nabadi.groundwork.domain.model.SiteId

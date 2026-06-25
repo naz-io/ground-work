@@ -1,15 +1,13 @@
-package com.nabadi.groundwork.feature.sites
+package com.nabadi.groundwork.feature.sites.editor
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.nabadi.groundwork.MainDispatcherRule
-import com.nabadi.groundwork.TestSite.site
+import com.nabadi.groundwork.feature.sites.TestSite
 import com.nabadi.groundwork.data.repository.FakeSitesRepository
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
-import com.nabadi.groundwork.feature.sites.editor.SiteEditorUiState
-import com.nabadi.groundwork.feature.sites.editor.SiteEditorViewModel
 import com.nabadi.groundwork.navigation.GroundWorkRoute
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -27,7 +25,7 @@ class SitesEditorViewModelTest {
 
     @Test
     fun `init loads existing site when site id is provided`() = runTest {
-        val existingSite = site(
+        val existingSite = TestSite.site(
             id = "site-001",
             name = "Existing site",
             description = "Existing description",
@@ -144,7 +142,10 @@ class SitesEditorViewModelTest {
 
         viewModel.onDescriptionChange("Recurring loading-bay access issue.")
 
-        assertEquals("Recurring loading-bay access issue.", viewModel.uiState.value.description)
+        assertEquals(
+            "Recurring loading-bay access issue.",
+            viewModel.uiState.value.description
+        )
     }
 
     @Test
@@ -219,7 +220,7 @@ class SitesEditorViewModelTest {
 
     @Test
     fun `saveSite updates existing site and preserves metadata`() = runTest {
-        val existingSite = site(
+        val existingSite = TestSite.site(
             id = "site-001",
             name = "Original site",
             description = "Original description",
@@ -266,7 +267,7 @@ class SitesEditorViewModelTest {
 
     @Test
     fun `deleteSite deletes existing site`() = runTest {
-        val existingSite = site(id = "site-001")
+        val existingSite = TestSite.site(id = "site-001")
         val repository = FakeSitesRepository().apply {
             setSites(listOf(existingSite))
         }
@@ -347,7 +348,7 @@ class SitesEditorViewModelTest {
 
     @Test
     fun `deleteSite shows error when repository delete fails`() = runTest {
-        val existingSite = site(id = "site-001")
+        val existingSite = TestSite.site(id = "site-001")
         val repository = FakeSitesRepository().apply {
             setSites(listOf(existingSite))
         }

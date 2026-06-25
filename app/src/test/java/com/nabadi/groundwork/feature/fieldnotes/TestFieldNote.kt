@@ -1,4 +1,4 @@
-package com.nabadi.groundwork
+package com.nabadi.groundwork.feature.fieldnotes
 
 import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
