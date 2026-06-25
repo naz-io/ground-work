@@ -8,6 +8,7 @@ import com.nabadi.groundwork.TestFieldNotes.fieldNote
 import com.nabadi.groundwork.data.local.GroundWorkDatabase
 import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
+import com.nabadi.groundwork.domain.model.SiteId
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -52,7 +53,7 @@ class OfflineFirstFieldNoteRepositoryTest {
     }
 
     @Test
-    fun `observeFieldNotes emits saved field notes`() = runTest {
+    fun `observeFieldNotes emits saved field notes ordered by updatedAt descending`() = runTest {
         val olderFieldNote = fieldNote(
             id = "1",
             title = "Older field note",
@@ -70,6 +71,86 @@ class OfflineFirstFieldNoteRepositoryTest {
         val fieldNotes = repository.observeFieldNotes().first()
 
         assertEquals(listOf(newerFieldNote, olderFieldNote), fieldNotes)
+    }
+
+    @Test
+    fun `observeFieldNotesForSite emits field notes assigned to site ordered by updatedAt descending`() = runTest {
+        val olderAssignedFieldNote = fieldNote(
+            id = "1",
+            siteId = "site-1",
+            title = "Older assigned field note",
+            updatedAt = 1L,
+        )
+        val newerAssignedFieldNote = fieldNote(
+            id = "2",
+            siteId = "site-1",
+            title = "Newer assigned field note",
+            updatedAt = 3L,
+        )
+        val otherSiteFieldNote = fieldNote(
+            id = "3",
+            siteId = "site-2",
+            title = "Other site field note",
+            updatedAt = 4L,
+        )
+        val unassignedFieldNote = fieldNote(
+            id = "4",
+            siteId = null,
+            title = "Unassigned field note",
+            updatedAt = 5L,
+        )
+
+        repository.saveFieldNote(olderAssignedFieldNote)
+        repository.saveFieldNote(newerAssignedFieldNote)
+        repository.saveFieldNote(otherSiteFieldNote)
+        repository.saveFieldNote(unassignedFieldNote)
+
+        val fieldNotes = repository.observeFieldNotesForSite(SiteId("site-1")).first()
+
+        assertEquals(listOf(newerAssignedFieldNote, olderAssignedFieldNote), fieldNotes)
+    }
+
+    @Test
+    fun `observeFieldNotesForSite emits empty list for site with no field notes`() = runTest {
+        val fieldNote = fieldNote(
+            id = "1",
+            siteId = "site-1",
+        )
+        repository.saveFieldNote(fieldNote)
+
+        val fieldNotes = repository.observeFieldNotesForSite(SiteId("missing-site")).first()
+
+        assertEquals(emptyList<FieldNote>(), fieldNotes)
+    }
+
+    @Test
+    fun `observeUnassignedFieldNotes emits unassigned field notes ordered by updatedAt descending`() = runTest {
+        val olderUnassignedFieldNote = fieldNote(
+            id = "1",
+            siteId = null,
+            title = "Older unassigned field note",
+            updatedAt = 1L,
+        )
+        val newerUnassignedFieldNote = fieldNote(
+            id = "2",
+            siteId = null,
+            title = "Newer unassigned field note",
+            updatedAt = 3L,
+        )
+        val assignedFieldNote = fieldNote(
+            id = "3",
+            siteId = "site-1",
+            title = "Assigned field note",
+            updatedAt = 4L,
+        )
+
+        repository.saveFieldNote(olderUnassignedFieldNote)
+        repository.saveFieldNote(newerUnassignedFieldNote)
+        repository.saveFieldNote(assignedFieldNote)
+
+        val fieldNotes = repository.observeUnassignedFieldNotes().first()
+
+        assertEquals(listOf(newerUnassignedFieldNote, olderUnassignedFieldNote), fieldNotes)
     }
 
     @Test

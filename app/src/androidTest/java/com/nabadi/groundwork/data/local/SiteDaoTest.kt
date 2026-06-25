@@ -36,7 +36,7 @@ class SiteDaoTest {
     }
 
     @Test
-    fun `observeSites emits saved sites`() = runTest {
+    fun `observeSites emits saved sites ordered by updatedAt descending`() = runTest {
         val olderEntity = siteEntity(
             id = "1",
             name = "Older site",
