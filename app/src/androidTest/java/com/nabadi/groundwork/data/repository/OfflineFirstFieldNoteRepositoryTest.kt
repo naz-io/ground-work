@@ -41,6 +41,7 @@ class OfflineFirstFieldNoteRepositoryTest {
         database.close()
     }
 
+
     @Test
     fun `saveFieldNote persists field note`() = runTest {
         val fieldNote = fieldNote(id = "1")
@@ -50,6 +51,33 @@ class OfflineFirstFieldNoteRepositoryTest {
         val savedFieldNote = repository.getFieldNote(fieldNote.id)
 
         assertEquals(fieldNote, savedFieldNote)
+    }
+
+    @Test
+    fun `saveFieldNote updates existing field note with same id`() = runTest {
+        val originalFieldNote = fieldNote(
+            id = "1",
+            siteId = null,
+            title = "Original title",
+            body = "Original body",
+            updatedAt = 1L,
+        )
+        val updatedFieldNote = fieldNote(
+            id = "1",
+            siteId = "site-1",
+            title = "Updated title",
+            body = "Updated body",
+            updatedAt = 2L,
+        )
+
+        repository.saveFieldNote(originalFieldNote)
+        repository.saveFieldNote(updatedFieldNote)
+
+        val savedFieldNote = repository.getFieldNote(updatedFieldNote.id)
+        val fieldNotes = repository.observeFieldNotes().first()
+
+        assertEquals(updatedFieldNote, savedFieldNote)
+        assertEquals(listOf(updatedFieldNote), fieldNotes)
     }
 
     @Test
@@ -171,6 +199,7 @@ class OfflineFirstFieldNoteRepositoryTest {
         assertNull(savedFieldNote)
     }
 
+
     @Test
     fun `deleteFieldNote removes saved field note`() = runTest {
         val fieldNote = fieldNote(id = "1")
@@ -181,6 +210,18 @@ class OfflineFirstFieldNoteRepositoryTest {
         val savedFieldNote = repository.getFieldNote(fieldNote.id)
 
         assertNull(savedFieldNote)
+    }
+
+    @Test
+    fun `deleteFieldNote with missing id does not remove other field notes`() = runTest {
+        val fieldNote = fieldNote(id = "1")
+        repository.saveFieldNote(fieldNote)
+
+        repository.deleteFieldNote(FieldNoteId("missing-id"))
+
+        val fieldNotes = repository.observeFieldNotes().first()
+
+        assertEquals(listOf(fieldNote), fieldNotes)
     }
 
     @Test

@@ -6,6 +6,7 @@ import com.nabadi.groundwork.domain.model.FieldNoteId
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
 import com.nabadi.groundwork.domain.model.SiteId
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class FieldNoteMapperTest {
@@ -55,6 +56,40 @@ class FieldNoteMapperTest {
         assertEquals("ACTIVE", entity.status)
         assertEquals(1_734_220_800_000L, entity.createdAt)
         assertEquals(1_734_224_400_000L, entity.updatedAt)
+    }
+
+    @Test
+    fun `toDomain maps null site id to null`() {
+        val entity = FieldNoteEntity(
+            id = "field-note-003",
+            siteId = null,
+            title = "Unassigned note",
+            body = "Captured quickly before selecting a site.",
+            status = "DRAFT",
+            createdAt = 1_734_220_800_000L,
+            updatedAt = 1_734_224_400_000L,
+        )
+
+        val fieldNote = entity.toDomain()
+
+        assertNull(fieldNote.siteId)
+    }
+
+    @Test
+    fun `toEntity maps null site id to null`() {
+        val fieldNote = FieldNote(
+            id = FieldNoteId("field-note-004"),
+            siteId = null,
+            title = "Unassigned note",
+            body = "Captured quickly before selecting a site.",
+            status = FieldNoteStatus.DRAFT,
+            createdAt = 1_734_220_800_000L,
+            updatedAt = 1_734_224_400_000L,
+        )
+
+        val entity = fieldNote.toEntity()
+
+        assertNull(entity.siteId)
     }
 
     @Test

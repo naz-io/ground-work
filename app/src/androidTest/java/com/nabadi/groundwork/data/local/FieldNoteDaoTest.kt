@@ -136,6 +136,7 @@ class FieldNoteDaoTest {
     fun `getFieldNote returns saved field note`() = runTest {
         val entity = fieldNoteEntity(
             id = "1",
+            siteId = "site-1",
             title = "Test Field Note",
             body = "This is a test field note.",
             status = "DRAFT",
@@ -148,6 +149,7 @@ class FieldNoteDaoTest {
         val retrievedFieldNote = dao.getFieldNote(entity.id)
         assertNotNull(retrievedFieldNote)
         assertEquals(entity.id, retrievedFieldNote?.id)
+        assertEquals(entity.siteId, retrievedFieldNote?.siteId)
         assertEquals(entity.title, retrievedFieldNote?.title)
         assertEquals(entity.body, retrievedFieldNote?.body)
         assertEquals(entity.status, retrievedFieldNote?.status)
@@ -165,6 +167,7 @@ class FieldNoteDaoTest {
     fun `upsertFieldNote replaces existing note with same id`() = runTest {
         val originalEntity = fieldNoteEntity(
             id = "1",
+            siteId = null,
             title = "Original title",
             body = "Original body",
             status = "DRAFT",
@@ -173,6 +176,7 @@ class FieldNoteDaoTest {
         )
         val updatedEntity = fieldNoteEntity(
             id = "1",
+            siteId = "site-1",
             title = "Updated title",
             body = "Updated body",
             status = "ACTIVE",
@@ -185,6 +189,7 @@ class FieldNoteDaoTest {
         val retrievedFieldNote = dao.getFieldNote("1")
         assertNotNull(retrievedFieldNote)
         assertEquals(updatedEntity.id, retrievedFieldNote?.id)
+        assertEquals(updatedEntity.siteId, retrievedFieldNote?.siteId)
         assertEquals(updatedEntity.title, retrievedFieldNote?.title)
         assertEquals(updatedEntity.body, retrievedFieldNote?.body)
         assertEquals(updatedEntity.status, retrievedFieldNote?.status)

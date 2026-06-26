@@ -9,7 +9,7 @@ import com.nabadi.groundwork.domain.model.SiteId
 fun FieldNoteEntity.toDomain(): FieldNote =
     FieldNote(
         id = FieldNoteId(id),
-        siteId = siteId?.let { SiteId(it) },
+        siteId = siteId?.let(::SiteId),
         title = title,
         body = body,
         status = FieldNoteStatus.valueOf(status),
