@@ -6,6 +6,7 @@ import app.cash.turbine.test
 import com.nabadi.groundwork.MainDispatcherRule
 import com.nabadi.groundwork.feature.fieldnotes.TestFieldNote.fieldNote
 import com.nabadi.groundwork.data.repository.FakeFieldNoteRepository
+import com.nabadi.groundwork.data.repository.FakeSiteRepository
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
 import com.nabadi.groundwork.navigation.GroundWorkRoute
 import kotlinx.coroutines.flow.first
@@ -30,11 +31,13 @@ class FieldNoteEditorViewModelTest {
             body = "Existing body",
             status = FieldNoteStatus.DRAFT,
         )
-        val repository = FakeFieldNoteRepository().apply {
+        val fieldNoteRepository = FakeFieldNoteRepository().apply {
             setFieldNotes(listOf(existingFieldNote))
         }
+        val siteRepository = FakeSiteRepository()
         val viewModel = FieldNoteEditorViewModel(
-            fieldNoteRepository = repository,
+            fieldNoteRepository = fieldNoteRepository,
+            siteRepository = siteRepository,
             savedStateHandle = SavedStateHandle(
                 initialState = mapOf(GroundWorkRoute.FIELD_NOTE_ID_ARG to existingFieldNote.id.value),
             ),
@@ -47,6 +50,9 @@ class FieldNoteEditorViewModelTest {
 
             assertEquals("Existing title", loadedState.title)
             assertEquals("Existing body", loadedState.body)
+            assertEquals(existingFieldNote.siteId, loadedState.siteId)
+            assertEquals(existingFieldNote.status, loadedState.status)
+            assertEquals(existingFieldNote.updatedAt, loadedState.updatedAt)
             assertTrue(loadedState.isEditing)
             assertFalse(loadedState.isLoading)
             assertNull(loadedState.errorMessage)
@@ -58,6 +64,7 @@ class FieldNoteEditorViewModelTest {
     fun `init shows error when existing field note is not found`() = runTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = FakeFieldNoteRepository(),
+            siteRepository = FakeSiteRepository(),
             savedStateHandle = SavedStateHandle(
                 initialState = mapOf(GroundWorkRoute.FIELD_NOTE_ID_ARG to "missing-id"),
             ),
@@ -79,6 +86,7 @@ class FieldNoteEditorViewModelTest {
     fun `onTitleChange updates title`() = runTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = FakeFieldNoteRepository(),
+            siteRepository = FakeSiteRepository(),
             savedStateHandle = SavedStateHandle(),
         )
 
@@ -91,6 +99,7 @@ class FieldNoteEditorViewModelTest {
     fun `onBodyChange updates body`() = runTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = FakeFieldNoteRepository(),
+            siteRepository = FakeSiteRepository(),
             savedStateHandle = SavedStateHandle(),
         )
 
@@ -107,12 +116,14 @@ class FieldNoteEditorViewModelTest {
         val repository = FakeFieldNoteRepository()
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = repository,
+            siteRepository = FakeSiteRepository(),
             savedStateHandle = SavedStateHandle(),
         )
         var onSavedCalled = false
 
         viewModel.onTitleChange("North gate issue")
         viewModel.onBodyChange("Loose fencing near the north access point.")
+        viewModel.onStatusChange(FieldNoteStatus.ACTIVE)
         viewModel.saveFieldNote(onSaved = { onSavedCalled = true })
 
         val savedFieldNote = repository.observeFieldNotes().first().single()
@@ -127,10 +138,11 @@ class FieldNoteEditorViewModelTest {
     }
 
     @Test
-    fun `saveFieldNote uses untitled field note when title is blank`() = runTest {
+    fun `saveFieldNote saves blank title when title is blank`() = runTest {
         val repository = FakeFieldNoteRepository()
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = repository,
+            siteRepository = FakeSiteRepository(),
             savedStateHandle = SavedStateHandle(),
         )
 
@@ -138,7 +150,7 @@ class FieldNoteEditorViewModelTest {
         viewModel.saveFieldNote(onSaved = {})
 
         val savedFieldNote = repository.observeFieldNotes().first().single()
-        assertEquals("Untitled field note", savedFieldNote.title)
+        assertEquals("", savedFieldNote.title)
         assertEquals("Observation without title.", savedFieldNote.body)
     }
 
@@ -157,6 +169,7 @@ class FieldNoteEditorViewModelTest {
         }
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = repository,
+            siteRepository = FakeSiteRepository(),
             savedStateHandle = SavedStateHandle(
                 mapOf(GroundWorkRoute.FIELD_NOTE_ID_ARG to existingFieldNote.id.value),
             ),
@@ -190,6 +203,7 @@ class FieldNoteEditorViewModelTest {
         }
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = repository,
+            siteRepository = FakeSiteRepository(),
             savedStateHandle = SavedStateHandle(
                 initialState = mapOf(GroundWorkRoute.FIELD_NOTE_ID_ARG to existingFieldNote.id.value),
             ),
@@ -213,13 +227,14 @@ class FieldNoteEditorViewModelTest {
         val repository = FakeFieldNoteRepository()
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = repository,
+            siteRepository = FakeSiteRepository(),
             savedStateHandle = SavedStateHandle(),
         )
         var onDiscardedCalled = false
 
         viewModel.onTitleChange("Draft title")
         viewModel.onBodyChange("Draft body")
-        viewModel.discardDraft(onDiscarded = { onDiscardedCalled = true })
+        viewModel.discardChanges(onDiscarded = { onDiscardedCalled = true })
 
         assertEquals(FieldNoteEditorUiState(), viewModel.uiState.value)
         assertTrue(onDiscardedCalled)
@@ -233,6 +248,7 @@ class FieldNoteEditorViewModelTest {
         }
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = repository,
+            siteRepository = FakeSiteRepository(),
             savedStateHandle = SavedStateHandle(),
         )
         var onSavedCalled = false
@@ -253,6 +269,7 @@ class FieldNoteEditorViewModelTest {
         }
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = repository,
+            siteRepository = FakeSiteRepository(),
             savedStateHandle = SavedStateHandle(),
         )
 

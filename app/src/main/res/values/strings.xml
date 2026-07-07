@@ -49,19 +49,24 @@
     <!-- Field note editor screen -->
     <string name="field_note_editor_new_title">Create Field Note</string>
     <string name="field_note_editor_edit_title">Edit Field Note</string>
-    <string name="field_note_editor_draft">Local Draft\nChanges will be saved locally on this device.</string>
-    <string name="field_note_editor_title_label">Note Title</string>
+    <string name="field_note_editor_last_modified">LAST MODIFIED: %1$s</string>
+    <string name="field_note_editor_title_label">NOTE TITLE</string>
     <string name="field_note_editor_title_hint">e.g., Generator Inspection 04</string>
-    <string name="field_note_editor_body_label">Field Notes &amp; Observations</string>
+    <string name="field_note_editor_associated_site_label">ASSOCIATED SITE</string>
+    <string name="field_note_editor_site_unassigned">None / Unassigned</string>
+    <string name="field_note_editor_status_label">STATUS</string>
+    <string name="field_note_editor_body_label">TECHNICAL OBSERVATIONS</string>
     <string name="field_note_editor_body_hint">Start typing field observations&#8230;</string>
-    <string name="field_note_editor_save">SAVE</string>
-    <string name="field_note_editor_discard">DISCARD DRAFT</string>
+    <string name="field_note_editor_create_note">CREATE FIELD NOTE</string>
+    <string name="field_note_editor_save_changes">SAVE CHANGES</string>
+    <string name="field_note_editor_discard_draft">DISCARD DRAFT</string>
+    <string name="field_note_editor_cancel_changes">CANCEL &amp; DISCARD CHANGES</string>
     <string name="field_note_editor_delete">DELETE FIELD NOTE</string>
 
     <!-- Field note status labels -->
-    <string name="field_note_status_active">Active</string>
-    <string name="field_note_status_draft">Draft</string>
-    <string name="field_note_status_archived">Archived</string>
+    <string name="field_note_status_active">ACTIVE</string>
+    <string name="field_note_status_draft">DRAFT</string>
+    <string name="field_note_status_archived">ARCHIVED</string>
 
     <!-- Sites list screen -->
     <string name="sites_list_title">Sites</string>
@@ -93,9 +98,10 @@
     <string name="site_editor_location_hint">e.g., 123 Main Street</string>
     <string name="site_editor_priority_label">PRIORITY</string>
     <string name="site_editor_status_label">STATUS</string>
-    <string name="site_editor_save">CREATE SITE</string>
+    <string name="site_editor_create_site">CREATE SITE</string>
     <string name="site_editor_save_changes">SAVE CHANGES</string>
-    <string name="site_editor_discard">DISCARD</string>
+    <string name="site_editor_discard_draft">DISCARD DRAFT</string>
+    <string name="site_editor_cancel_changes">CANCEL &amp; DISCARD CHANGES</string>
     <string name="site_editor_delete">DELETE SITE</string>
 
     <!-- Site status labels -->

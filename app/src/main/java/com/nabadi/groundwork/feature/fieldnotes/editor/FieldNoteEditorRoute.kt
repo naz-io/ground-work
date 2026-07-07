@@ -17,15 +17,12 @@ fun FieldNoteEditorRoute(
     FieldNoteEditorScreen(
         uiState = uiState,
         onTitleChange = viewModel::onTitleChange,
+        onAssociatedSiteChange = viewModel::onAssociatedSiteChange,
+        onStatusChange = viewModel::onStatusChange,
         onBodyChange = viewModel::onBodyChange,
         onSaveClick = { viewModel.saveFieldNote(onSaved = onEditorFinished) },
-        onDestructiveActionClick = {
-            if (uiState.isEditing) {
-                viewModel.deleteFieldNote(onDeleted = onEditorFinished)
-            } else {
-                viewModel.discardDraft(onDiscarded = onEditorFinished)
-            }
-        },
+        onDeleteClick = { viewModel.deleteFieldNote(onDeleted = onEditorFinished) },
+        onDiscardClick = { viewModel.discardChanges(onDiscarded = onEditorFinished) },
         onBackClick = onEditorFinished,
         modifier = modifier,
     )

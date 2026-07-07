@@ -206,7 +206,7 @@ private fun SiteEditorBottomBar(
                             if (isEditing) {
                                 R.string.site_editor_save_changes
                             } else {
-                                R.string.site_editor_save
+                                R.string.site_editor_create_site
                             },
                         ),
                     )
@@ -232,7 +232,7 @@ private fun SiteEditorBottomBar(
                             if (isEditing) {
                                 R.string.site_editor_delete
                             } else {
-                                R.string.site_editor_discard
+                                R.string.site_editor_discard_draft
                             }
                         ),
                     )

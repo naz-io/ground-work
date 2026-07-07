@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 
-class FakeSitesRepository : SiteRepository {
+class FakeSiteRepository : SiteRepository {
 
     private val sitesFlow = MutableStateFlow<Map<SiteId, Site>>(emptyMap())
     private var shouldThrowError = false

@@ -26,7 +26,10 @@
     <dimen name="size_icon_action_touch_target">48dp</dimen>
 
     <!-- Forms -->
-    <dimen name="spacing_form_section">24dp</dimen>
+    <dimen name="spacing_form_section">16dp</dimen>
+    <dimen name="spacing_form_label_field">6dp</dimen>
+    <dimen name="spacing_divider_vertical">8dp</dimen>
+    <dimen name="height_status_chip">42dp</dimen>
 
     <!-- Error messages -->
     <dimen name="height_error_message_area">48dp</dimen>

@@ -5,7 +5,7 @@ import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.nabadi.groundwork.MainDispatcherRule
 import com.nabadi.groundwork.feature.sites.TestSite
-import com.nabadi.groundwork.data.repository.FakeSitesRepository
+import com.nabadi.groundwork.data.repository.FakeSiteRepository
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
 import com.nabadi.groundwork.navigation.GroundWorkRoute
@@ -33,7 +33,7 @@ class SitesEditorViewModelTest {
             priority = SitePriority.HIGH,
             status = SiteStatus.ACTIVE,
         )
-        val repository = FakeSitesRepository().apply {
+        val repository = FakeSiteRepository().apply {
             setSites(listOf(existingSite))
         }
         val viewModel = SiteEditorViewModel(
@@ -68,7 +68,7 @@ class SitesEditorViewModelTest {
     @Test
     fun `init shows error when existing site is not found`() = runTest {
         val viewModel = SiteEditorViewModel(
-            siteRepository = FakeSitesRepository(),
+            siteRepository = FakeSiteRepository(),
             savedStateHandle = SavedStateHandle(
                 initialState = mapOf(GroundWorkRoute.SITE_ID_ARG to "missing-id"),
             ),
@@ -88,7 +88,7 @@ class SitesEditorViewModelTest {
 
     @Test
     fun `init shows error when repository load fails`() = runTest {
-        val repository = FakeSitesRepository().apply {
+        val repository = FakeSiteRepository().apply {
             setShouldThrowError(true)
         }
         val viewModel = SiteEditorViewModel(
@@ -112,7 +112,7 @@ class SitesEditorViewModelTest {
     @Test
     fun `onNameChange updates name`() = runTest {
         val viewModel = SiteEditorViewModel(
-            siteRepository = FakeSitesRepository(),
+            siteRepository = FakeSiteRepository(),
             savedStateHandle = SavedStateHandle(),
         )
 
@@ -124,7 +124,7 @@ class SitesEditorViewModelTest {
     @Test
     fun `onLocationChange updates location`() = runTest {
         val viewModel = SiteEditorViewModel(
-            siteRepository = FakeSitesRepository(),
+            siteRepository = FakeSiteRepository(),
             savedStateHandle = SavedStateHandle(),
         )
 
@@ -136,7 +136,7 @@ class SitesEditorViewModelTest {
     @Test
     fun `onDescriptionChange updates description`() = runTest {
         val viewModel = SiteEditorViewModel(
-            siteRepository = FakeSitesRepository(),
+            siteRepository = FakeSiteRepository(),
             savedStateHandle = SavedStateHandle(),
         )
 
@@ -151,7 +151,7 @@ class SitesEditorViewModelTest {
     @Test
     fun `onPriorityChange updates priority`() = runTest {
         val viewModel = SiteEditorViewModel(
-            siteRepository = FakeSitesRepository(),
+            siteRepository = FakeSiteRepository(),
             savedStateHandle = SavedStateHandle(),
         )
 
@@ -163,7 +163,7 @@ class SitesEditorViewModelTest {
     @Test
     fun `onStatusChange updates status`() = runTest {
         val viewModel = SiteEditorViewModel(
-            siteRepository = FakeSitesRepository(),
+            siteRepository = FakeSiteRepository(),
             savedStateHandle = SavedStateHandle(),
         )
 
@@ -174,7 +174,7 @@ class SitesEditorViewModelTest {
 
     @Test
     fun `saveSite saves new site`() = runTest {
-        val repository = FakeSitesRepository()
+        val repository = FakeSiteRepository()
         val viewModel = SiteEditorViewModel(
             siteRepository = repository,
             savedStateHandle = SavedStateHandle(),
@@ -203,7 +203,7 @@ class SitesEditorViewModelTest {
 
     @Test
     fun `saveSite does not save when name is blank`() = runTest {
-        val repository = FakeSitesRepository()
+        val repository = FakeSiteRepository()
         val viewModel = SiteEditorViewModel(
             siteRepository = repository,
             savedStateHandle = SavedStateHandle(),
@@ -230,7 +230,7 @@ class SitesEditorViewModelTest {
             createdAt = 1_734_220_800_000L,
             updatedAt = 1_734_224_400_000L,
         )
-        val repository = FakeSitesRepository().apply {
+        val repository = FakeSiteRepository().apply {
             setSites(listOf(existingSite))
         }
         val viewModel = SiteEditorViewModel(
@@ -268,7 +268,7 @@ class SitesEditorViewModelTest {
     @Test
     fun `deleteSite deletes existing site`() = runTest {
         val existingSite = TestSite.site(id = "site-001")
-        val repository = FakeSitesRepository().apply {
+        val repository = FakeSiteRepository().apply {
             setSites(listOf(existingSite))
         }
         val viewModel = SiteEditorViewModel(
@@ -293,7 +293,7 @@ class SitesEditorViewModelTest {
 
     @Test
     fun `deleteSite does nothing when site is not editing existing site`() = runTest {
-        val repository = FakeSitesRepository()
+        val repository = FakeSiteRepository()
         val viewModel = SiteEditorViewModel(
             siteRepository = repository,
             savedStateHandle = SavedStateHandle(),
@@ -309,7 +309,7 @@ class SitesEditorViewModelTest {
 
     @Test
     fun `discardDraft clears state and does not save site`() = runTest {
-        val repository = FakeSitesRepository()
+        val repository = FakeSiteRepository()
         val viewModel = SiteEditorViewModel(
             siteRepository = repository,
             savedStateHandle = SavedStateHandle(),
@@ -328,7 +328,7 @@ class SitesEditorViewModelTest {
 
     @Test
     fun `saveSite shows error when repository save fails`() = runTest {
-        val repository = FakeSitesRepository().apply {
+        val repository = FakeSiteRepository().apply {
             setShouldThrowError(true)
         }
         val viewModel = SiteEditorViewModel(
@@ -349,7 +349,7 @@ class SitesEditorViewModelTest {
     @Test
     fun `deleteSite shows error when repository delete fails`() = runTest {
         val existingSite = TestSite.site(id = "site-001")
-        val repository = FakeSitesRepository().apply {
+        val repository = FakeSiteRepository().apply {
             setSites(listOf(existingSite))
         }
         val viewModel = SiteEditorViewModel(
@@ -376,7 +376,7 @@ class SitesEditorViewModelTest {
 
     @Test
     fun `onNameChange clears error message`() = runTest {
-        val repository = FakeSitesRepository().apply {
+        val repository = FakeSiteRepository().apply {
             setShouldThrowError(true)
         }
         val viewModel = SiteEditorViewModel(

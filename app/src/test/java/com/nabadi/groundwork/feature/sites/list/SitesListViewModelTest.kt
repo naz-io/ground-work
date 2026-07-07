@@ -4,7 +4,7 @@ import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.nabadi.groundwork.MainDispatcherRule
 import com.nabadi.groundwork.feature.sites.TestSite
-import com.nabadi.groundwork.data.repository.FakeSitesRepository
+import com.nabadi.groundwork.data.repository.FakeSiteRepository
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
 import kotlinx.coroutines.test.runTest
@@ -21,7 +21,7 @@ class SitesListViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private val repository = FakeSitesRepository()
+    private val repository = FakeSiteRepository()
     private lateinit var viewModel: SitesListViewModel
 
     @Before
