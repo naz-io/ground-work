@@ -13,7 +13,7 @@ import androidx.compose.ui.res.stringResource
 import com.nabadi.groundwork.navigation.GroundWorkRoute
 import android.content.res.Configuration
 import androidx.compose.ui.tooling.preview.Preview
-import com.nabadi.groundwork.ui.theme.GroundWorkTheme
+import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
 
 @Composable
 fun GroundWorkBottomBar(
@@ -61,7 +61,7 @@ fun GroundWorkBottomBar(
 )
 @Composable
 private fun GroundWorkBottomBarPreview_SitesSelected() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         GroundWorkBottomBar(
             selectedRoute = GroundWorkRoute.SITES_LIST,
             onSitesClick = {},
@@ -76,7 +76,7 @@ private fun GroundWorkBottomBarPreview_SitesSelected() {
 )
 @Composable
 private fun GroundWorkBottomBarPreview_FieldNotesSelected() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         GroundWorkBottomBar(
             selectedRoute = GroundWorkRoute.FIELD_NOTES_LIST,
             onSitesClick = {},
@@ -92,7 +92,7 @@ private fun GroundWorkBottomBarPreview_FieldNotesSelected() {
 )
 @Composable
 private fun GroundWorkBottomBarPreview_DarkMode_SitesSelected() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         GroundWorkBottomBar(
             selectedRoute = GroundWorkRoute.SITES_LIST,
             onSitesClick = {},
@@ -108,7 +108,7 @@ private fun GroundWorkBottomBarPreview_DarkMode_SitesSelected() {
 )
 @Composable
 private fun GroundWorkBottomBarPreview_DarkMode_FieldNotesSelected() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         GroundWorkBottomBar(
             selectedRoute = GroundWorkRoute.FIELD_NOTES_LIST,
             onSitesClick = {},

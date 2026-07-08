@@ -24,12 +24,18 @@
     <dimen name="spacing_chip">8dp</dimen>
     <dimen name="size_icon_small">16dp</dimen>
     <dimen name="size_icon_action_touch_target">48dp</dimen>
+    <dimen name="size_loading_indicator">100dp</dimen>
+    <dimen name="stroke_width_loading_indicator">5dp</dimen>
+    <dimen name="stroke_width_button_progress_indicator">2dp</dimen>
 
     <!-- Forms -->
     <dimen name="spacing_form_section">16dp</dimen>
     <dimen name="spacing_form_label_field">6dp</dimen>
     <dimen name="spacing_divider_vertical">8dp</dimen>
     <dimen name="height_status_chip">42dp</dimen>
+    <dimen name="height_filter_chip">42dp</dimen>
+    <dimen name="padding_filter_chip_horizontal">16dp</dimen>
+    <dimen name="radius_control">2dp</dimen>
 
     <!-- Error messages -->
     <dimen name="height_error_message_area">48dp</dimen>

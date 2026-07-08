@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.nabadi.groundwork.R
-import com.nabadi.groundwork.ui.theme.GroundWorkTheme
 
 @Composable
 fun BackButton(onBackClick: () -> Unit) {
@@ -29,7 +28,7 @@ fun BackButton(onBackClick: () -> Unit) {
 )
 @Composable
 private fun BackButtonPreview() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         BackButton(onBackClick = {})
     }
 }
@@ -41,7 +40,7 @@ private fun BackButtonPreview() {
 )
 @Composable
 private fun BackButtonPreview_Dark() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         BackButton(onBackClick = {})
     }
 }

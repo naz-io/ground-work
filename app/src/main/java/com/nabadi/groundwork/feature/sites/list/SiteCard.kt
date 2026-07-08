@@ -35,8 +35,8 @@ import com.nabadi.groundwork.domain.model.SiteStatus
 import com.nabadi.groundwork.feature.sites.PREVIEW_API_LEVEL
 import com.nabadi.groundwork.feature.sites.labelResId
 import com.nabadi.groundwork.feature.sites.previewSites
+import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
 import com.nabadi.groundwork.ui.format.relativeTimeLabel
-import com.nabadi.groundwork.ui.theme.GroundWorkTheme
 
 @Composable
 fun SiteCard(
@@ -264,7 +264,7 @@ private fun SiteCardMetadata(
 )
 @Composable
 private fun SiteCardPreview() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SiteCard(
             site = previewSites.first(),
             onOpenSiteClick = {},
@@ -281,7 +281,7 @@ private fun SiteCardPreview() {
 )
 @Composable
 private fun SiteCardPreview_Dark() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SiteCard(
             site = previewSites.first(),
             onOpenSiteClick = {},

@@ -1,17 +1,16 @@
 package com.nabadi.groundwork.feature.fieldnotes.editor
 
 import android.content.res.Configuration
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
@@ -36,7 +35,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -47,11 +45,14 @@ import androidx.compose.ui.unit.dp
 import com.nabadi.groundwork.R
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
 import com.nabadi.groundwork.domain.model.SiteId
+import com.nabadi.groundwork.ui.components.GroundWorkFilterChip
+import com.nabadi.groundwork.feature.fieldnotes.labelResId
 import com.nabadi.groundwork.ui.components.BackButton
 import com.nabadi.groundwork.ui.components.FormSection
+import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
+import com.nabadi.groundwork.ui.components.GroundWorkShapes
 import com.nabadi.groundwork.ui.components.TechnicalLabel
 import com.nabadi.groundwork.ui.format.absoluteDateTimeLabel
-import com.nabadi.groundwork.ui.theme.GroundWorkTheme
 
 @Composable
 fun FieldNoteEditorScreen(
@@ -123,6 +124,7 @@ fun FieldNoteEditorScreen(
             FieldNoteStatusChips(
                 selectedStatus = uiState.status,
                 onStatusChange = onStatusChange,
+                enabled = !uiState.isBusy,
             )
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_form_section)))
 
@@ -218,6 +220,7 @@ private fun FieldNoteEditorBottomBar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(dimensionResource(R.dimen.height_primary_action_button)),
+                shape = GroundWorkShapes.Control,
             ) {
                 if (isSaving) {
                     CircularProgressIndicator(
@@ -365,64 +368,29 @@ private fun AssociatedSiteField(
 private fun FieldNoteStatusChips(
     selectedStatus: FieldNoteStatus,
     onStatusChange: (FieldNoteStatus) -> Unit,
+    enabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
     FormSection(
         label = stringResource(R.string.field_note_editor_status_label),
         modifier = modifier,
     ) {
-        Row(modifier = Modifier.fillMaxWidth()) {
-            StatusChip(
-                text = stringResource(R.string.field_note_status_draft),
-                selected = selectedStatus == FieldNoteStatus.DRAFT,
-                onClick = { onStatusChange(FieldNoteStatus.DRAFT) },
-                modifier = Modifier.weight(1f),
-            )
-            StatusChip(
-                text = stringResource(R.string.field_note_status_active),
-                selected = selectedStatus == FieldNoteStatus.ACTIVE,
-                onClick = { onStatusChange(FieldNoteStatus.ACTIVE) },
-                modifier = Modifier.weight(1f),
-            )
-            StatusChip(
-                text = stringResource(R.string.field_note_status_archived),
-                selected = selectedStatus == FieldNoteStatus.ARCHIVED,
-                onClick = { onStatusChange(FieldNoteStatus.ARCHIVED) },
-                modifier = Modifier.weight(1f),
-            )
-        }
-    }
-}
-
-@Composable
-private fun StatusChip(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Surface(
-        onClick = onClick,
-        modifier = modifier.height(dimensionResource(R.dimen.height_status_chip)),
-        color = if (selected) {
-            MaterialTheme.colorScheme.primary
-        } else {
-            MaterialTheme.colorScheme.surfaceVariant
-        },
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-    ) {
-        Box(contentAlignment = Alignment.Center) {
-            Text(
-                text = text,
-                style = MaterialTheme.typography.labelMedium,
-                color = if (selected) {
-                    MaterialTheme.colorScheme.onPrimary
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.Monospace,
-            )
+        LazyRow(
+            modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
+        ) {
+            items(
+                items = FieldNoteStatus.entries,
+                key = { it },
+                contentType = { "StatusOption" },
+            ) { noteStatus ->
+                GroundWorkFilterChip(
+                    selected = selectedStatus == noteStatus,
+                    onClick = { onStatusChange(noteStatus) },
+                    enabled = enabled,
+                    label = stringResource(noteStatus.labelResId),
+                )
+            }
         }
     }
 }
@@ -486,7 +454,7 @@ private val previewSiteOptions = listOf(
 )
 @Composable
 private fun FieldNoteEditorScreenPreview_EmptyDraft() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         FieldNoteEditorScreen(
             uiState = emptyDraftPreviewState,
             onTitleChange = {},
@@ -509,7 +477,7 @@ private fun FieldNoteEditorScreenPreview_EmptyDraft() {
 )
 @Composable
 private fun FieldNoteEditorScreenPreview_DarkMode_Empty() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         FieldNoteEditorScreen(
             uiState = emptyDraftPreviewState,
             onTitleChange = {},
@@ -531,7 +499,7 @@ private fun FieldNoteEditorScreenPreview_DarkMode_Empty() {
 )
 @Composable
 private fun FieldNoteEditorScreenPreview_FilledDraft() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         FieldNoteEditorScreen(
             uiState = filledDraftPreviewState,
             onTitleChange = {},
@@ -554,7 +522,7 @@ private fun FieldNoteEditorScreenPreview_FilledDraft() {
 )
 @Composable
 private fun FieldNoteEditorScreenPreview_DarkMode_Filled() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         FieldNoteEditorScreen(
             uiState = filledDraftPreviewState,
             onTitleChange = {},
@@ -576,7 +544,7 @@ private fun FieldNoteEditorScreenPreview_DarkMode_Filled() {
 )
 @Composable
 private fun FieldNoteEditorScreenPreview_Saving() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         FieldNoteEditorScreen(
             uiState = savingPreviewState,
             onTitleChange = {},
@@ -599,7 +567,7 @@ private fun FieldNoteEditorScreenPreview_Saving() {
 )
 @Composable
 private fun FieldNoteEditorScreenPreview_DarkMode_Saving() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         FieldNoteEditorScreen(
             uiState = savingPreviewState,
             onTitleChange = {},
@@ -621,7 +589,7 @@ private fun FieldNoteEditorScreenPreview_DarkMode_Saving() {
 )
 @Composable
 private fun FieldNoteEditorScreenPreview_Error() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         FieldNoteEditorScreen(
             uiState = errorPreviewState,
             onTitleChange = {},
@@ -644,7 +612,7 @@ private fun FieldNoteEditorScreenPreview_Error() {
 )
 @Composable
 private fun FieldNoteEditorScreenPreview_DarkMode_Error() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         FieldNoteEditorScreen(
             uiState = errorPreviewState,
             onTitleChange = {},
@@ -666,7 +634,7 @@ private fun FieldNoteEditorScreenPreview_DarkMode_Error() {
 )
 @Composable
 private fun FieldNoteEditorScreenPreview_Editing() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         FieldNoteEditorScreen(
             uiState = editingPreviewState,
             onTitleChange = {},
@@ -689,7 +657,7 @@ private fun FieldNoteEditorScreenPreview_Editing() {
 )
 @Composable
 private fun FieldNoteEditorScreenPreview_DarkMode_Editing() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         FieldNoteEditorScreen(
             uiState = editingPreviewState,
             onTitleChange = {},
@@ -711,7 +679,7 @@ private fun FieldNoteEditorScreenPreview_DarkMode_Editing() {
 )
 @Composable
 private fun FieldNoteEditorScreenPreview_EditingUnassignedActive() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         FieldNoteEditorScreen(
             uiState = editingUnassignedActivePreviewState,
             onTitleChange = {},
@@ -734,7 +702,7 @@ private fun FieldNoteEditorScreenPreview_EditingUnassignedActive() {
 )
 @Composable
 private fun FieldNoteEditorScreenPreview_DarkMode_EditingUnassignedActive() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         FieldNoteEditorScreen(
             uiState = editingUnassignedActivePreviewState,
             onTitleChange = {},

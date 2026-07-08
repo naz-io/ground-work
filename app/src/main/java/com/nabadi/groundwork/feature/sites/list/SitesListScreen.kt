@@ -14,18 +14,22 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.nabadi.groundwork.R
 import com.nabadi.groundwork.domain.model.Site
@@ -34,7 +38,9 @@ import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
 import com.nabadi.groundwork.feature.sites.PREVIEW_API_LEVEL
 import com.nabadi.groundwork.feature.sites.previewSites
-import com.nabadi.groundwork.ui.theme.GroundWorkTheme
+import com.nabadi.groundwork.ui.components.GroundWorkLoadingState
+import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
+import com.nabadi.groundwork.ui.components.GroundWorkShapes
 
 @Composable
 fun SitesListScreen(
@@ -52,72 +58,85 @@ fun SitesListScreen(
 
     Scaffold(
         modifier = modifier,
+        topBar = {
+            SitesTopBar()
+        },
         floatingActionButton = {
             if (shouldShowAddButton) {
-                FloatingActionButton(onClick = onAddSiteClick) {
+                FloatingActionButton(
+                    onClick = onAddSiteClick,
+                    shape = GroundWorkShapes.Control,
+                ) {
                     Icon(
                         imageVector = Icons.Filled.Add,
-                        contentDescription = stringResource(R.string.sites_list_add_content_description),
+                        contentDescription = stringResource(R.string.sites_list_add_new_site_content_description),
                     )
                 }
             }
         },
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(dimensionResource(id = R.dimen.spacing_screen)),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_screen_section)),
+            contentAlignment = Alignment.Center,
         ) {
-            Text(
-                text = stringResource(R.string.sites_list_title),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.primary,
-            )
+            when {
+                uiState.isLoading -> GroundWorkLoadingState()
+                uiState.isError -> ErrorState(errorMessage = uiState.errorMessage.orEmpty())
+                uiState.shouldShowEmptyState -> EmptySitesState()
+                uiState.shouldShowNoMatchesState -> SitesNoMatchesContent(
+                    selectedStatus = uiState.selectedStatus,
+                    selectedPriority = uiState.selectedPriority,
+                    searchQuery = uiState.searchQuery,
+                    onSearchQueryChange = onSearchQueryChange,
+                    onStatusFilterChange = onStatusFilterChange,
+                    onPriorityFilterChange = onPriorityFilterChange,
+                    onClearCriteriaClick = onClearCriteriaClick,
+                    modifier = Modifier.fillMaxSize(),
+                )
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                contentAlignment = Alignment.Center,
-            ) {
-                when {
-                    uiState.isLoading -> LoadingState()
-                    uiState.isError -> ErrorState(errorMessage = uiState.errorMessage.orEmpty())
-                    uiState.shouldShowEmptyState -> EmptySitesState()
-                    uiState.shouldShowNoMatchesState -> SitesNoMatchesContent(
-                        selectedStatus = uiState.selectedStatus,
-                        selectedPriority = uiState.selectedPriority,
-                        searchQuery = uiState.searchQuery,
-                        onSearchQueryChange = onSearchQueryChange,
-                        onStatusFilterChange = onStatusFilterChange,
-                        onPriorityFilterChange = onPriorityFilterChange,
-                        onClearCriteriaClick = onClearCriteriaClick,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                    uiState.shouldShowContent -> SitesContent(
-                        selectedStatus = uiState.selectedStatus,
-                        selectedPriority = uiState.selectedPriority,
-                        searchQuery = uiState.searchQuery,
-                        onSearchQueryChange = onSearchQueryChange,
-                        onStatusFilterChange = onStatusFilterChange,
-                        onPriorityFilterChange = onPriorityFilterChange,
-                        sites = uiState.sites,
-                        onOpenSiteClick = onOpenSiteClick,
-                        onEditSiteClick = onEditSiteClick,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                    else -> Unit
-                }
+                uiState.shouldShowContent -> SitesContent(
+                    selectedStatus = uiState.selectedStatus,
+                    selectedPriority = uiState.selectedPriority,
+                    searchQuery = uiState.searchQuery,
+                    onSearchQueryChange = onSearchQueryChange,
+                    onStatusFilterChange = onStatusFilterChange,
+                    onPriorityFilterChange = onPriorityFilterChange,
+                    sites = uiState.sites,
+                    onOpenSiteClick = onOpenSiteClick,
+                    onEditSiteClick = onEditSiteClick,
+                    modifier = Modifier.fillMaxSize(),
+                )
+
+                else -> Unit
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun LoadingState(modifier: Modifier = Modifier) {
-    CircularProgressIndicator(modifier = modifier)
+private fun SitesTopBar(
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        TopAppBar(
+            title = {
+                Text(
+                    text = stringResource(R.string.sites_list_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace,
+                )
+            },
+        )
+        HorizontalDivider(
+            color = MaterialTheme.colorScheme.outlineVariant,
+        )
+    }
 }
 
 @Composable
@@ -234,7 +253,6 @@ private fun SitesSearchResultsContent(
                 onPriorityFilterChange = onPriorityFilterChange,
             )
         }
-
         resultsContent()
     }
 }
@@ -263,6 +281,7 @@ private fun NoMatchingSitesState(
         )
         Button(
             onClick = onClearCriteriaClick,
+            shape = GroundWorkShapes.Control,
             modifier = Modifier.fillMaxWidth(),
         ) {
             Text(text = stringResource(R.string.sites_list_no_matches_action))
@@ -277,7 +296,7 @@ private fun NoMatchingSitesState(
 )
 @Composable
 private fun SitesListScreenPreview_Content() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SitesListScreen(
             uiState = SitesListUiState(
                 isLoading = false,
@@ -302,7 +321,7 @@ private fun SitesListScreenPreview_Content() {
 )
 @Composable
 private fun SitesListScreenPreview_Content_Dark() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SitesListScreen(
             uiState = SitesListUiState(
                 isLoading = false,
@@ -326,7 +345,7 @@ private fun SitesListScreenPreview_Content_Dark() {
 )
 @Composable
 private fun SitesListScreenPreview_FilteredContent() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SitesListScreen(
             uiState = SitesListUiState(
                 isLoading = false,
@@ -356,7 +375,7 @@ private fun SitesListScreenPreview_FilteredContent() {
 )
 @Composable
 private fun SitesListScreenPreview_FilteredContent_Dark() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SitesListScreen(
             uiState = SitesListUiState(
                 isLoading = false,
@@ -385,7 +404,7 @@ private fun SitesListScreenPreview_FilteredContent_Dark() {
 )
 @Composable
 private fun SitesListScreenPreview_NoMatches() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SitesListScreen(
             uiState = SitesListUiState(
                 isLoading = false,
@@ -413,7 +432,7 @@ private fun SitesListScreenPreview_NoMatches() {
 )
 @Composable
 private fun SitesListScreenPreview_NoMatches_Dark() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SitesListScreen(
             uiState = SitesListUiState(
                 isLoading = false,
@@ -440,7 +459,7 @@ private fun SitesListScreenPreview_NoMatches_Dark() {
 )
 @Composable
 private fun SitesListScreenPreview_Loading() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SitesListScreen(
             uiState = SitesListUiState(isLoading = true),
             onSearchQueryChange = {},
@@ -462,7 +481,7 @@ private fun SitesListScreenPreview_Loading() {
 )
 @Composable
 private fun SitesListScreenPreview_Loading_Dark() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SitesListScreen(
             uiState = SitesListUiState(isLoading = true),
             onSearchQueryChange = {},
@@ -483,7 +502,7 @@ private fun SitesListScreenPreview_Loading_Dark() {
 )
 @Composable
 private fun SitesListScreenPreview_Empty() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SitesListScreen(
             uiState = SitesListUiState(
                 isLoading = false,
@@ -508,7 +527,7 @@ private fun SitesListScreenPreview_Empty() {
 )
 @Composable
 private fun SitesListScreenPreview_Empty_Dark() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SitesListScreen(
             uiState = SitesListUiState(
                 isLoading = false,
@@ -532,7 +551,7 @@ private fun SitesListScreenPreview_Empty_Dark() {
 )
 @Composable
 private fun SitesListScreenPreview_Error() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SitesListScreen(
             uiState = SitesListUiState(
                 isLoading = false,
@@ -557,7 +576,7 @@ private fun SitesListScreenPreview_Error() {
 )
 @Composable
 private fun SitesListScreenPreview_Error_Dark() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SitesListScreen(
             uiState = SitesListUiState(
                 isLoading = false,

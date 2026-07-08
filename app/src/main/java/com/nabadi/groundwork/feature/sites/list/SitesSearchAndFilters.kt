@@ -28,7 +28,8 @@ import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
 import com.nabadi.groundwork.feature.sites.PREVIEW_API_LEVEL
 import com.nabadi.groundwork.feature.sites.labelResId
-import com.nabadi.groundwork.ui.theme.GroundWorkTheme
+import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
+import com.nabadi.groundwork.ui.components.GroundWorkShapes
 
 @Composable
 fun SitesSearchAndFilters(
@@ -68,7 +69,11 @@ private fun SitesSearchField(
         onValueChange = onSearchQueryChange,
         modifier = modifier.fillMaxWidth(),
         label = {
-            Text(text = stringResource(R.string.sites_search_label))
+            Text(
+                text = stringResource(R.string.sites_list_search_placeholder),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         },
         leadingIcon = {
             Icon(
@@ -83,7 +88,7 @@ private fun SitesSearchField(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Close,
-                        contentDescription = stringResource(R.string.sites_search_clear_content_description),
+                        contentDescription = stringResource(R.string.sites_list_search_clear_content_description),
                     )
                 }
             }
@@ -182,6 +187,7 @@ private fun SitesFilterChip(
                 overflow = TextOverflow.Ellipsis,
             )
         },
+        shape = GroundWorkShapes.Control,
         colors = FilterChipDefaults.filterChipColors(
             selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
             selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -198,7 +204,7 @@ private fun SitesFilterChip(
 )
 @Composable
 private fun SitesSearchAndFiltersPreview_EmptyCriteria() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SitesSearchAndFilters(
             selectedStatus = null,
             selectedPriority = null,
@@ -217,7 +223,7 @@ private fun SitesSearchAndFiltersPreview_EmptyCriteria() {
 )
 @Composable
 private fun SitesSearchAndFiltersPreview_ActiveCriteria() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SitesSearchAndFilters(
             selectedStatus = SiteStatus.ACTIVE,
             selectedPriority = SitePriority.HIGH,
@@ -237,7 +243,7 @@ private fun SitesSearchAndFiltersPreview_ActiveCriteria() {
 )
 @Composable
 private fun SitesSearchAndFiltersPreview_DarkMode_EmptyCriteria() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SitesSearchAndFilters(
             selectedStatus = null,
             selectedPriority = null,
@@ -257,7 +263,7 @@ private fun SitesSearchAndFiltersPreview_DarkMode_EmptyCriteria() {
 )
 @Composable
 private fun SitesSearchAndFiltersPreview_DarkMode_ActiveCriteria() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SitesSearchAndFilters(
             selectedStatus = SiteStatus.ACTIVE,
             selectedPriority = SitePriority.HIGH,

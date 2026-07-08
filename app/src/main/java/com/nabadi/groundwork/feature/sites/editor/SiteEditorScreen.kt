@@ -18,23 +18,24 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.nabadi.groundwork.R
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
@@ -48,7 +49,9 @@ import com.nabadi.groundwork.feature.sites.labelResId
 import com.nabadi.groundwork.feature.sites.longContentSiteEditorPreviewState
 import com.nabadi.groundwork.feature.sites.savingSiteEditorPreviewState
 import com.nabadi.groundwork.ui.components.BackButton
-import com.nabadi.groundwork.ui.theme.GroundWorkTheme
+import com.nabadi.groundwork.ui.components.FormSection
+import com.nabadi.groundwork.ui.components.GroundWorkFilterChip
+import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
 
 @Composable
 fun SiteEditorScreen(
@@ -87,7 +90,7 @@ fun SiteEditorScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = dimensionResource(R.dimen.spacing_screen_horizontal)),
+                .padding(dimensionResource(R.dimen.spacing_screen_horizontal)),
         ) {
             val areFieldsEnabled = !uiState.isBusy
             SiteNameField(
@@ -144,24 +147,31 @@ private fun SiteEditorTopBar(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    TopAppBar(
-        title = {
-            Text(
-                text = stringResource(
-                    if (isEditing) {
-                        R.string.site_editor_edit_title
-                    } else {
-                        R.string.site_editor_new_title
-                    }
-                ),
-                style = MaterialTheme.typography.headlineSmall,
-            )
-        },
-        navigationIcon = {
-            BackButton(onBackClick = onBackClick)
-        },
-        modifier = modifier,
-    )
+    Column(modifier = modifier) {
+        TopAppBar(
+            title = {
+                Text(
+                    text = stringResource(
+                        if (isEditing) {
+                            R.string.site_editor_edit_title
+                        } else {
+                            R.string.site_editor_new_title
+                        }
+                    ),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace,
+                )
+            },
+            navigationIcon = {
+                BackButton(onBackClick = onBackClick)
+            },
+        )
+        HorizontalDivider(
+            color = MaterialTheme.colorScheme.outlineVariant,
+        )
+    }
 }
 
 @Composable
@@ -197,7 +207,7 @@ private fun SiteEditorBottomBar(
                 if (isSaving) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(dimensionResource(R.dimen.size_button_progress_indicator)),
-                        strokeWidth = 2.dp,
+                        strokeWidth = dimensionResource(R.dimen.stroke_width_button_progress_indicator),
                         color = MaterialTheme.colorScheme.onPrimary,
                     )
                 } else {
@@ -213,7 +223,7 @@ private fun SiteEditorBottomBar(
                 }
             }
 
-            OutlinedButton(
+            TextButton(
                 onClick = onDestructiveActionClick,
                 enabled = !isSaving && !isDeleting,
                 modifier = Modifier
@@ -223,7 +233,7 @@ private fun SiteEditorBottomBar(
                 if (isDeleting) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(dimensionResource(R.dimen.size_button_progress_indicator)),
-                        strokeWidth = 2.dp,
+                        strokeWidth = dimensionResource(R.dimen.stroke_width_button_progress_indicator),
                         color = MaterialTheme.colorScheme.primary,
                     )
                 } else {
@@ -253,22 +263,19 @@ private fun SiteNameField(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
     ) {
-        Text(
-            text = stringResource(R.string.site_editor_name_label),
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-        OutlinedTextField(
-            value = name,
-            onValueChange = onValueChange,
-            enabled = enabled,
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = {
-                Text(text = stringResource(R.string.site_editor_name_hint))
-            },
-            textStyle = MaterialTheme.typography.bodyLarge,
-            maxLines = 2,
-        )
+        FormSection(label = stringResource(R.string.site_editor_name_label)) {
+            OutlinedTextField(
+                value = name,
+                onValueChange = onValueChange,
+                enabled = enabled,
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = {
+                    Text(text = stringResource(R.string.site_editor_name_hint))
+                },
+                textStyle = MaterialTheme.typography.bodyLarge,
+                maxLines = 2,
+            )
+        }
     }
 }
 
@@ -283,22 +290,19 @@ private fun SiteLocationField(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
     ) {
-        Text(
-            text = stringResource(R.string.site_editor_location_label),
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-        OutlinedTextField(
-            value = location,
-            onValueChange = onValueChange,
-            enabled = enabled,
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = {
-                Text(text = stringResource(R.string.site_editor_location_hint))
-            },
-            textStyle = MaterialTheme.typography.bodyLarge,
-            maxLines = 2,
-        )
+        FormSection(label = stringResource(R.string.site_editor_location_label)) {
+            OutlinedTextField(
+                value = location,
+                onValueChange = onValueChange,
+                enabled = enabled,
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = {
+                    Text(text = stringResource(R.string.site_editor_location_hint))
+                },
+                textStyle = MaterialTheme.typography.bodyLarge,
+                maxLines = 2,
+            )
+        }
     }
 }
 
@@ -313,24 +317,21 @@ private fun SiteDescriptionField(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
     ) {
-        Text(
-            text = stringResource(R.string.site_editor_description_label),
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-        OutlinedTextField(
-            value = description,
-            onValueChange = onValueChange,
-            enabled = enabled,
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            placeholder = {
-                Text(text = stringResource(R.string.site_editor_description_hint))
-            },
-            textStyle = MaterialTheme.typography.bodyLarge,
-            minLines = 3,
-        )
+        FormSection(label = stringResource(R.string.site_editor_description_label)) {
+            OutlinedTextField(
+                value = description,
+                onValueChange = onValueChange,
+                enabled = enabled,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                placeholder = {
+                    Text(text = stringResource(R.string.site_editor_description_hint))
+                },
+                textStyle = MaterialTheme.typography.bodyLarge,
+                minLines = 3,
+            )
+        }
     }
 }
 
@@ -351,13 +352,11 @@ private fun SitePrioritySelector(
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
         ) {
             SitePriority.entries.forEach { priority ->
-                FilterChip(
+                GroundWorkFilterChip(
                     selected = priority == selectedPriority,
-                    onClick = { onPriorityChange(priority) },
                     enabled = enabled,
-                    label = {
-                        Text(text = stringResource(priority.labelResId))
-                    },
+                    onClick = { onPriorityChange(priority) },
+                    label = stringResource(priority.labelResId),
                 )
             }
         }
@@ -381,13 +380,11 @@ private fun SiteStatusSelector(
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
         ) {
             SiteStatus.entries.forEach { status ->
-                FilterChip(
+                GroundWorkFilterChip(
                     selected = status == selectedStatus,
                     onClick = { onStatusChange(status) },
                     enabled = enabled,
-                    label = {
-                        Text(text = stringResource(status.labelResId))
-                    },
+                    label = stringResource(status.labelResId),
                 )
             }
         }
@@ -404,12 +401,9 @@ private fun SiteChoiceSection(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
     ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-        content()
+        FormSection(label = title) {
+            content()
+        }
     }
 }
 
@@ -451,7 +445,7 @@ private fun SiteEditorErrorMessage(
 )
 @Composable
 private fun SiteEditorScreenPreview_EmptyDraft() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SiteEditorScreen(
             uiState = emptySiteEditorPreviewState,
             onNameChange = {},
@@ -474,7 +468,7 @@ private fun SiteEditorScreenPreview_EmptyDraft() {
 )
 @Composable
 private fun SiteEditorScreenPreview_DarkMode_Empty() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SiteEditorScreen(
             uiState = emptySiteEditorPreviewState,
             onNameChange = {},
@@ -496,7 +490,7 @@ private fun SiteEditorScreenPreview_DarkMode_Empty() {
 )
 @Composable
 private fun SiteEditorScreenPreview_FilledDraft() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SiteEditorScreen(
             uiState = filledSiteEditorPreviewState,
             onNameChange = {},
@@ -519,7 +513,7 @@ private fun SiteEditorScreenPreview_FilledDraft() {
 )
 @Composable
 private fun SiteEditorScreenPreview_DarkMode_FilledDraft() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SiteEditorScreen(
             uiState = filledSiteEditorPreviewState,
             onNameChange = {},
@@ -541,7 +535,7 @@ private fun SiteEditorScreenPreview_DarkMode_FilledDraft() {
 )
 @Composable
 private fun SiteEditorScreenPreview_Saving() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SiteEditorScreen(
             uiState = savingSiteEditorPreviewState,
             onNameChange = {},
@@ -564,7 +558,7 @@ private fun SiteEditorScreenPreview_Saving() {
 )
 @Composable
 private fun SiteEditorScreenPreview_DarkMode_Saving() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SiteEditorScreen(
             uiState = savingSiteEditorPreviewState,
             onNameChange = {},
@@ -586,7 +580,7 @@ private fun SiteEditorScreenPreview_DarkMode_Saving() {
 )
 @Composable
 private fun SiteEditorScreenPreview_Error() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SiteEditorScreen(
             uiState = errorSiteEditorPreviewState,
             onNameChange = {},
@@ -609,7 +603,7 @@ private fun SiteEditorScreenPreview_Error() {
 )
 @Composable
 private fun SiteEditorScreenPreview_DarkMode_Error() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SiteEditorScreen(
             uiState = errorSiteEditorPreviewState,
             onNameChange = {},
@@ -631,7 +625,7 @@ private fun SiteEditorScreenPreview_DarkMode_Error() {
 )
 @Composable
 private fun SiteEditorScreenPreview_Editing() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SiteEditorScreen(
             uiState = editingSiteEditorPreviewState,
             onNameChange = {},
@@ -654,7 +648,7 @@ private fun SiteEditorScreenPreview_Editing() {
 )
 @Composable
 private fun SiteEditorScreenPreview_DarkMode_Editing() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SiteEditorScreen(
             uiState = editingSiteEditorPreviewState,
             onNameChange = {},
@@ -676,7 +670,7 @@ private fun SiteEditorScreenPreview_DarkMode_Editing() {
 )
 @Composable
 private fun SiteEditorScreenPreview_LongContent() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SiteEditorScreen(
             uiState = longContentSiteEditorPreviewState,
             onNameChange = {},
@@ -699,7 +693,7 @@ private fun SiteEditorScreenPreview_LongContent() {
 )
 @Composable
 private fun SiteEditorScreenPreview_DarkMode_LongContent() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SiteEditorScreen(
             uiState = longContentSiteEditorPreviewState,
             onNameChange = {},
@@ -722,7 +716,7 @@ private fun SiteEditorScreenPreview_DarkMode_LongContent() {
 )
 @Composable
 private fun SiteEditorScreenPreview_Deleting() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SiteEditorScreen(
             uiState = deletingSiteEditorPreviewState,
             onNameChange = {},
@@ -745,7 +739,7 @@ private fun SiteEditorScreenPreview_Deleting() {
 )
 @Composable
 private fun SiteEditorScreenPreview_DarkMode_Deleting() {
-    GroundWorkTheme {
+    GroundWorkPreviewSurface {
         SiteEditorScreen(
             uiState = deletingSiteEditorPreviewState,
             onNameChange = {},
