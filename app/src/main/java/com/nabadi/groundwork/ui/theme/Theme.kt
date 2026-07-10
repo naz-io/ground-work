@@ -12,34 +12,19 @@ private val GroundWorkLightColorScheme = lightColorScheme(
     primaryContainer = GroundWorkPrimaryContainer,
     onPrimaryContainer = GroundWorkOnPrimaryContainer,
 
-    secondary = GroundWorkSecondary,
-    onSecondary = GroundWorkOnSecondary,
-    secondaryContainer = GroundWorkSecondaryContainer,
-    onSecondaryContainer = GroundWorkOnSecondaryContainer,
-
-    tertiary = GroundWorkTertiary,
-    onTertiary = GroundWorkOnTertiary,
-    tertiaryContainer = GroundWorkTertiaryContainer,
-    onTertiaryContainer = GroundWorkOnTertiaryContainer,
-
-    background = GroundWorkBackground,
-    onBackground = GroundWorkOnBackground,
-
     surface = GroundWorkSurface,
     onSurface = GroundWorkOnSurface,
-    surfaceVariant = GroundWorkNeutral,
-    onSurfaceVariant = GroundWorkSecondary,
+    surfaceVariant = GroundWorkSurfaceContainer,
+    onSurfaceVariant = GroundWorkOnSurfaceVariant,
 
     outline = GroundWorkOutline,
     outlineVariant = GroundWorkOutlineVariant,
 
     error = GroundWorkError,
     onError = GroundWorkOnError,
-    errorContainer = GroundWorkErrorContainer,
-    onErrorContainer = GroundWorkOnErrorContainer,
 
-    inverseSurface = GroundWorkSecondary,
-    inverseOnSurface = GroundWorkNeutral,
+    background = GroundWorkSurfaceContainerLowest,
+    onBackground = GroundWorkOnSurface,
 )
 
 private val GroundWorkDarkColorScheme = darkColorScheme(
@@ -48,34 +33,19 @@ private val GroundWorkDarkColorScheme = darkColorScheme(
     primaryContainer = GroundWorkOnPrimaryContainer,
     onPrimaryContainer = GroundWorkPrimaryContainer,
 
-    secondary = GroundWorkSecondaryContainer,
-    onSecondary = GroundWorkSecondary,
-    secondaryContainer = GroundWorkSecondary,
-    onSecondaryContainer = GroundWorkSecondaryContainer,
-
-    tertiary = GroundWorkTertiaryContainer,
-    onTertiary = GroundWorkTertiary,
-    tertiaryContainer = GroundWorkTertiary,
-    onTertiaryContainer = GroundWorkTertiaryContainer,
-
-    background = GroundWorkSecondary,
-    onBackground = GroundWorkNeutral,
-
-    surface = GroundWorkSecondary,
-    onSurface = GroundWorkNeutral,
-    surfaceVariant = GroundWorkCharcoal,
-    onSurfaceVariant = GroundWorkNeutral,
+    surface = GroundWorkOnSurface,
+    onSurface = GroundWorkSurface,
+    surfaceVariant = GroundWorkOnSurfaceVariant,
+    onSurfaceVariant = GroundWorkSurfaceContainer,
 
     outline = GroundWorkOutlineVariant,
     outlineVariant = GroundWorkOutline,
 
-    error = GroundWorkErrorContainer,
-    onError = GroundWorkOnErrorContainer,
-    errorContainer = GroundWorkError,
-    onErrorContainer = GroundWorkErrorContainer,
+    error = GroundWorkError,
+    onError = GroundWorkOnError,
 
-    inverseSurface = GroundWorkNeutral,
-    inverseOnSurface = GroundWorkSecondary,
+    background = GroundWorkOnSurface,
+    onBackground = GroundWorkSurface,
 )
 
 @Composable
