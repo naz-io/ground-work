@@ -37,7 +37,7 @@ jobs:
     name: Instrumented Android tests
     needs: unit-tests
     timeout-minutes: 45
-    runs-on: ubuntu-latest
+    runs-on: macos-13
 
     steps:
       - name: Check out code
@@ -65,4 +65,5 @@ jobs:
           emulator-options: -no-window -no-audio -no-boot-anim
           emulator-boot-timeout: 900
           disable-animations: true
+          enable-hw-accel: true
           script: ./gradlew connectedDebugAndroidTest --stacktrace
