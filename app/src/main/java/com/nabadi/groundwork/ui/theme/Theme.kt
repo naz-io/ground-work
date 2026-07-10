@@ -7,67 +7,64 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 
 private val GroundWorkLightColorScheme = lightColorScheme(
-    primary = GroundWorkBurntOrange,
-    onPrimary = GroundWorkSurface,
-    primaryContainer = GroundWorkSafetyOrange,
-    onPrimaryContainer = GroundWorkOrangeDark,
+    primary = GroundWorkPrimary,
+    onPrimary = GroundWorkOnPrimary,
+    primaryContainer = GroundWorkPrimaryContainer,
+    onPrimaryContainer = GroundWorkOnPrimaryContainer,
 
-    secondary = GroundWorkSteel,
-    onSecondary = GroundWorkSurface,
-    secondaryContainer = GroundWorkSteelContainer,
-    onSecondaryContainer = GroundWorkSteelDark,
+    secondary = GroundWorkSecondary,
+    onSecondary = GroundWorkOnSecondary,
+    secondaryContainer = GroundWorkSecondaryContainer,
+    onSecondaryContainer = GroundWorkOnSecondaryContainer,
 
-    tertiary = GroundWorkCharcoal,
-    onTertiary = GroundWorkSurface,
-    tertiaryContainer = GroundWorkSurfaceHighest,
-    onTertiaryContainer = GroundWorkInk,
+    tertiary = GroundWorkTertiary,
+    onTertiary = GroundWorkOnTertiary,
+    tertiaryContainer = GroundWorkTertiaryContainer,
+    onTertiaryContainer = GroundWorkOnTertiaryContainer,
 
     background = GroundWorkBackground,
-    onBackground = GroundWorkInk,
+    onBackground = GroundWorkOnBackground,
 
     surface = GroundWorkSurface,
-    onSurface = GroundWorkInk,
-    surfaceVariant = GroundWorkSurfaceHighest,
-    onSurfaceVariant = GroundWorkOutline,
+    onSurface = GroundWorkOnSurface,
+    surfaceVariant = GroundWorkNeutral,
+    onSurfaceVariant = GroundWorkSecondary,
 
     outline = GroundWorkOutline,
     outlineVariant = GroundWorkOutlineVariant,
 
     error = GroundWorkError,
-    onError = GroundWorkSurface,
+    onError = GroundWorkOnError,
     errorContainer = GroundWorkErrorContainer,
     onErrorContainer = GroundWorkOnErrorContainer,
 
-    inverseSurface = GroundWorkCharcoal,
-    inverseOnSurface = GroundWorkInkInverse,
-    inversePrimary = GroundWorkOrangeLight,
-
-    surfaceTint = GroundWorkBurntOrange,
+    inverseSurface = GroundWorkSecondary,
+    inverseOnSurface = GroundWorkNeutral,
 )
 
 private val GroundWorkDarkColorScheme = darkColorScheme(
-    primary = GroundWorkOrangeLight,
-    onPrimary = GroundWorkOrangeDark,
-    primaryContainer = GroundWorkBurntOrange,
-    onPrimaryContainer = GroundWorkOrangeContainer,
+    primary = GroundWorkPrimary,
+    onPrimary = GroundWorkOnPrimaryContainer,
+    primaryContainer = GroundWorkOnPrimaryContainer,
+    onPrimaryContainer = GroundWorkPrimaryContainer,
 
-    secondary = GroundWorkSteelContainer,
-    onSecondary = GroundWorkInk,
-    secondaryContainer = GroundWorkSteelDark,
-    onSecondaryContainer = GroundWorkSteelContainer,
+    secondary = GroundWorkSecondaryContainer,
+    onSecondary = GroundWorkSecondary,
+    secondaryContainer = GroundWorkSecondary,
+    onSecondaryContainer = GroundWorkSecondaryContainer,
 
-    tertiary = GroundWorkSurfaceHighest,
-    onTertiary = GroundWorkInk,
-    tertiaryContainer = GroundWorkCharcoal,
-    onTertiaryContainer = GroundWorkSurfaceHighest,
+    tertiary = GroundWorkTertiaryContainer,
+    onTertiary = GroundWorkTertiary,
+    tertiaryContainer = GroundWorkTertiary,
+    onTertiaryContainer = GroundWorkTertiaryContainer,
 
-    background = GroundWorkInk,
-    onBackground = GroundWorkInkInverse,
+    background = GroundWorkSecondary,
+    onBackground = GroundWorkNeutral,
 
-    surface = GroundWorkCharcoal,
-    onSurface = GroundWorkInkInverse,
-    surfaceVariant = GroundWorkSteelDark,
-    onSurfaceVariant = GroundWorkSteelContainer,
+    surface = GroundWorkSecondary,
+    onSurface = GroundWorkNeutral,
+    surfaceVariant = GroundWorkCharcoal,
+    onSurfaceVariant = GroundWorkNeutral,
 
     outline = GroundWorkOutlineVariant,
     outlineVariant = GroundWorkOutline,
@@ -77,11 +74,8 @@ private val GroundWorkDarkColorScheme = darkColorScheme(
     errorContainer = GroundWorkError,
     onErrorContainer = GroundWorkErrorContainer,
 
-    inverseSurface = GroundWorkInkInverse,
-    inverseOnSurface = GroundWorkInk,
-    inversePrimary = GroundWorkBurntOrange,
-
-    surfaceTint = GroundWorkOrangeLight,
+    inverseSurface = GroundWorkNeutral,
+    inverseOnSurface = GroundWorkSecondary,
 )
 
 @Composable
