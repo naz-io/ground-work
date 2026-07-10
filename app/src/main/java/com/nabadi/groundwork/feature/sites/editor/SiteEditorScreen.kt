@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -52,6 +51,7 @@ import com.nabadi.groundwork.ui.components.BackButton
 import com.nabadi.groundwork.ui.components.FormSection
 import com.nabadi.groundwork.ui.components.GroundWorkFilterChip
 import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
+import com.nabadi.groundwork.ui.components.GroundWorkPrimaryButton
 
 @Composable
 fun SiteEditorScreen(
@@ -197,31 +197,18 @@ private fun SiteEditorBottomBar(
                 ),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
         ) {
-            Button(
+            GroundWorkPrimaryButton(
+                text = stringResource(
+                    if (isEditing) {
+                        R.string.site_editor_save_changes
+                    } else {
+                        R.string.site_editor_create_site
+                    },
+                ),
                 onClick = onSaveClick,
                 enabled = canSave && !isSaving && !isDeleting,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(dimensionResource(R.dimen.height_primary_action_button)),
-            ) {
-                if (isSaving) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(dimensionResource(R.dimen.size_button_progress_indicator)),
-                        strokeWidth = dimensionResource(R.dimen.stroke_width_button_progress_indicator),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                    )
-                } else {
-                    Text(
-                        text = stringResource(
-                            if (isEditing) {
-                                R.string.site_editor_save_changes
-                            } else {
-                                R.string.site_editor_create_site
-                            },
-                        ),
-                    )
-                }
-            }
+                isLoading = isSaving,
+            )
 
             TextButton(
                 onClick = onDestructiveActionClick,

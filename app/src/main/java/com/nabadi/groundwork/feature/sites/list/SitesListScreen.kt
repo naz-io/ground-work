@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -40,6 +39,7 @@ import com.nabadi.groundwork.feature.sites.PREVIEW_API_LEVEL
 import com.nabadi.groundwork.feature.sites.previewSites
 import com.nabadi.groundwork.ui.components.GroundWorkLoadingState
 import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
+import com.nabadi.groundwork.ui.components.GroundWorkPrimaryButton
 import com.nabadi.groundwork.ui.components.GroundWorkShapes
 
 @Composable
@@ -279,13 +279,10 @@ private fun NoMatchingSitesState(
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyMedium,
         )
-        Button(
+        GroundWorkPrimaryButton(
+            text = stringResource(R.string.sites_list_no_matches_action),
             onClick = onClearCriteriaClick,
-            shape = GroundWorkShapes.Control,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(text = stringResource(R.string.sites_list_no_matches_action))
-        }
+        )
     }
 }
 

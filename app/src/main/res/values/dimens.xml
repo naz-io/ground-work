@@ -26,7 +26,6 @@
     <dimen name="size_icon_action_touch_target">48dp</dimen>
     <dimen name="size_loading_indicator">100dp</dimen>
     <dimen name="stroke_width_loading_indicator">5dp</dimen>
-    <dimen name="stroke_width_button_progress_indicator">2dp</dimen>
 
     <!-- Forms -->
     <dimen name="spacing_form_section">16dp</dimen>
@@ -43,5 +42,7 @@
     <!-- Bottom actions -->
     <dimen name="padding_bottom_action_horizontal">24dp</dimen>
     <dimen name="height_primary_action_button">56dp</dimen>
+    <dimen name="stroke_width_primary_button_border">2dp</dimen>
     <dimen name="size_button_progress_indicator">24dp</dimen>
+    <dimen name="stroke_width_button_progress_indicator">2dp</dimen>
 </resources>

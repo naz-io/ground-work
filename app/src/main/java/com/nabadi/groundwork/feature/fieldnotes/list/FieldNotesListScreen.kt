@@ -15,7 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -47,6 +46,7 @@ import com.nabadi.groundwork.feature.fieldnotes.previewFieldNotes
 import com.nabadi.groundwork.ui.components.GroundWorkLoadingState
 import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
 import com.nabadi.groundwork.ui.components.GroundWorkShapes
+import com.nabadi.groundwork.ui.components.GroundWorkPrimaryButton
 
 @Composable
 fun FieldNotesListScreen(
@@ -157,7 +157,7 @@ private fun FieldNotesContent(
                         onClearCriteriaClick = {
                             onSearchQueryChange("")
                             onStatusFilterChange(null)
-                        }
+                        },
                     )
                 }
             }
@@ -307,14 +307,10 @@ private fun NoMatchingFieldNotesState(
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyMedium,
         )
-        Button(
+        GroundWorkPrimaryButton(
+            text = stringResource(R.string.field_notes_list_no_matches_action),
             onClick = onClearCriteriaClick,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(
-                text = stringResource(R.string.field_notes_list_no_matches_action),
-            )
-        }
+        )
     }
 }
 

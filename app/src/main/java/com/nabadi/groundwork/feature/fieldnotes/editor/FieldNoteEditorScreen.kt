@@ -8,13 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -50,7 +47,7 @@ import com.nabadi.groundwork.feature.fieldnotes.labelResId
 import com.nabadi.groundwork.ui.components.BackButton
 import com.nabadi.groundwork.ui.components.FormSection
 import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
-import com.nabadi.groundwork.ui.components.GroundWorkShapes
+import com.nabadi.groundwork.ui.components.GroundWorkPrimaryButton
 import com.nabadi.groundwork.ui.components.TechnicalLabel
 import com.nabadi.groundwork.ui.format.absoluteDateTimeLabel
 
@@ -210,38 +207,18 @@ private fun FieldNoteEditorBottomBar(
                 ),
             verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
         ) {
-            Button(
-                onClick = {
-                    if (!isBusy) {
-                        onSaveClick()
+            GroundWorkPrimaryButton(
+                text = stringResource(
+                    if (isEditing) {
+                        R.string.field_note_editor_save_changes
+                    } else {
+                        R.string.field_note_editor_create_note
                     }
-                },
+                ),
+                onClick = onSaveClick,
                 enabled = canSave,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(dimensionResource(R.dimen.height_primary_action_button)),
-                shape = GroundWorkShapes.Control,
-            ) {
-                if (isSaving) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(dimensionResource(R.dimen.size_button_progress_indicator)),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                    )
-                } else {
-                    Text(
-                        text = stringResource(
-                            if (isEditing) {
-                                R.string.field_note_editor_save_changes
-                            } else {
-                                R.string.field_note_editor_create_note
-                            }
-                        ),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
-            }
+                isLoading = isSaving,
+            )
 
             TextButton(
                 onClick = onDiscardClick,
