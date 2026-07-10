@@ -57,7 +57,7 @@
     <string name="field_note_editor_status_label">STATUS</string>
     <string name="field_note_editor_body_label">TECHNICAL OBSERVATIONS</string>
     <string name="field_note_editor_body_hint">Detailed site conditions, structural anomalies, or safety compliance logs…</string>
-    <string name="field_note_editor_create_note">CREATE FIELD NOTE</string>
+    <string name="field_note_editor_create_note">CREATE NOTE</string>
     <string name="field_note_editor_save_changes">SAVE CHANGES</string>
     <string name="field_note_editor_discard_draft">DISCARD DRAFT</string>
     <string name="field_note_editor_cancel_changes">CANCEL &amp; DISCARD CHANGES</string>
@@ -85,7 +85,7 @@
     <string name="sites_list_filter_priority_label">Priority: %1$s</string>
     <string name="sites_list_no_matches_title">No sites found.</string>
     <string name="sites_list_no_matches_description">Try changing your search or filters.</string>
-    <string name="sites_list_no_matches_action">Clear search and filters</string>
+    <string name="sites_list_no_matches_action">CLEAR ALL FILTERS</string>
 
     <!-- Site editor screen -->
     <string name="site_editor_new_title">CREATE NEW SITE</string>

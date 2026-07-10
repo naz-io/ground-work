@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -215,6 +217,12 @@ private fun FieldNoteEditorBottomBar(
                         R.string.field_note_editor_create_note
                     }
                 ),
+                leadingIcon =
+                    if (isEditing) {
+                        Icons.Filled.Save
+                    } else {
+                        Icons.Filled.AddCircle
+                    },
                 onClick = onSaveClick,
                 enabled = canSave,
                 isLoading = isSaving,

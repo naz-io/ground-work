@@ -13,8 +13,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
+import androidx.compose.material.icons.filled.FilterAltOff
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -35,12 +34,12 @@ import com.nabadi.groundwork.domain.model.Site
 import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
-import com.nabadi.groundwork.feature.sites.PREVIEW_API_LEVEL
 import com.nabadi.groundwork.feature.sites.previewSites
+import com.nabadi.groundwork.ui.components.GroundWorkFloatingActionButton
 import com.nabadi.groundwork.ui.components.GroundWorkLoadingState
 import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
 import com.nabadi.groundwork.ui.components.GroundWorkPrimaryButton
-import com.nabadi.groundwork.ui.components.GroundWorkShapes
+import com.nabadi.groundwork.ui.components.PREVIEW_API_LEVEL
 
 @Composable
 fun SitesListScreen(
@@ -63,15 +62,11 @@ fun SitesListScreen(
         },
         floatingActionButton = {
             if (shouldShowAddButton) {
-                FloatingActionButton(
+                GroundWorkFloatingActionButton(
+                    icon = Icons.Filled.Add,
+                    contentDescription = stringResource(R.string.sites_list_add_new_site_content_description),
                     onClick = onAddSiteClick,
-                    shape = GroundWorkShapes.Control,
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = stringResource(R.string.sites_list_add_new_site_content_description),
-                    )
-                }
+                )
             }
         },
     ) { paddingValues ->
@@ -282,6 +277,7 @@ private fun NoMatchingSitesState(
         GroundWorkPrimaryButton(
             text = stringResource(R.string.sites_list_no_matches_action),
             onClick = onClearCriteriaClick,
+            leadingIcon = Icons.Filled.FilterAltOff,
         )
     }
 }

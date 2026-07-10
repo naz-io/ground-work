@@ -14,9 +14,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.FilterAltOff
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -40,13 +40,14 @@ import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
 import com.nabadi.groundwork.ui.components.GroundWorkFilterChip
-import com.nabadi.groundwork.feature.fieldnotes.PREVIEW_API_LEVEL
 import com.nabadi.groundwork.feature.fieldnotes.labelResId
 import com.nabadi.groundwork.feature.fieldnotes.previewFieldNotes
+import com.nabadi.groundwork.ui.components.GroundWorkFloatingActionButton
 import com.nabadi.groundwork.ui.components.GroundWorkLoadingState
 import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
 import com.nabadi.groundwork.ui.components.GroundWorkShapes
 import com.nabadi.groundwork.ui.components.GroundWorkPrimaryButton
+import com.nabadi.groundwork.ui.components.PREVIEW_API_LEVEL
 
 @Composable
 fun FieldNotesListScreen(
@@ -64,15 +65,11 @@ fun FieldNotesListScreen(
         topBar = { FieldNotesTopBar() },
         floatingActionButton = {
             if (shouldShowAddButton) {
-                FloatingActionButton(
+                GroundWorkFloatingActionButton(
+                    icon = Icons.Filled.Add,
+                    contentDescription = stringResource(R.string.field_notes_list_add_content_description),
                     onClick = onAddFieldNoteClick,
-                    shape = GroundWorkShapes.Control,
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = stringResource(R.string.field_notes_list_add_content_description),
-                    )
-                }
+                )
             }
         },
     ) { paddingValues ->
@@ -310,6 +307,7 @@ private fun NoMatchingFieldNotesState(
         GroundWorkPrimaryButton(
             text = stringResource(R.string.field_notes_list_no_matches_action),
             onClick = onClearCriteriaClick,
+            leadingIcon = Icons.Filled.FilterAltOff,
         )
     }
 }

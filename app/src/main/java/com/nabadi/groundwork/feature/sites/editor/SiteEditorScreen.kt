@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddLocationAlt
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,7 +40,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.nabadi.groundwork.R
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
-import com.nabadi.groundwork.feature.sites.PREVIEW_API_LEVEL
 import com.nabadi.groundwork.feature.sites.deletingSiteEditorPreviewState
 import com.nabadi.groundwork.feature.sites.editingSiteEditorPreviewState
 import com.nabadi.groundwork.feature.sites.emptySiteEditorPreviewState
@@ -50,8 +51,10 @@ import com.nabadi.groundwork.feature.sites.savingSiteEditorPreviewState
 import com.nabadi.groundwork.ui.components.BackButton
 import com.nabadi.groundwork.ui.components.FormSection
 import com.nabadi.groundwork.ui.components.GroundWorkFilterChip
+import com.nabadi.groundwork.ui.components.GroundWorkLoadingState
 import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
 import com.nabadi.groundwork.ui.components.GroundWorkPrimaryButton
+import com.nabadi.groundwork.ui.components.PREVIEW_API_LEVEL
 
 @Composable
 fun SiteEditorScreen(
@@ -76,65 +79,84 @@ fun SiteEditorScreen(
             )
         },
         bottomBar = {
-            SiteEditorBottomBar(
-                isEditing = uiState.isEditing,
-                isSaving = uiState.isSaving,
-                canSave = uiState.canSave,
-                onSaveClick = onSaveClick,
-                isDeleting = uiState.isDeleting,
-                onDestructiveActionClick = onDestructiveActionClick,
-            )
+            if (!uiState.isLoading) {
+                SiteEditorBottomBar(
+                    isEditing = uiState.isEditing,
+                    isSaving = uiState.isSaving,
+                    canSave = uiState.canSave,
+                    onSaveClick = onSaveClick,
+                    isDeleting = uiState.isDeleting,
+                    onDestructiveActionClick = onDestructiveActionClick,
+                )
+            }
         },
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(dimensionResource(R.dimen.spacing_screen_horizontal)),
-        ) {
-            val areFieldsEnabled = !uiState.isBusy
-            SiteNameField(
-                name = uiState.name,
-                onValueChange = onNameChange,
-                enabled = areFieldsEnabled,
-            )
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_form_section)))
-
-            SiteLocationField(
-                location = uiState.location,
-                onValueChange = onLocationChange,
-                enabled = areFieldsEnabled,
-            )
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_form_section)))
-
-            SitePrioritySelector(
-                selectedPriority = uiState.priority,
-                onPriorityChange = onPriorityChange,
-                enabled = areFieldsEnabled,
-            )
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_form_section)))
-
-            SiteStatusSelector(
-                selectedStatus = uiState.status,
-                onStatusChange = onStatusChange,
-                enabled = areFieldsEnabled,
-            )
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_form_section)))
-
-            SiteDescriptionField(
-                description = uiState.description,
-                onValueChange = onDescriptionChange,
-                enabled = areFieldsEnabled,
-                modifier = Modifier.weight(1f),
-            )
-
+        if (uiState.isLoading) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(dimensionResource(R.dimen.height_error_message_area)),
+                    .fillMaxSize()
+                    .padding(innerPadding),
                 contentAlignment = Alignment.Center,
             ) {
-                SiteEditorErrorMessage(errorMessage = uiState.errorMessage)
+                GroundWorkLoadingState()
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(
+                        start = dimensionResource(R.dimen.spacing_screen_horizontal),
+                        end = dimensionResource(R.dimen.spacing_screen_horizontal),
+                        top = dimensionResource(R.dimen.spacing_screen_horizontal),
+                    ),
+            ) {
+                val areFieldsEnabled = !uiState.isBusy
+                SiteNameField(
+                    name = uiState.name,
+                    onValueChange = onNameChange,
+                    enabled = areFieldsEnabled,
+                )
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_form_section)))
+
+                SiteLocationField(
+                    location = uiState.location,
+                    onValueChange = onLocationChange,
+                    enabled = areFieldsEnabled,
+                )
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_form_section)))
+
+                SitePrioritySelector(
+                    selectedPriority = uiState.priority,
+                    onPriorityChange = onPriorityChange,
+                    enabled = areFieldsEnabled,
+                )
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_form_section)))
+
+                SiteStatusSelector(
+                    selectedStatus = uiState.status,
+                    onStatusChange = onStatusChange,
+                    enabled = areFieldsEnabled,
+                )
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_form_section)))
+
+                SiteDescriptionField(
+                    description = uiState.description,
+                    onValueChange = onDescriptionChange,
+                    enabled = areFieldsEnabled,
+                    modifier = Modifier.weight(1f),
+                )
+
+                if (!uiState.errorMessage.isNullOrBlank()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = dimensionResource(R.dimen.spacing_list_item)),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        SiteEditorErrorMessage(errorMessage = uiState.errorMessage)
+                    }
+                }
             }
         }
     }
@@ -206,6 +228,12 @@ private fun SiteEditorBottomBar(
                     },
                 ),
                 onClick = onSaveClick,
+                leadingIcon =
+                    if (isEditing) {
+                        Icons.Filled.Save
+                    } else {
+                        Icons.Filled.AddLocationAlt
+                    },
                 enabled = canSave && !isSaving && !isDeleting,
                 isLoading = isSaving,
             )
@@ -729,6 +757,57 @@ private fun SiteEditorScreenPreview_DarkMode_Deleting() {
     GroundWorkPreviewSurface {
         SiteEditorScreen(
             uiState = deletingSiteEditorPreviewState,
+            onNameChange = {},
+            onDescriptionChange = {},
+            onLocationChange = {},
+            onStatusChange = {},
+            onPriorityChange = {},
+            onSaveClick = {},
+            onDestructiveActionClick = {},
+            onBackClick = {},
+        )
+    }
+}
+
+@Preview(
+    name = "Loading",
+    showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
+)
+@Composable
+private fun SiteEditorScreenPreview_Loading() {
+    GroundWorkPreviewSurface {
+        SiteEditorScreen(
+            uiState = SiteEditorUiState(
+                isLoading = true,
+                isEditing = true,
+            ),
+            onNameChange = {},
+            onDescriptionChange = {},
+            onLocationChange = {},
+            onStatusChange = {},
+            onPriorityChange = {},
+            onSaveClick = {},
+            onDestructiveActionClick = {},
+            onBackClick = {},
+        )
+    }
+}
+
+@Preview(
+    name = "Dark Mode - Loading",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    apiLevel = PREVIEW_API_LEVEL,
+)
+@Composable
+private fun SiteEditorScreenPreview_DarkMode_Loading() {
+    GroundWorkPreviewSurface {
+        SiteEditorScreen(
+            uiState = SiteEditorUiState(
+                isLoading = true,
+                isEditing = true,
+            ),
             onNameChange = {},
             onDescriptionChange = {},
             onLocationChange = {},

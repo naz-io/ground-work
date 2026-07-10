@@ -26,10 +26,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.nabadi.groundwork.R
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
-import com.nabadi.groundwork.feature.sites.PREVIEW_API_LEVEL
 import com.nabadi.groundwork.feature.sites.labelResId
 import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
 import com.nabadi.groundwork.ui.components.GroundWorkShapes
+import com.nabadi.groundwork.ui.components.PREVIEW_API_LEVEL
 
 @Composable
 fun SitesSearchAndFilters(

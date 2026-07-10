@@ -9,6 +9,10 @@
     <dimen name="spacing_list_item">8dp</dimen>
     <dimen name="spacing_fab_clearance">64dp</dimen>
 
+    <!-- Floating action button -->
+    <dimen name="size_fab">56dp</dimen>
+    <dimen name="radius_fab">12dp</dimen>
+
     <!-- Cards -->
     <dimen name="padding_card_content">16dp</dimen>
     <dimen name="spacing_card_content">4dp</dimen>
@@ -21,9 +25,10 @@
     <!-- Icons -->
     <dimen name="padding_trailing_action_end">4dp</dimen>
     <dimen name="spacing_icon_text">4dp</dimen>
-    <dimen name="spacing_chip">8dp</dimen>
     <dimen name="size_icon_small">16dp</dimen>
     <dimen name="size_icon_action_touch_target">48dp</dimen>
+
+    <!-- Loading states -->
     <dimen name="size_loading_indicator">100dp</dimen>
     <dimen name="stroke_width_loading_indicator">5dp</dimen>
 
@@ -31,10 +36,13 @@
     <dimen name="spacing_form_section">16dp</dimen>
     <dimen name="spacing_form_label_field">6dp</dimen>
     <dimen name="spacing_divider_vertical">8dp</dimen>
+    <dimen name="radius_control">2dp</dimen>
+
+    <!-- Chips -->
+    <dimen name="spacing_chip">8dp</dimen>
     <dimen name="height_status_chip">42dp</dimen>
     <dimen name="height_filter_chip">42dp</dimen>
     <dimen name="padding_filter_chip_horizontal">16dp</dimen>
-    <dimen name="radius_control">2dp</dimen>
 
     <!-- Error messages -->
     <dimen name="height_error_message_area">48dp</dimen>
@@ -42,7 +50,10 @@
     <!-- Bottom actions -->
     <dimen name="padding_bottom_action_horizontal">24dp</dimen>
     <dimen name="height_primary_action_button">56dp</dimen>
+    <dimen name="stroke_width_primary_button_bottom">4dp</dimen>
     <dimen name="stroke_width_primary_button_border">2dp</dimen>
+    <dimen name="spacing_button_icon_text">12dp</dimen>
+    <dimen name="size_button_icon">28dp</dimen>
     <dimen name="size_button_progress_indicator">24dp</dimen>
     <dimen name="stroke_width_button_progress_indicator">2dp</dimen>
 </resources>

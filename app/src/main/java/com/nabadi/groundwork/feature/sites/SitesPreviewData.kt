@@ -5,8 +5,6 @@ import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
 import com.nabadi.groundwork.feature.sites.editor.SiteEditorUiState
-
-internal const val PREVIEW_API_LEVEL = 35
 internal const val previewNowMillis = 1_735_689_600_000L
 
 internal val previewLongContentSite = Site(

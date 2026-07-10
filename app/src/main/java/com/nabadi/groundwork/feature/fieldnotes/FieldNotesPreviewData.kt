@@ -5,8 +5,6 @@ import com.nabadi.groundwork.domain.model.FieldNoteId
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
 import com.nabadi.groundwork.domain.model.SiteId
 
-internal const val PREVIEW_API_LEVEL = 35
-
 internal val previewFieldNotes = listOf(
     FieldNote(
         id = FieldNoteId("field-note-001"),

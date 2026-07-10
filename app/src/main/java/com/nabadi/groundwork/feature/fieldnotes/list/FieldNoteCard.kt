@@ -35,11 +35,11 @@ import androidx.compose.ui.unit.dp
 import com.nabadi.groundwork.R
 import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
-import com.nabadi.groundwork.feature.fieldnotes.PREVIEW_API_LEVEL
 import com.nabadi.groundwork.feature.fieldnotes.labelResId
 import com.nabadi.groundwork.feature.fieldnotes.previewFieldNotes
 import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
 import com.nabadi.groundwork.ui.components.GroundWorkShapes
+import com.nabadi.groundwork.ui.components.PREVIEW_API_LEVEL
 import com.nabadi.groundwork.ui.components.TechnicalLabel
 import com.nabadi.groundwork.ui.format.absoluteDateTimeLabel
 

@@ -2,9 +2,11 @@ package com.nabadi.groundwork.ui.components
 
 import android.content.res.Configuration
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -13,6 +15,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,9 +24,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.nabadi.groundwork.R
-
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AddCircle
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.ui.tooling.preview.Preview
 
@@ -36,55 +41,88 @@ internal fun GroundWorkPrimaryButton(
     enabled: Boolean = true,
     isLoading: Boolean = false,
 ) {
-    Button(
-        onClick = {
-            if (!isLoading) {
-                onClick()
-            }
-        },
-        enabled = enabled,
+    val bottomStrokeWidth = dimensionResource(R.dimen.stroke_width_primary_button_bottom)
+    val shape = GroundWorkShapes.Control
+
+    Box(
         modifier = modifier
             .fillMaxWidth()
             .height(dimensionResource(R.dimen.height_primary_action_button)),
-        shape = GroundWorkShapes.Control,
-        border = BorderStroke(
-            width = dimensionResource(R.dimen.stroke_width_primary_button_border),
-            color = MaterialTheme.colorScheme.primary,
-        ),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-        ),
+        contentAlignment = Alignment.TopCenter
     ) {
-        if (isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(dimensionResource(R.dimen.size_button_progress_indicator)),
-                strokeWidth = dimensionResource(R.dimen.stroke_width_button_progress_indicator),
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
-        } else {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_icon_text)),
-            ) {
-                if (leadingIcon != null) {
-                    Icon(
-                        imageVector = leadingIcon,
-                        contentDescription = null,
-                        modifier = Modifier.size(dimensionResource(R.dimen.size_icon_small)),
+        // Bottom Shadow / Depth Layer
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = if (enabled) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.outlineVariant,
+            shape = shape
+        ) {}
+
+        // Interactive Button Layer
+        Button(
+            onClick = {
+                if (!isLoading) {
+                    onClick()
+                }
+            },
+            enabled = enabled,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(dimensionResource(R.dimen.height_primary_action_button) - bottomStrokeWidth),
+            shape = shape,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            ),
+            elevation = null,
+            contentPadding = PaddingValues(0.dp),
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(dimensionResource(R.dimen.size_button_progress_indicator)),
+                    strokeWidth = dimensionResource(R.dimen.stroke_width_button_progress_indicator),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                )
+            } else {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_button_icon_text)),
+                ) {
+                    if (leadingIcon != null) {
+                        Icon(
+                            imageVector = leadingIcon,
+                            contentDescription = null,
+                            modifier = Modifier.size(dimensionResource(R.dimen.size_button_icon)),
+                        )
+                    }
+                    Text(
+                        text = text,
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            letterSpacing = 1.sp
+                        ),
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
-                Text(
-                    text = text,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
             }
         }
+    }
+}
+
+@Preview(
+    name = "GroundWorkPrimaryButton - Create Site",
+    apiLevel = PREVIEW_API_LEVEL,
+)
+@Composable
+private fun GroundWorkPrimaryButtonCreateSitePreview() {
+    GroundWorkPreviewSurface {
+        GroundWorkPrimaryButton(
+            text = "CREATE SITE",
+            leadingIcon = Icons.Rounded.AddCircle,
+            onClick = {},
+        )
     }
 }
 

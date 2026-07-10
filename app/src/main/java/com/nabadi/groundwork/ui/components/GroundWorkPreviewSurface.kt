@@ -8,6 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.nabadi.groundwork.ui.theme.GroundWorkTheme
 
+
+internal const val PREVIEW_API_LEVEL = 35
+
 @Composable
 internal fun GroundWorkPreviewSurface(
     content: @Composable () -> Unit,
