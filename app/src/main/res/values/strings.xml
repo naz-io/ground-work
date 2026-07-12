@@ -37,7 +37,6 @@
     <string name="field_notes_list_empty">No field notes yet.</string>
     <string name="field_notes_list_error">Error loading field notes: %1$s</string>
     <string name="field_notes_list_add_content_description">Add a new field note</string>
-
     <!-- Field notes list screen: Search and filters -->
     <string name="field_notes_list_search_placeholder">Search field notes by site, title, or content…</string>
     <string name="field_notes_list_search_clear_content_description">Clear search</string>
@@ -45,6 +44,10 @@
     <string name="field_notes_list_no_matches_title">NO MATCHES FOUND</string>
     <string name="field_notes_list_no_matches_description">We could not find any notes matching your current filters or search query. Try adjusting your criteria or checking for typos.</string>
     <string name="field_notes_list_no_matches_action">CLEAR ALL FILTERS</string>
+    <!-- Field notes list screen: Field note card -->
+    <string name="field_note_card_site_unassigned">None / Unassigned</string>
+    <string name="field_note_card_site_label">SITE: %1$s</string>
+    <string name="field_note_card_updated_label">UPDATED: %1$s</string>
 
     <!-- Field note editor screen -->
     <string name="field_note_editor_new_title">CREATE NEW FIELD NOTE</string>
@@ -76,7 +79,6 @@
     <string name="sites_list_empty_sites_message">No sites yet.</string>
     <string name="sites_list_error">Error loading sites: %1$s</string>
     <string name="sites_list_add_new_site_content_description">Add a new site</string>
-
     <!-- Sites list screen: Search and filters -->
     <string name="sites_list_search_placeholder">Search site name, location, or ID…</string>
     <string name="sites_list_search_clear_content_description">Clear site search</string>
@@ -86,7 +88,6 @@
     <string name="sites_list_no_matches_title">No sites found.</string>
     <string name="sites_list_no_matches_description">Try changing your search or filters.</string>
     <string name="sites_list_no_matches_action">CLEAR ALL FILTERS</string>
-
     <!-- Site editor screen -->
     <string name="site_editor_new_title">CREATE NEW SITE</string>
     <string name="site_editor_edit_title">EDIT SITE</string>

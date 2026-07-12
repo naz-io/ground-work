@@ -36,18 +36,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.nabadi.groundwork.R
-import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
 import com.nabadi.groundwork.ui.components.GroundWorkFilterChip
 import com.nabadi.groundwork.feature.fieldnotes.labelResId
-import com.nabadi.groundwork.feature.fieldnotes.previewFieldNotes
+import com.nabadi.groundwork.feature.fieldnotes.previewFieldNoteItems
 import com.nabadi.groundwork.ui.components.GroundWorkFloatingActionButton
 import com.nabadi.groundwork.ui.components.GroundWorkLoadingState
 import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
 import com.nabadi.groundwork.ui.components.GroundWorkShapes
 import com.nabadi.groundwork.ui.components.GroundWorkPrimaryButton
 import com.nabadi.groundwork.ui.components.PREVIEW_API_LEVEL
+import com.nabadi.groundwork.ui.theme.GroundWorkTheme
 
 @Composable
 fun FieldNotesListScreen(
@@ -73,51 +73,44 @@ fun FieldNotesListScreen(
             }
         },
     ) { paddingValues ->
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(dimensionResource(id = R.dimen.spacing_screen)),
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_screen_section)),
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(dimensionResource(id = R.dimen.spacing_screen)),
+            contentAlignment = Alignment.Center,
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                contentAlignment = Alignment.Center,
-            ) {
-                when {
-                    uiState.isLoading -> GroundWorkLoadingState()
-                    uiState.isError -> uiState.errorMessage?.let {
-                        ErrorState(
-                            errorMessage = it,
-                        )
-                    }
-
-                    !uiState.hasActiveCriteria && uiState.fieldNotes.isEmpty() -> EmptyFieldNotesState()
-                    else -> FieldNotesContent(
-                        selectedStatus = uiState.selectedStatus,
-                        searchQuery = uiState.searchQuery,
-                        onSearchQueryChange = onSearchQueryChange,
-                        onStatusFilterChange = onStatusFilterChange,
-                        fieldNotes = uiState.fieldNotes,
-                        onFieldNoteClick = onFieldNoteClick,
-                        modifier = Modifier.fillMaxSize(),
+            when {
+                uiState.isLoading -> GroundWorkLoadingState()
+                uiState.isError -> uiState.errorMessage?.let {
+                    ErrorState(
+                        errorMessage = it,
                     )
                 }
+
+                uiState.shouldShowEmptyState -> EmptyFieldNotesState()
+                else -> FieldNoteItemsContent(
+                    selectedStatus = uiState.selectedStatus,
+                    searchQuery = uiState.searchQuery,
+                    onSearchQueryChange = onSearchQueryChange,
+                    onStatusFilterChange = onStatusFilterChange,
+                    fieldNoteItems = uiState.fieldNoteItems,
+                    onFieldNoteClick = onFieldNoteClick,
+                    modifier = Modifier.fillMaxSize(),
+                )
             }
         }
     }
+
 }
 
 @Composable
-private fun FieldNotesContent(
+private fun FieldNoteItemsContent(
     selectedStatus: FieldNoteStatus?,
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit,
     onStatusFilterChange: (FieldNoteStatus?) -> Unit,
-    fieldNotes: List<FieldNote>,
+    fieldNoteItems: List<FieldNoteListItemUiState>,
     onFieldNoteClick: (FieldNoteId) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -142,7 +135,7 @@ private fun FieldNotesContent(
             )
         }
 
-        if (fieldNotes.isEmpty()) {
+        if (fieldNoteItems.isEmpty()) {
             item {
                 Box(
                     modifier = Modifier
@@ -150,7 +143,7 @@ private fun FieldNotesContent(
                         .padding(dimensionResource(R.dimen.padding_card_content)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    NoMatchingFieldNotesState(
+                    NoMatchingFieldNoteItemsState(
                         onClearCriteriaClick = {
                             onSearchQueryChange("")
                             onStatusFilterChange(null)
@@ -160,13 +153,13 @@ private fun FieldNotesContent(
             }
         } else {
             items(
-                items = fieldNotes,
-                key = { it.id.value },
+                items = fieldNoteItems,
+                key = { it.note.id.value },
                 contentType = { "FieldNote" },
-            ) { fieldNote ->
-                FieldNoteCard(
-                    fieldNote = fieldNote,
-                    onClick = { onFieldNoteClick(fieldNote.id) },
+            ) { fieldNoteItems ->
+                FieldNoteItemCard(
+                    fieldNoteItem = fieldNoteItems,
+                    onClick = { onFieldNoteClick(fieldNoteItems.note.id) },
                 )
             }
         }
@@ -214,7 +207,6 @@ private fun FieldNotesSearchField(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FieldNotesStatusFilters(
     selectedStatus: FieldNoteStatus?,
@@ -229,7 +221,6 @@ private fun FieldNotesStatusFilters(
             GroundWorkFilterChip(
                 selected = selectedStatus == null,
                 onClick = { onStatusFilterChange(null) },
-                enabled = true,
                 label = stringResource(R.string.field_notes_list_filter_all),
             )
         }
@@ -241,7 +232,6 @@ private fun FieldNotesStatusFilters(
             GroundWorkFilterChip(
                 selected = selectedStatus == statusFilter,
                 onClick = { onStatusFilterChange(statusFilter) },
-                enabled = true,
                 label = stringResource(statusFilter.labelResId),
             )
         }
@@ -283,7 +273,7 @@ private fun EmptyFieldNotesState(
 }
 
 @Composable
-private fun NoMatchingFieldNotesState(
+private fun NoMatchingFieldNoteItemsState(
     onClearCriteriaClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -331,10 +321,10 @@ private fun ErrorState(
 )
 @Composable
 private fun FieldNotesListScreenPreview_Content() {
-    GroundWorkPreviewSurface {
+    GroundWorkTheme {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(
-                fieldNotes = previewFieldNotes,
+                fieldNoteItems = previewFieldNoteItems,
                 isLoading = false,
             ),
             onSearchQueryChange = {},
@@ -353,10 +343,10 @@ private fun FieldNotesListScreenPreview_Content() {
 )
 @Composable
 private fun FieldNotesListScreenPreview_Content_Dark() {
-    GroundWorkPreviewSurface {
+    GroundWorkTheme {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(
-                fieldNotes = previewFieldNotes,
+                fieldNoteItems = previewFieldNoteItems,
                 isLoading = false,
             ),
             onSearchQueryChange = {},
@@ -374,7 +364,7 @@ private fun FieldNotesListScreenPreview_Content_Dark() {
 )
 @Composable
 private fun FieldNotesListScreenPreview_Loading() {
-    GroundWorkPreviewSurface {
+    GroundWorkTheme {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(
                 isLoading = true
@@ -395,7 +385,7 @@ private fun FieldNotesListScreenPreview_Loading() {
 )
 @Composable
 private fun FieldNotesListScreenPreview_Loading_Dark() {
-    GroundWorkPreviewSurface {
+    GroundWorkTheme {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(
                 isLoading = true
@@ -415,11 +405,11 @@ private fun FieldNotesListScreenPreview_Loading_Dark() {
 )
 @Composable
 private fun FieldNotesListScreenPreview_Empty() {
-    GroundWorkPreviewSurface {
+    GroundWorkTheme {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(
                 isLoading = false,
-                fieldNotes = emptyList(),
+                fieldNoteItems = emptyList(),
             ),
             onSearchQueryChange = {},
             onStatusFilterChange = {},
@@ -437,10 +427,10 @@ private fun FieldNotesListScreenPreview_Empty() {
 )
 @Composable
 private fun FieldNotesListScreenPreview_Empty_Dark() {
-    GroundWorkPreviewSurface {
+    GroundWorkTheme {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(
-                fieldNotes = emptyList(),
+                fieldNoteItems = emptyList(),
                 isLoading = false,
             ),
             onSearchQueryChange = {},
@@ -458,12 +448,12 @@ private fun FieldNotesListScreenPreview_Empty_Dark() {
 )
 @Composable
 private fun FieldNotesListScreenPreview_NoFilterMatches() {
-    GroundWorkPreviewSurface {
+    GroundWorkTheme {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(
                 searchQuery = "Testing",
                 selectedStatus = FieldNoteStatus.DRAFT,
-                fieldNotes = emptyList(),
+                fieldNoteItems = emptyList(),
                 isLoading = false,
             ),
             onSearchQueryChange = {},
@@ -482,12 +472,12 @@ private fun FieldNotesListScreenPreview_NoFilterMatches() {
 )
 @Composable
 private fun FieldNotesListScreenPreview_NoFilterMatches_Dark() {
-    GroundWorkPreviewSurface {
+    GroundWorkTheme {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(
                 searchQuery = "Testing",
                 selectedStatus = FieldNoteStatus.DRAFT,
-                fieldNotes = emptyList(),
+                fieldNoteItems = emptyList(),
                 isLoading = false,
             ),
             onSearchQueryChange = {},
@@ -505,7 +495,7 @@ private fun FieldNotesListScreenPreview_NoFilterMatches_Dark() {
 )
 @Composable
 private fun FieldNotesListScreenPreview_Error() {
-    GroundWorkPreviewSurface {
+    GroundWorkTheme {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(
                 errorMessage = "Could not connect to the server.",
@@ -527,7 +517,7 @@ private fun FieldNotesListScreenPreview_Error() {
 )
 @Composable
 private fun FieldNotesListScreenPreview_Error_Dark() {
-    GroundWorkPreviewSurface {
+    GroundWorkTheme {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(
                 errorMessage = "Could not connect to the server.",
@@ -544,7 +534,6 @@ private fun FieldNotesListScreenPreview_Error_Dark() {
 
 @Preview(
     name = "Error State",
-    showBackground = true,
     apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
@@ -558,7 +547,6 @@ private fun ErrorStatePreview() {
 
 @Preview(
     name = "Error State - Dark",
-    showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
     apiLevel = PREVIEW_API_LEVEL,
 )
@@ -573,13 +561,12 @@ private fun ErrorStatePreview_Dark() {
 
 @Preview(
     name = "Empty Filtered/Searched State",
-    showBackground = true,
     apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
-private fun NoMatchingFieldNotesStatePreview() {
+private fun NoMatchingFieldNoteItemsStatePreview() {
     GroundWorkPreviewSurface {
-        NoMatchingFieldNotesState(
+        NoMatchingFieldNoteItemsState(
             onClearCriteriaClick = {},
         )
     }
@@ -587,14 +574,13 @@ private fun NoMatchingFieldNotesStatePreview() {
 
 @Preview(
     name = "Empty Filtered/Search State - Dark",
-    showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
     apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
-private fun NoMatchingFieldNotesStatePreview_Dark() {
+private fun NoMatchingFieldNoteItemsStatePreview_Dark() {
     GroundWorkPreviewSurface {
-        NoMatchingFieldNotesState(
+        NoMatchingFieldNoteItemsState(
             onClearCriteriaClick = {},
         )
     }

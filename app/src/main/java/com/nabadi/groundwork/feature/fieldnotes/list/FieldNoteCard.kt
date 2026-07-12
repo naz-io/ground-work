@@ -31,39 +31,40 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.nabadi.groundwork.R
-import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
 import com.nabadi.groundwork.feature.fieldnotes.labelResId
-import com.nabadi.groundwork.feature.fieldnotes.previewFieldNotes
+import com.nabadi.groundwork.feature.fieldnotes.previewFieldNoteItems
 import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
 import com.nabadi.groundwork.ui.components.GroundWorkShapes
 import com.nabadi.groundwork.ui.components.PREVIEW_API_LEVEL
 import com.nabadi.groundwork.ui.components.TechnicalLabel
 import com.nabadi.groundwork.ui.format.absoluteDateTimeLabel
+import androidx.compose.ui.platform.LocalLocale
 
 @Composable
-internal fun FieldNoteCard(
-    fieldNote: FieldNote,
+internal fun FieldNoteItemCard(
+    fieldNoteItem: FieldNoteListItemUiState,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val statusColor = when (fieldNote.status) {
+    val note = fieldNoteItem.note
+    val locale = LocalLocale.current.platformLocale
+    val statusColor = when (note.status) {
         FieldNoteStatus.ACTIVE -> MaterialTheme.colorScheme.primary
         FieldNoteStatus.DRAFT -> MaterialTheme.colorScheme.secondary
         FieldNoteStatus.ARCHIVED -> MaterialTheme.colorScheme.outline
     }
-    val siteLabel = fieldNote.siteId?.value
-        ?.removePrefix("site-")
-        ?.replace('-', ' ')
-        ?.uppercase()
-        ?: "UNASSIGNED"
+    val siteLabel = fieldNoteItem.siteName?.uppercase(locale)
+        ?: stringResource(R.string.field_note_card_site_unassigned)
 
     Card(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        border = BorderStroke(
+            dimensionResource(R.dimen.border_field_note_card),
+            MaterialTheme.colorScheme.outlineVariant
+        ),
         shape = GroundWorkShapes.Control,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
@@ -78,14 +79,19 @@ internal fun FieldNoteCard(
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .padding(
                         horizontal = dimensionResource(R.dimen.padding_card_content),
-                        vertical = 8.dp
+                        vertical = dimensionResource(R.dimen.padding_field_note_card_header_vertical)
                     ),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                TechnicalLabel(text = "SITE: $siteLabel")
+                TechnicalLabel(
+                    text = stringResource(
+                        R.string.field_note_card_site_label,
+                        siteLabel,
+                    ),
+                )
                 FieldNoteStatusIcon(
-                    status = fieldNote.status,
+                    status = note.status,
                     tint = statusColor,
                 )
             }
@@ -98,20 +104,20 @@ internal fun FieldNoteCard(
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_card_content)),
             ) {
                 Text(
-                    text = fieldNote.title.ifBlank { stringResource(R.string.field_notes_list_untitled_note_title) },
+                    text = note.title.ifBlank { stringResource(R.string.field_notes_list_untitled_note_title) },
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = fieldNote.body,
+                    text = note.body,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_field_note_card_footer_top)))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -119,32 +125,33 @@ internal fun FieldNoteCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     TechnicalLabel(
-                        text = "UPDATED: ${
-                            fieldNote.updatedAt.absoluteDateTimeLabel().uppercase()
-                        }"
+                        text = stringResource(
+                            R.string.field_note_card_updated_label,
+                            note.updatedAt.absoluteDateTimeLabel().uppercase(locale),
+                        ),
                     )
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_field_note_card_actions)),
                     ) {
-                        if (fieldNote.siteId == null) {
+                        if (note.siteId == null) {
                             Icon(
                                 imageVector = Icons.Outlined.Image,
                                 contentDescription = null,
-                                modifier = Modifier.size(18.dp),
+                                modifier = Modifier.size(dimensionResource(R.dimen.size_field_note_card_action_icon)),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             Icon(
                                 imageVector = Icons.Outlined.Mic,
                                 contentDescription = null,
-                                modifier = Modifier.size(18.dp),
+                                modifier = Modifier.size(dimensionResource(R.dimen.size_field_note_card_action_icon)),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         } else {
                             Icon(
                                 imageVector = Icons.Filled.MoreVert,
                                 contentDescription = null,
-                                modifier = Modifier.size(18.dp),
+                                modifier = Modifier.size(dimensionResource(R.dimen.size_field_note_card_action_icon)),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
@@ -168,21 +175,20 @@ private fun FieldNoteStatusIcon(
             FieldNoteStatus.ARCHIVED -> Icons.Filled.CheckCircle
         },
         contentDescription = stringResource(status.labelResId),
-        modifier = modifier.size(16.dp),
+        modifier = modifier.size(dimensionResource(R.dimen.size_field_note_card_status_icon)),
         tint = tint,
     )
 }
 
 @Preview(
     name = "Field Note Card",
-    showBackground = true,
     apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
-private fun FieldNoteCardPreview() {
+private fun FieldNoteItemCardPreview() {
     GroundWorkPreviewSurface {
-        FieldNoteCard(
-            fieldNote = previewFieldNotes.first(),
+        FieldNoteItemCard(
+            fieldNoteItem = previewFieldNoteItems.first(),
             onClick = {},
         )
     }
@@ -190,15 +196,14 @@ private fun FieldNoteCardPreview() {
 
 @Preview(
     name = "Field Note Card - Dark",
-    showBackground = true,
     uiMode = Configuration.UI_MODE_NIGHT_YES,
     apiLevel = PREVIEW_API_LEVEL,
 )
 @Composable
-private fun FieldNoteCardPreview_Dark() {
+private fun FieldNoteItemCardPreview_Dark() {
     GroundWorkPreviewSurface {
-        FieldNoteCard(
-            fieldNote = previewFieldNotes.first(),
+        FieldNoteItemCard(
+            fieldNoteItem = previewFieldNoteItems.first(),
             onClick = {},
         )
     }

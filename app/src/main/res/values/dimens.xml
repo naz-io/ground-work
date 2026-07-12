@@ -18,6 +18,14 @@
     <dimen name="spacing_card_content">4dp</dimen>
     <dimen name="border_card_strong">2dp</dimen>
 
+    <!-- Field note card -->
+    <dimen name="border_field_note_card">1dp</dimen>
+    <dimen name="padding_field_note_card_header_vertical">8dp</dimen>
+    <dimen name="spacing_field_note_card_footer_top">4dp</dimen>
+    <dimen name="spacing_field_note_card_actions">8dp</dimen>
+    <dimen name="size_field_note_card_action_icon">18dp</dimen>
+    <dimen name="size_field_note_card_status_icon">16dp</dimen>
+
     <!-- Card metadata -->
     <dimen name="padding_card_metadata_vertical">12dp</dimen>
     <dimen name="spacing_metadata_item">16dp</dimen>

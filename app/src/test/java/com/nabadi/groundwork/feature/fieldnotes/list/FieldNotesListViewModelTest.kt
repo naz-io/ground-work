@@ -5,7 +5,9 @@ import app.cash.turbine.test
 import com.nabadi.groundwork.MainDispatcherRule
 import com.nabadi.groundwork.feature.fieldnotes.TestFieldNote.fieldNote
 import com.nabadi.groundwork.data.repository.FakeFieldNoteRepository
+import com.nabadi.groundwork.data.repository.FakeSiteRepository
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
+import com.nabadi.groundwork.feature.sites.TestSite.site
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -20,12 +22,13 @@ class FieldNotesListViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private val repository = FakeFieldNoteRepository()
+    private val fieldNoteRepository = FakeFieldNoteRepository()
+    private val siteRepository = FakeSiteRepository()
     private lateinit var viewModel: FieldNotesListViewModel
 
     @Before
     fun setup() {
-        viewModel = FieldNotesListViewModel(repository)
+        viewModel = FieldNotesListViewModel(fieldNoteRepository, siteRepository)
     }
 
     @Test
@@ -44,17 +47,60 @@ class FieldNotesListViewModelTest {
                 status = FieldNoteStatus.ARCHIVED,
             ),
         )
-        repository.setFieldNotes(fieldNotes)
+        fieldNoteRepository.setFieldNotes(fieldNotes)
 
         viewModel.uiState.test {
             val state = skipItemsUntilLoaded()
             assertFalse(state.isLoading)
-            assertEquals(fieldNotes, state.fieldNotes)
+            assertEquals(fieldNotes, state.fieldNoteItems.map { it.note })
         }
     }
 
     @Test
-    fun `onSearchQueryChange updates searchQuery and filters fieldNotes`() = runTest {
+    fun `uiState maps associated site names from repository`() = runTest {
+        siteRepository.setSites(
+            listOf(
+                site(
+                    id = "site-generator-room",
+                    name = "Generator Room",
+                ),
+                site(
+                    id = "site-north-gate",
+                    name = "North Gate",
+                ),
+            ),
+        )
+
+        fieldNoteRepository.setFieldNotes(
+            listOf(
+                fieldNote(
+                    id = "field-note-1",
+                    title = "Generator note",
+                    siteId = "site-generator-room",
+                    body = "Body 1",
+                    status = FieldNoteStatus.ACTIVE,
+                ),
+                fieldNote(
+                    id = "field-note-2",
+                    title = "Unassigned note",
+                    siteId = null,
+                    body = "Body 2",
+                    status = FieldNoteStatus.ACTIVE,
+                ),
+            )
+        )
+
+        viewModel.uiState.test {
+            val state = skipItemsUntilLoaded()
+
+            assertEquals(2, state.fieldNoteItems.size)
+            assertEquals("Generator Room", state.fieldNoteItems[0].siteName)
+            assertNull(state.fieldNoteItems[1].siteName)
+        }
+    }
+
+    @Test
+    fun `onSearchQueryChange updates searchQuery and filters field note items`() = runTest {
         val fieldNotes = listOf(
             fieldNote(
                 id = "1",
@@ -69,7 +115,7 @@ class FieldNotesListViewModelTest {
                 status = FieldNoteStatus.ACTIVE,
             ),
         )
-        repository.setFieldNotes(fieldNotes)
+        fieldNoteRepository.setFieldNotes(fieldNotes)
 
         viewModel.uiState.test {
             skipItemsUntilLoaded()
@@ -78,13 +124,13 @@ class FieldNotesListViewModelTest {
 
             val filteredState = awaitItem()
             assertEquals("App", filteredState.searchQuery)
-            assertEquals(1, filteredState.fieldNotes.size)
-            assertEquals("Apple", filteredState.fieldNotes[0].title)
+            assertEquals(1, filteredState.fieldNoteItems.size)
+            assertEquals("Apple", filteredState.fieldNoteItems[0].note.title)
         }
     }
 
     @Test
-    fun `onStatusFilterChange updates selectedStatus and filters fieldNotes`() = runTest {
+    fun `onStatusFilterChange updates selectedStatus and filters field note items`() = runTest {
         val fieldNotes = listOf(
             fieldNote(
                 id = "1",
@@ -99,7 +145,7 @@ class FieldNotesListViewModelTest {
                 status = FieldNoteStatus.DRAFT,
             ),
         )
-        repository.setFieldNotes(fieldNotes)
+        fieldNoteRepository.setFieldNotes(fieldNotes)
 
         viewModel.uiState.test {
             skipItemsUntilLoaded()
@@ -108,8 +154,8 @@ class FieldNotesListViewModelTest {
 
             val filteredState = awaitItem()
             assertEquals(FieldNoteStatus.DRAFT, filteredState.selectedStatus)
-            assertEquals(1, filteredState.fieldNotes.size)
-            assertEquals(FieldNoteStatus.DRAFT, filteredState.fieldNotes[0].status)
+            assertEquals(1, filteredState.fieldNoteItems.size)
+            assertEquals(FieldNoteStatus.DRAFT, filteredState.fieldNoteItems[0].note.status)
         }
     }
 
@@ -135,7 +181,7 @@ class FieldNotesListViewModelTest {
                 status = FieldNoteStatus.ACTIVE,
             ),
         )
-        repository.setFieldNotes(notes)
+        fieldNoteRepository.setFieldNotes(notes)
 
         viewModel.uiState.test {
             skipItemsUntilLoaded()
@@ -146,31 +192,32 @@ class FieldNotesListViewModelTest {
             viewModel.onStatusFilterChange(status = FieldNoteStatus.DRAFT)
             val finalState = awaitItem()
 
-            assertEquals(1, finalState.fieldNotes.size)
+            assertEquals(1, finalState.fieldNoteItems.size)
             assertEquals("Apple", finalState.searchQuery)
             assertEquals(FieldNoteStatus.DRAFT, finalState.selectedStatus)
-            assertEquals("Apple Pie", finalState.fieldNotes[0].title)
-            assertEquals(FieldNoteStatus.DRAFT, finalState.fieldNotes[0].status)
+            assertEquals("Apple Pie", finalState.fieldNoteItems[0].note.title)
+            assertEquals(FieldNoteStatus.DRAFT, finalState.fieldNoteItems[0].note.status)
         }
     }
 
     @Test
     fun `search query filters notes by body`() = runTest {
-        val fieldNotes = listOf(
-            fieldNote(
-                id = "field-note-001",
-                title = "North gate safety check",
-                body = "Loose temporary fencing reported near the north access point.",
-                status = FieldNoteStatus.ACTIVE,
-            ),
-            fieldNote(
-                id = "field-note-002",
-                title = "Pump room inspection",
-                body = "Pressure gauge needs follow-up.",
-                status = FieldNoteStatus.ACTIVE,
-            ),
+        fieldNoteRepository.setFieldNotes(
+            listOf(
+                fieldNote(
+                    id = "field-note-001",
+                    title = "North gate safety check",
+                    body = "Loose temporary fencing reported near the north access point.",
+                    status = FieldNoteStatus.ACTIVE,
+                ),
+                fieldNote(
+                    id = "field-note-002",
+                    title = "Pump room inspection",
+                    body = "Pressure gauge needs follow-up.",
+                    status = FieldNoteStatus.ACTIVE,
+                ),
+            )
         )
-        repository.setFieldNotes(fieldNotes)
 
         viewModel.uiState.test {
             skipItemsUntilLoaded()
@@ -179,10 +226,81 @@ class FieldNotesListViewModelTest {
 
             val finalState = awaitItem()
 
-            assertEquals(1, finalState.fieldNotes.size)
-            assertEquals("field-note-001", finalState.fieldNotes.first().id.value)
-            assertEquals("North gate safety check", finalState.fieldNotes.first().title)
+            assertEquals(1, finalState.fieldNoteItems.size)
+            assertEquals("field-note-001", finalState.fieldNoteItems.first().note.id.value)
+            assertEquals("North gate safety check", finalState.fieldNoteItems.first().note.title)
             assertEquals("fencing", finalState.searchQuery)
+        }
+    }
+
+    @Test
+    fun `search query filters notes by associated site name`() = runTest {
+        siteRepository.setSites(
+            listOf(
+                site(
+                    id = "site-generator-room",
+                    name = "Generator Room",
+                ),
+                site(
+                    id = "site-north-gate",
+                    name = "North Gate",
+                ),
+            ),
+        )
+
+        fieldNoteRepository.setFieldNotes(
+            listOf(
+                fieldNote(
+                    id = "field-note-001",
+                    title = "Unrelated title",
+                    siteId = "site-generator-room",
+                    body = "Unrelated body",
+                    status = FieldNoteStatus.ACTIVE,
+                ),
+                fieldNote(
+                    id = "field-note-002",
+                    title = "Another unrelated title",
+                    siteId = "site-north-gate",
+                    body = "Another unrelated body",
+                    status = FieldNoteStatus.ACTIVE,
+                ),
+            )
+        )
+
+        viewModel.uiState.test {
+            skipItemsUntilLoaded()
+
+            viewModel.onSearchQueryChange(query = "generator")
+
+            val filteredState = awaitItem()
+            assertEquals("generator", filteredState.searchQuery)
+            assertEquals(1, filteredState.fieldNoteItems.size)
+            assertEquals("field-note-001", filteredState.fieldNoteItems.first().note.id.value)
+            assertEquals("Generator Room", filteredState.fieldNoteItems.first().siteName)
+        }
+    }
+
+    @Test
+    fun `missing associated site keeps siteName null`() = runTest {
+        siteRepository.setSites(emptyList())
+        fieldNoteRepository.setFieldNotes(
+            listOf(
+                fieldNote(
+                    id = "field-note-001",
+                    title = "Unknown site note",
+                    siteId = "site-missing",
+                    body = "Body 1",
+                    status = FieldNoteStatus.ACTIVE,
+                ),
+            ),
+        )
+
+        viewModel.uiState.test {
+            val state = skipItemsUntilLoaded()
+
+            assertEquals(1, state.fieldNoteItems.size)
+            assertEquals("field-note-001", state.fieldNoteItems.first().note.id.value)
+            assertNull(state.fieldNoteItems.first().siteName)
         }
     }
 
@@ -202,7 +320,7 @@ class FieldNotesListViewModelTest {
                 status = FieldNoteStatus.ACTIVE,
             ),
         )
-        repository.setFieldNotes(fieldNotes)
+        fieldNoteRepository.setFieldNotes(fieldNotes)
 
         viewModel.uiState.test {
             skipItemsUntilLoaded()
@@ -210,13 +328,13 @@ class FieldNotesListViewModelTest {
             viewModel.onSearchQueryChange(query = "gate")
 
             val filteredState = awaitItem()
-            assertEquals(1, filteredState.fieldNotes.size)
-            assertEquals("North Gate Safety Check", filteredState.fieldNotes.first().title)
+            assertEquals(1, filteredState.fieldNoteItems.size)
+            assertEquals("North Gate Safety Check", filteredState.fieldNoteItems.first().note.title)
         }
     }
 
     @Test
-    fun `blank search query does not filter fieldNotes`() = runTest {
+    fun `blank search query does not filter field note items`() = runTest {
         val fieldNotes = listOf(
             fieldNote(
                 id = "1",
@@ -231,7 +349,7 @@ class FieldNotesListViewModelTest {
                 status = FieldNoteStatus.ACTIVE,
             ),
         )
-        repository.setFieldNotes(fieldNotes)
+        fieldNoteRepository.setFieldNotes(fieldNotes)
 
         viewModel.uiState.test {
             skipItemsUntilLoaded()
@@ -240,12 +358,12 @@ class FieldNotesListViewModelTest {
 
             val state = awaitItem()
             assertEquals("   ", state.searchQuery)
-            assertEquals(fieldNotes, state.fieldNotes)
+            assertEquals(fieldNotes, state.fieldNoteItems.map { it.note })
         }
     }
 
     @Test
-    fun `clearing status filter shows all fieldNotes`() = runTest {
+    fun `clearing status filter shows all field note items`() = runTest {
         val fieldNotes = listOf(
             fieldNote(
                 id = "1",
@@ -260,7 +378,7 @@ class FieldNotesListViewModelTest {
                 status = FieldNoteStatus.DRAFT,
             ),
         )
-        repository.setFieldNotes(fieldNotes)
+        fieldNoteRepository.setFieldNotes(fieldNotes)
 
         viewModel.uiState.test {
             skipItemsUntilLoaded()
@@ -272,15 +390,15 @@ class FieldNotesListViewModelTest {
 
             val clearedState = awaitItem()
             assertNull(clearedState.selectedStatus)
-            assertEquals(fieldNotes, clearedState.fieldNotes)
+            assertEquals(fieldNotes, clearedState.fieldNoteItems.map { it.note })
         }
     }
 
     @Test
     fun `uiState emits error message when repository fails`() = runTest {
-        repository.setShouldThrowError(true)
+        fieldNoteRepository.setShouldThrowError(true)
 
-        val errorViewModel = FieldNotesListViewModel(repository)
+        val errorViewModel = FieldNotesListViewModel(fieldNoteRepository, siteRepository)
 
         errorViewModel.uiState.test {
             val state = awaitItem()

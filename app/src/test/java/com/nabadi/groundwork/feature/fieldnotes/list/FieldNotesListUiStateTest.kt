@@ -75,21 +75,21 @@ class FieldNotesListUiStateTest {
     fun `isEmpty is false while loading`() {
         val state = FieldNotesListUiState(
             isLoading = true,
-            fieldNotes = emptyList(),
+            fieldNoteItems = emptyList(),
         )
 
-        assertFalse(state.isEmpty)
+        assertFalse(state.shouldShowEmptyState)
     }
 
     @Test
     fun `isEmpty is false when error message exists`() {
         val state = FieldNotesListUiState(
             isLoading = false,
-            fieldNotes = emptyList(),
+            fieldNoteItems = emptyList(),
             errorMessage = "Unable to load field notes.",
         )
 
-        assertFalse(state.isEmpty)
+        assertFalse(state.shouldShowEmptyState)
     }
 
     @Test
@@ -97,10 +97,10 @@ class FieldNotesListUiStateTest {
         val state = FieldNotesListUiState(
             isLoading = false,
             searchQuery = "client",
-            fieldNotes = emptyList(),
+            fieldNoteItems = emptyList(),
         )
 
-        assertFalse(state.isEmpty)
+        assertFalse(state.shouldShowEmptyState)
     }
 
     @Test
@@ -108,29 +108,34 @@ class FieldNotesListUiStateTest {
         val state = FieldNotesListUiState(
             isLoading = false,
             selectedStatus = FieldNoteStatus.ACTIVE,
-            fieldNotes = emptyList(),
+            fieldNoteItems = emptyList(),
         )
 
-        assertFalse(state.isEmpty)
+        assertFalse(state.shouldShowEmptyState)
     }
 
     @Test
     fun `isEmpty is false when field notes exist`() {
         val state = FieldNotesListUiState(
             isLoading = false,
-            fieldNotes = listOf(fieldNote(id = "1")),
+            fieldNoteItems = listOf(
+                FieldNoteListItemUiState(
+                    note = fieldNote(id = "1"),
+                    siteName = "Site 1"
+                )
+            ),
         )
 
-        assertFalse(state.isEmpty)
+        assertFalse(state.shouldShowEmptyState)
     }
 
     @Test
     fun `isEmpty is true when not loading no error no active criteria and no field notes`() {
         val state = FieldNotesListUiState(
             isLoading = false,
-            fieldNotes = emptyList(),
+            fieldNoteItems = emptyList(),
         )
 
-        assertTrue(state.isEmpty)
+        assertTrue(state.shouldShowEmptyState)
     }
 }
