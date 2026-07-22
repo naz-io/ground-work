@@ -17,6 +17,8 @@
     <dimen name="padding_card_content">16dp</dimen>
     <dimen name="spacing_card_content">4dp</dimen>
     <dimen name="border_card_strong">2dp</dimen>
+    <dimen name="padding_site_card_priority_horizontal">8dp</dimen>
+    <dimen name="padding_site_card_priority_vertical">4dp</dimen>
 
     <!-- Site detail -->
     <dimen name="padding_site_detail_badge_horizontal">8dp</dimen>
@@ -38,13 +40,10 @@
 
     <!-- Card metadata -->
     <dimen name="padding_card_metadata_vertical">12dp</dimen>
-    <dimen name="spacing_metadata_item">16dp</dimen>
 
     <!-- Icons -->
-    <dimen name="padding_trailing_action_end">4dp</dimen>
     <dimen name="spacing_icon_text">4dp</dimen>
     <dimen name="size_icon_small">16dp</dimen>
-    <dimen name="size_icon_action_touch_target">48dp</dimen>
 
     <!-- Loading states -->
     <dimen name="size_loading_indicator">100dp</dimen>

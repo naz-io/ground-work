@@ -61,9 +61,6 @@ fun GroundWorkNavHost(
                 onOpenSiteClick = { siteId ->
                     navController.navigate(GroundWorkRoute.siteDetail(siteId))
                 },
-                onEditSiteClick = { siteId ->
-                    navController.navigate(GroundWorkRoute.siteEditor(siteId))
-                },
                 onAddSiteClick = {
                     navController.navigate(GroundWorkRoute.siteEditor())
                 },

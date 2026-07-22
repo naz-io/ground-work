@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
+import com.nabadi.groundwork.domain.repository.FieldNoteRepository
 import com.nabadi.groundwork.domain.repository.SiteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SitesListViewModel @Inject constructor(
     siteRepository: SiteRepository,
+    fieldNoteRepository: FieldNoteRepository,
 ) : ViewModel() {
     private val searchQuery = MutableStateFlow("")
     private val selectedStatus = MutableStateFlow<SiteStatus?>(null)
@@ -25,10 +27,11 @@ class SitesListViewModel @Inject constructor(
     val uiState: StateFlow<SitesListUiState> =
         combine(
             siteRepository.observeSites(),
+            fieldNoteRepository.observeFieldNotes(),
             searchQuery,
             selectedStatus,
             selectedPriority,
-        ) { sites, searchQuery, selectedStatus, selectedPriority ->
+        ) { sites, fieldNotes, searchQuery, selectedStatus, selectedPriority ->
             val normalizedSearchQuery = searchQuery.trim()
             val filteredSites = sites.filter { site ->
                 val matchesStatus = selectedStatus == null || site.status == selectedStatus
@@ -48,6 +51,10 @@ class SitesListViewModel @Inject constructor(
                 selectedStatus = selectedStatus,
                 selectedPriority = selectedPriority,
                 sites = filteredSites,
+                noteCountsBySiteId = fieldNotes
+                    .mapNotNull { it.siteId }
+                    .groupingBy { it }
+                    .eachCount(),
             )
         }.catch {
             emit(

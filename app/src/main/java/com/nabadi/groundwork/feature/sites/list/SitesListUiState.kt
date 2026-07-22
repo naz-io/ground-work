@@ -1,6 +1,7 @@
 package com.nabadi.groundwork.feature.sites.list
 
 import com.nabadi.groundwork.domain.model.Site
+import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
 
@@ -10,6 +11,7 @@ data class SitesListUiState(
     val selectedStatus: SiteStatus? = null,
     val selectedPriority: SitePriority? = null,
     val sites: List<Site> = emptyList(),
+    val noteCountsBySiteId: Map<SiteId, Int> = emptyMap(),
     val errorMessage: String? = null,
 ) {
     val isError: Boolean
@@ -35,4 +37,6 @@ data class SitesListUiState(
 
     val shouldShowContent: Boolean
         get() = !isLoading && !isError && (sites.isNotEmpty() || shouldShowNoMatchesState)
+
+    fun noteCountFor(siteId: SiteId): Int = noteCountsBySiteId[siteId] ?: 0
 }

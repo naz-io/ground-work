@@ -1,13 +1,25 @@
 package com.nabadi.groundwork.feature.sites.list
 
 import com.nabadi.groundwork.feature.sites.TestSite.site
+import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class SitesListUiStateTest {
+
+    @Test
+    fun `noteCountFor returns stored count or zero when the site has no notes`() {
+        val state = SitesListUiState(
+            noteCountsBySiteId = mapOf(SiteId("1") to 3),
+        )
+
+        assertEquals(3, state.noteCountFor(SiteId("1")))
+        assertEquals(0, state.noteCountFor(SiteId("2")))
+    }
 
     @Test
     fun `isError is false by default`() {

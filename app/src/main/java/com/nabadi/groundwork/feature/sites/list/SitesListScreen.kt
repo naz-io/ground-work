@@ -49,7 +49,6 @@ fun SitesListScreen(
     onPriorityFilterChange: (SitePriority?) -> Unit,
     onClearCriteriaClick: () -> Unit,
     onOpenSiteClick: (SiteId) -> Unit,
-    onEditSiteClick: (SiteId) -> Unit,
     onAddSiteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -100,8 +99,8 @@ fun SitesListScreen(
                     onStatusFilterChange = onStatusFilterChange,
                     onPriorityFilterChange = onPriorityFilterChange,
                     sites = uiState.sites,
+                    noteCountFor = uiState::noteCountFor,
                     onOpenSiteClick = onOpenSiteClick,
-                    onEditSiteClick = onEditSiteClick,
                     modifier = Modifier.fillMaxSize(),
                 )
 
@@ -164,8 +163,8 @@ private fun SitesContent(
     onStatusFilterChange: (SiteStatus?) -> Unit,
     onPriorityFilterChange: (SitePriority?) -> Unit,
     sites: List<Site>,
+    noteCountFor: (SiteId) -> Int,
     onOpenSiteClick: (SiteId) -> Unit,
-    onEditSiteClick: (SiteId) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     SitesSearchResultsContent(
@@ -180,8 +179,8 @@ private fun SitesContent(
         items(sites, key = { it.id.value }) { site ->
             SiteCard(
                 site = site,
+                noteCount = noteCountFor(site.id),
                 onOpenSiteClick = { onOpenSiteClick(site.id) },
-                onEditSiteClick = { onEditSiteClick(site.id) },
             )
         }
     }
@@ -282,6 +281,10 @@ private fun NoMatchingSitesState(
     }
 }
 
+private val previewNoteCountsBySiteId = previewSites
+    .mapIndexed { index, site -> site.id to (12 - index * 3).coerceAtLeast(0) }
+    .toMap()
+
 @Preview(
     name = "Content",
     showBackground = true,
@@ -294,13 +297,13 @@ private fun SitesListScreenPreview_Content() {
             uiState = SitesListUiState(
                 isLoading = false,
                 sites = previewSites,
+                noteCountsBySiteId = previewNoteCountsBySiteId,
             ),
             onSearchQueryChange = {},
             onStatusFilterChange = {},
             onPriorityFilterChange = {},
             onClearCriteriaClick = {},
             onOpenSiteClick = {},
-            onEditSiteClick = {},
             onAddSiteClick = {},
         )
     }
@@ -319,13 +322,13 @@ private fun SitesListScreenPreview_Content_Dark() {
             uiState = SitesListUiState(
                 isLoading = false,
                 sites = previewSites,
+                noteCountsBySiteId = previewNoteCountsBySiteId,
             ),
             onSearchQueryChange = {},
             onStatusFilterChange = {},
             onPriorityFilterChange = {},
             onClearCriteriaClick = {},
             onOpenSiteClick = {},
-            onEditSiteClick = {},
             onAddSiteClick = {},
         )
     }
@@ -348,13 +351,13 @@ private fun SitesListScreenPreview_FilteredContent() {
                 sites = previewSites.filter {
                     it.status == SiteStatus.ACTIVE && it.priority == SitePriority.HIGH
                 },
+                noteCountsBySiteId = previewNoteCountsBySiteId,
             ),
             onSearchQueryChange = {},
             onStatusFilterChange = {},
             onPriorityFilterChange = {},
             onClearCriteriaClick = {},
             onOpenSiteClick = {},
-            onEditSiteClick = {},
             onAddSiteClick = {},
         )
     }
@@ -378,13 +381,13 @@ private fun SitesListScreenPreview_FilteredContent_Dark() {
                 sites = previewSites.filter {
                     it.status == SiteStatus.ACTIVE && it.priority == SitePriority.HIGH
                 },
+                noteCountsBySiteId = previewNoteCountsBySiteId,
             ),
             onSearchQueryChange = {},
             onStatusFilterChange = {},
             onPriorityFilterChange = {},
             onClearCriteriaClick = {},
             onOpenSiteClick = {},
-            onEditSiteClick = {},
             onAddSiteClick = {},
         )
     }
@@ -411,7 +414,6 @@ private fun SitesListScreenPreview_NoMatches() {
             onPriorityFilterChange = {},
             onClearCriteriaClick = {},
             onOpenSiteClick = {},
-            onEditSiteClick = {},
             onAddSiteClick = {},
         )
     }
@@ -439,7 +441,6 @@ private fun SitesListScreenPreview_NoMatches_Dark() {
             onPriorityFilterChange = {},
             onClearCriteriaClick = {},
             onOpenSiteClick = {},
-            onEditSiteClick = {},
             onAddSiteClick = {},
         )
     }
@@ -460,7 +461,6 @@ private fun SitesListScreenPreview_Loading() {
             onPriorityFilterChange = {},
             onClearCriteriaClick = {},
             onOpenSiteClick = {},
-            onEditSiteClick = {},
             onAddSiteClick = {},
         )
     }
@@ -482,7 +482,6 @@ private fun SitesListScreenPreview_Loading_Dark() {
             onPriorityFilterChange = {},
             onClearCriteriaClick = {},
             onOpenSiteClick = {},
-            onEditSiteClick = {},
             onAddSiteClick = {},
         )
     }
@@ -506,7 +505,6 @@ private fun SitesListScreenPreview_Empty() {
             onPriorityFilterChange = {},
             onClearCriteriaClick = {},
             onOpenSiteClick = {},
-            onEditSiteClick = {},
             onAddSiteClick = {},
         )
     }
@@ -531,7 +529,6 @@ private fun SitesListScreenPreview_Empty_Dark() {
             onPriorityFilterChange = {},
             onClearCriteriaClick = {},
             onOpenSiteClick = {},
-            onEditSiteClick = {},
             onAddSiteClick = {},
         )
     }
@@ -555,7 +552,6 @@ private fun SitesListScreenPreview_Error() {
             onPriorityFilterChange = {},
             onClearCriteriaClick = {},
             onOpenSiteClick = {},
-            onEditSiteClick = {},
             onAddSiteClick = {},
         )
     }
@@ -580,7 +576,6 @@ private fun SitesListScreenPreview_Error_Dark() {
             onPriorityFilterChange = {},
             onClearCriteriaClick = {},
             onOpenSiteClick = {},
-            onEditSiteClick = {},
             onAddSiteClick = {},
         )
     }

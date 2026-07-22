@@ -3,8 +3,11 @@ package com.nabadi.groundwork.feature.sites.list
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.nabadi.groundwork.MainDispatcherRule
-import com.nabadi.groundwork.feature.sites.TestSite
+import com.nabadi.groundwork.data.repository.FakeFieldNoteRepository
 import com.nabadi.groundwork.data.repository.FakeSiteRepository
+import com.nabadi.groundwork.domain.model.SiteId
+import com.nabadi.groundwork.feature.fieldnotes.TestFieldNote
+import com.nabadi.groundwork.feature.sites.TestSite
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
 import kotlinx.coroutines.test.runTest
@@ -22,11 +25,12 @@ class SitesListViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val repository = FakeSiteRepository()
+    private val fieldNoteRepository = FakeFieldNoteRepository()
     private lateinit var viewModel: SitesListViewModel
 
     @Before
     fun setup() {
-        viewModel = SitesListViewModel(repository)
+        viewModel = SitesListViewModel(repository, fieldNoteRepository)
     }
 
     @Test
@@ -41,6 +45,59 @@ class SitesListViewModelTest {
             val state = skipItemsUntilLoaded()
             assertFalse(state.isLoading)
             assertEquals(sites, state.sites)
+        }
+    }
+
+    @Test
+    fun `uiState groups field note counts by site and excludes unassigned notes`() = runTest {
+        repository.setSites(
+            listOf(
+                TestSite.site(id = "1"),
+                TestSite.site(id = "2"),
+                TestSite.site(id = "3"),
+            ),
+        )
+        fieldNoteRepository.setFieldNotes(
+            listOf(
+                TestFieldNote.fieldNote(id = "note-1", siteId = "1"),
+                TestFieldNote.fieldNote(id = "note-2", siteId = "1"),
+                TestFieldNote.fieldNote(id = "note-3", siteId = "2"),
+                TestFieldNote.fieldNote(id = "unassigned", siteId = null),
+            ),
+        )
+
+        viewModel.uiState.test {
+            val state = skipItemsUntilLoaded()
+
+            assertEquals(2, state.noteCountFor(SiteId("1")))
+            assertEquals(1, state.noteCountFor(SiteId("2")))
+            assertEquals(0, state.noteCountFor(SiteId("3")))
+        }
+    }
+
+    @Test
+    fun `field note updates refresh counts without changing the visible sites`() = runTest {
+        val sites = listOf(
+            TestSite.site(id = "1"),
+            TestSite.site(id = "2"),
+        )
+        repository.setSites(sites)
+
+        viewModel.uiState.test {
+            val initialState = skipItemsUntilLoaded()
+            assertEquals(0, initialState.noteCountFor(SiteId("1")))
+
+            fieldNoteRepository.setFieldNotes(
+                listOf(
+                    TestFieldNote.fieldNote(id = "note-1", siteId = "1"),
+                    TestFieldNote.fieldNote(id = "note-2", siteId = "1"),
+                ),
+            )
+
+            val updatedState = awaitItem()
+            assertEquals(sites, updatedState.sites)
+            assertEquals(2, updatedState.noteCountFor(SiteId("1")))
+            assertEquals(0, updatedState.noteCountFor(SiteId("2")))
         }
     }
 
@@ -413,7 +470,27 @@ class SitesListViewModelTest {
     fun `uiState emits error message when repository fails`() = runTest {
         repository.setShouldThrowError(true)
 
-        val errorViewModel = SitesListViewModel(repository)
+        val errorViewModel = SitesListViewModel(repository, fieldNoteRepository)
+
+        errorViewModel.uiState.test {
+            val state = awaitItem()
+            if (state.errorMessage == null) {
+                val nextState = awaitItem()
+                assertNotNull(nextState.errorMessage)
+                assertEquals("Unable to load sites.", nextState.errorMessage)
+            } else {
+                assertNotNull(state.errorMessage)
+                assertEquals("Unable to load sites.", state.errorMessage)
+            }
+        }
+    }
+
+    @Test
+    fun `uiState emits error message when field note repository fails`() = runTest {
+        val failingFieldNoteRepository = FakeFieldNoteRepository().apply {
+            setShouldThrowError(true)
+        }
+        val errorViewModel = SitesListViewModel(repository, failingFieldNoteRepository)
 
         errorViewModel.uiState.test {
             val state = awaitItem()

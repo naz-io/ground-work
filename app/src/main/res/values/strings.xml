@@ -73,9 +73,9 @@
 
     <!-- Sites list screen -->
     <string name="sites_list_title">SITES</string>
-    <string name="sites_list_site_actions">Site actions</string>
-    <string name="sites_list_site_updated_label">Updated: %1$s</string>
-    <string name="sites_list_site_notes_count">Notes: %1$d</string>
+    <string name="sites_list_site_id_label">SITE #%1$s</string>
+    <string name="sites_list_site_updated_label">UPDATED: %1$s</string>
+    <string name="sites_list_site_notes_count">%1$d NOTES</string>
     <string name="sites_list_empty_sites_message">No sites yet.</string>
     <string name="sites_list_error">Error loading sites: %1$s</string>
     <string name="sites_list_add_new_site_content_description">Add a new site</string>
@@ -83,8 +83,8 @@
     <string name="sites_list_search_placeholder">Search site name, location, or ID…</string>
     <string name="sites_list_search_clear_content_description">Clear site search</string>
     <string name="sites_list_filter_all">ALL</string>
-    <string name="sites_list_filter_status_label">Status: %1$s</string>
-    <string name="sites_list_filter_priority_label">Priority: %1$s</string>
+    <string name="sites_list_filter_status_title">STATUS</string>
+    <string name="sites_list_filter_priority_title">PRIORITY</string>
     <string name="sites_list_no_matches_title">No sites found.</string>
     <string name="sites_list_no_matches_description">Try changing your search or filters.</string>
     <string name="sites_list_no_matches_action">CLEAR ALL FILTERS</string>

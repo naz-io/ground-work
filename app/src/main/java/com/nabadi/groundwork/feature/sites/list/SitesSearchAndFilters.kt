@@ -30,6 +30,7 @@ import com.nabadi.groundwork.feature.sites.labelResId
 import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
 import com.nabadi.groundwork.ui.components.GroundWorkShapes
 import com.nabadi.groundwork.ui.components.PREVIEW_API_LEVEL
+import com.nabadi.groundwork.ui.components.TechnicalLabel
 
 @Composable
 fun SitesSearchAndFilters(
@@ -105,68 +106,119 @@ private fun SitesFilters(
     onPriorityFilterChange: (SitePriority?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyRow(
+    Column(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
     ) {
-        item {
-            SitesFilterChip(
-                selected = selectedStatus == null && selectedPriority == null,
-                onClick = {
-                    onStatusFilterChange(null)
-                    onPriorityFilterChange(null)
-                },
-                label = stringResource(R.string.sites_list_filter_all),
-            )
-        }
+        SiteStatusFilters(
+            selectedStatus = selectedStatus,
+            onStatusFilterChange = onStatusFilterChange,
+        )
+        SitePriorityFilters(
+            selectedPriority = selectedPriority,
+            onPriorityFilterChange = onPriorityFilterChange,
+        )
+    }
+}
 
-        items(
-            items = SiteStatus.entries,
-            key = { it },
-            contentType = { "SiteStatusFilterOption" },
-        ) { statusFilter ->
-            SitesFilterChip(
-                selected = selectedStatus == statusFilter,
-                onClick = {
-                    onStatusFilterChange(
-                        if (selectedStatus == statusFilter) {
-                            null
-                        } else {
-                            statusFilter
-                        },
-                    )
-                },
-                label = stringResource(
-                    R.string.sites_list_filter_status_label,
-                    stringResource(statusFilter.labelResId),
-                ),
-            )
-        }
+@Composable
+private fun SiteStatusFilters(
+    selectedStatus: SiteStatus?,
+    onStatusFilterChange: (SiteStatus?) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_card_content)),
+    ) {
+        TechnicalLabel(text = stringResource(R.string.sites_list_filter_status_title))
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
+        ) {
+            item {
+                SitesFilterChip(
+                    selected = selectedStatus == null,
+                    onClick = { onStatusFilterChange(null) },
+                    label = stringResource(R.string.sites_list_filter_all),
+                )
+            }
 
-        items(
-            items = SitePriority.entries,
-            key = { it },
-            contentType = { "SitePriorityFilterOption" },
-        ) { priorityFilter ->
-            SitesFilterChip(
-                selected = selectedPriority == priorityFilter,
-                onClick = {
-                    onPriorityFilterChange(
-                        if (selectedPriority == priorityFilter) {
-                            null
-                        } else {
-                            priorityFilter
-                        },
-                    )
-                },
-                label = stringResource(
-                    R.string.sites_list_filter_priority_label,
-                    stringResource(priorityFilter.labelResId),
-                ),
-            )
+            items(
+                items = SiteStatus.entries,
+                key = { it },
+                contentType = { "SiteStatusFilterOption" },
+            ) { statusFilter ->
+                SitesFilterChip(
+                    selected = selectedStatus == statusFilter,
+                    onClick = {
+                        onStatusFilterChange(
+                            if (selectedStatus == statusFilter) {
+                                null
+                            } else {
+                                statusFilter
+                            },
+                        )
+                    },
+                    label = stringResource(statusFilter.labelResId),
+                )
+            }
         }
     }
 }
+
+@Composable
+private fun SitePriorityFilters(
+    selectedPriority: SitePriority?,
+    onPriorityFilterChange: (SitePriority?) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_card_content)),
+    ) {
+        TechnicalLabel(text = stringResource(R.string.sites_list_filter_priority_title))
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
+        ) {
+            item {
+                SitesFilterChip(
+                    selected = selectedPriority == null,
+                    onClick = { onPriorityFilterChange(null) },
+                    label = stringResource(R.string.sites_list_filter_all),
+                )
+            }
+
+            items(
+                items = sitePriorityFilterOrder,
+                key = { it },
+                contentType = { "SitePriorityFilterOption" },
+            ) { priorityFilter ->
+                SitesFilterChip(
+                    selected = selectedPriority == priorityFilter,
+                    onClick = {
+                        onPriorityFilterChange(
+                            if (selectedPriority == priorityFilter) {
+                                null
+                            } else {
+                                priorityFilter
+                            },
+                        )
+                    },
+                    label = stringResource(priorityFilter.labelResId),
+                )
+            }
+        }
+    }
+}
+
+internal val sitePriorityFilterOrder = listOf(
+    SitePriority.URGENT,
+    SitePriority.HIGH,
+    SitePriority.NORMAL,
+    SitePriority.LOW,
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -228,6 +280,44 @@ private fun SitesSearchAndFiltersPreview_ActiveCriteria() {
             selectedStatus = SiteStatus.ACTIVE,
             selectedPriority = SitePriority.HIGH,
             searchQuery = "warehouse",
+            onSearchQueryChange = {},
+            onStatusFilterChange = {},
+            onPriorityFilterChange = {},
+        )
+    }
+}
+
+@Preview(
+    name = "Status Criteria",
+    showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
+)
+@Composable
+private fun SitesSearchAndFiltersPreview_StatusCriteria() {
+    GroundWorkPreviewSurface {
+        SitesSearchAndFilters(
+            selectedStatus = SiteStatus.COMPLETED,
+            selectedPriority = null,
+            searchQuery = "",
+            onSearchQueryChange = {},
+            onStatusFilterChange = {},
+            onPriorityFilterChange = {},
+        )
+    }
+}
+
+@Preview(
+    name = "Priority Criteria",
+    showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
+)
+@Composable
+private fun SitesSearchAndFiltersPreview_PriorityCriteria() {
+    GroundWorkPreviewSurface {
+        SitesSearchAndFilters(
+            selectedStatus = null,
+            selectedPriority = SitePriority.URGENT,
+            searchQuery = "",
             onSearchQueryChange = {},
             onStatusFilterChange = {},
             onPriorityFilterChange = {},
