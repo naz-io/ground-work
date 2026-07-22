@@ -105,6 +105,13 @@
     <string name="site_editor_cancel_changes">CANCEL &amp; DISCARD CHANGES</string>
     <string name="site_editor_delete">DELETE SITE</string>
 
+    <!-- Site detail screen -->
+    <string name="site_detail_title">SITE DETAILS</string>
+    <string name="site_detail_edit_site">Edit site</string>
+    <string name="site_detail_add_note">Add a field note for this site</string>
+    <string name="site_detail_notes_title">FIELD NOTES (%1$d)</string>
+    <string name="site_detail_notes_empty">No field notes are assigned to this site yet.</string>
+
     <!-- Site status labels -->
     <string name="site_status_active">ACTIVE</string>
     <string name="site_status_completed">COMPLETED</string>

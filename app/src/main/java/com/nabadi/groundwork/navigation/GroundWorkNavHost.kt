@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import com.nabadi.groundwork.feature.fieldnotes.editor.FieldNoteEditorRoute
 import com.nabadi.groundwork.feature.fieldnotes.list.FieldNotesListRoute
 import com.nabadi.groundwork.feature.sites.editor.SiteEditorRoute
+import com.nabadi.groundwork.feature.sites.detail.SiteDetailRoute
 import com.nabadi.groundwork.feature.sites.list.SitesListRoute
 
 @Composable
@@ -41,6 +42,11 @@ fun GroundWorkNavHost(
                     nullable = true
                     defaultValue = null
                 },
+                navArgument(GroundWorkRoute.SITE_ID_ARG) {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                },
             ),
         ) {
             FieldNoteEditorRoute(
@@ -53,10 +59,35 @@ fun GroundWorkNavHost(
         composable(route = GroundWorkRoute.SITES_LIST) {
             SitesListRoute(
                 onOpenSiteClick = { siteId ->
+                    navController.navigate(GroundWorkRoute.siteDetail(siteId))
+                },
+                onEditSiteClick = { siteId ->
                     navController.navigate(GroundWorkRoute.siteEditor(siteId))
                 },
                 onAddSiteClick = {
                     navController.navigate(GroundWorkRoute.siteEditor())
+                },
+            )
+        }
+
+        composable(
+            route = GroundWorkRoute.SITE_DETAIL_ROUTE,
+            arguments = listOf(
+                navArgument(GroundWorkRoute.SITE_ID_ARG) {
+                    type = NavType.StringType
+                },
+            ),
+        ) {
+            SiteDetailRoute(
+                onBackClick = { navController.popBackStack() },
+                onEditSiteClick = { siteId ->
+                    navController.navigate(GroundWorkRoute.siteEditor(siteId))
+                },
+                onFieldNoteClick = { fieldNoteId ->
+                    navController.navigate(GroundWorkRoute.fieldNoteEditor(fieldNoteId))
+                },
+                onAddFieldNoteClick = { siteId ->
+                    navController.navigate(GroundWorkRoute.fieldNoteEditor(siteId = siteId))
                 },
             )
         }

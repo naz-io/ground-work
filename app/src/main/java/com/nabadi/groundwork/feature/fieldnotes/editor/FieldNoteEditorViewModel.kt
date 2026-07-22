@@ -26,11 +26,14 @@ class FieldNoteEditorViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
+    private val initialSiteId: SiteId? =
+        savedStateHandle.get<String>(GroundWorkRoute.SITE_ID_ARG)?.let(::SiteId)
+
     private val fieldNoteId: FieldNoteId? =
         savedStateHandle.get<String>(GroundWorkRoute.FIELD_NOTE_ID_ARG)?.let(::FieldNoteId)
     private var existingFieldNote: FieldNote? = null
 
-    private val _uiState = MutableStateFlow(FieldNoteEditorUiState())
+    private val _uiState = MutableStateFlow(FieldNoteEditorUiState(siteId = initialSiteId))
     val uiState: StateFlow<FieldNoteEditorUiState> = _uiState.asStateFlow()
 
     init {

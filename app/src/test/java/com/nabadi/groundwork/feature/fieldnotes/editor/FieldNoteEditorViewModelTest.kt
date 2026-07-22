@@ -8,6 +8,7 @@ import com.nabadi.groundwork.feature.fieldnotes.TestFieldNote.fieldNote
 import com.nabadi.groundwork.data.repository.FakeFieldNoteRepository
 import com.nabadi.groundwork.data.repository.FakeSiteRepository
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
+import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.navigation.GroundWorkRoute
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -22,6 +23,24 @@ class FieldNoteEditorViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
+
+    @Test
+    fun `init preselects site when site id is provided for a new field note`() = runTest {
+        val siteId = SiteId("site-001")
+        val viewModel = FieldNoteEditorViewModel(
+            fieldNoteRepository = FakeFieldNoteRepository(),
+            siteRepository = FakeSiteRepository(),
+            savedStateHandle = SavedStateHandle(
+                initialState = mapOf(GroundWorkRoute.SITE_ID_ARG to siteId.value),
+            ),
+        )
+
+        val state = viewModel.uiState.value
+
+        assertEquals(siteId, state.siteId)
+        assertFalse(state.isEditing)
+        assertFalse(state.isLoading)
+    }
 
     @Test
     fun `init loads existing field note when field note id is provided`() = runTest {
