@@ -82,6 +82,17 @@ class FieldNoteEditorUiStateTest {
     }
 
     @Test
+    fun `site options error does not block saving an unassigned field note`() {
+        val state = FieldNoteEditorUiState(
+            title = "Safety issue",
+            siteOptionsErrorMessage = "Unable to load sites.",
+        )
+
+        assertTrue(state.canSave)
+        assertFalse(state.isBusy)
+    }
+
+    @Test
     fun `canSave is false while loading`() {
         val state = FieldNoteEditorUiState(
             title = "Safety issue",

@@ -14,6 +14,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -146,18 +147,28 @@ class FieldNoteEditorViewModel @Inject constructor(
 
     private fun observeAvailableSites() {
         viewModelScope.launch {
-            siteRepository.observeSites().collect { sites ->
-                _uiState.update { currentState ->
-                    currentState.copy(
-                        availableSites = sites.map { site ->
-                            SiteOptionUiState(
-                                id = site.id,
-                                name = site.name,
-                            )
-                        },
-                    )
+            siteRepository.observeSites()
+                .catch {
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            availableSites = emptyList(),
+                            siteOptionsErrorMessage = "Unable to load sites.",
+                        )
+                    }
                 }
-            }
+                .collect { sites ->
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            availableSites = sites.map { site ->
+                                SiteOptionUiState(
+                                    id = site.id,
+                                    name = site.name,
+                                )
+                            },
+                            siteOptionsErrorMessage = null,
+                        )
+                    }
+                }
         }
     }
 

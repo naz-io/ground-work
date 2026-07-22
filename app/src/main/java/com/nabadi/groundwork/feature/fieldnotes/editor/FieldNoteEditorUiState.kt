@@ -14,6 +14,7 @@ data class FieldNoteEditorUiState(
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
     val isDeleting: Boolean = false,
+    val siteOptionsErrorMessage: String? = null,
     val errorMessage: String? = null,
 ) {
     val isBusy: Boolean

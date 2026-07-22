@@ -2,7 +2,7 @@
 
 GroundWork is an offline-first Android app for field operations teams working in low-connectivity environments.
 
-The long-term product direction includes site management, field notes, reports, local sync visibility, and conflict-aware offline workflows. The current implementation intentionally starts smaller: a local-first foundation for field notes and sites, with the relationship between them planned as the next step.
+The long-term product direction includes site management, field notes, reports, local sync visibility, and conflict-aware offline workflows. The current implementation provides a local-first foundation in which field notes can optionally belong to sites while remaining available for fast unassigned capture.
 
 ## Project Goal
 
@@ -10,7 +10,7 @@ The goal of this project is not to build another generic notes app. The goal is 
 
 The current version focuses on getting the local foundation right: creating, editing, deleting, listing, searching, and filtering field notes and sites using a clean Compose UI, a Room-backed data layer, ViewModel-managed state, and repository contracts between the domain and data layers.
 
-Future versions will extend this foundation by associating field notes with sites, then adding sync simulation, retry handling, conflict resolution, attachments, and performance/testing work. These are intentionally delayed until the local model and state flow are stable.
+Future versions will extend this foundation with sync simulation, retry handling, conflict resolution, attachments, and performance work. These are intentionally delayed until the local relationship model and state flow are stable.
 
 ## Seniority Signals
 
@@ -21,13 +21,13 @@ This project is designed to showcase:
 - Explicit UI state modeling with ViewModels and Compose
 - Repository-driven data access instead of direct database access from UI
 - Route/screen separation for previewable, stateless Compose UI
-- Scope control: sync, conflict resolution, field-note/site association, and attachments are delayed until the local foundations are stable
+- Scope control: field-note/site association was added only after both local foundations were stable, while sync, conflict resolution, and attachments remain intentionally delayed
 - A roadmap that grows complexity intentionally instead of adding features randomly
-- Local and instrumented tests for mappers, DAOs, repositories, ViewModels, and UI state models
+- Local and instrumented tests for mappers, DAOs, repositories, ViewModels, UI state models, and key Compose interactions
 
 ## Current Progress
 
-Git tags are created only for stable checkpoints. The current checkpoint is `v0.7.0`, representing the local field notes and sites foundation with create/edit/delete flows, search/filtering, Room persistence, DAO tests, repository tests, ViewModel tests, UI state tests, and CI workflow.
+Git tags are created only for stable checkpoints. The latest stable tag is `v0.8.0`, representing the field-note/site relationship, site-aware creation and editing flows, Site Detail, and assigned/unassigned test coverage.
 
 ### v0.1 — Project Setup
 - Created Android project
@@ -110,12 +110,15 @@ Git tags are created only for stable checkpoints. The current checkpoint is `v0.
 - Added UI state tests for Field Notes and Sites list/editor state models
 
 ### v0.8.0 — Field Note and Site Relationship
-- Planned next
-- Associate field notes with sites using an optional `siteId`
-- Keep field notes usable without a site for fast capture
-- Add site-aware field note creation and editing flows
-- Add list filtering or grouping by site where useful
-- Add tests for assigned and unassigned field notes across DAO, repository, and ViewModel layers
+- Added an optional `siteId` relationship from field notes to sites
+- Added a Room foreign key and index while preserving unassigned notes and converting orphaned migrated relationships to unassigned
+- Preserved field notes as unassigned when their associated site is deleted
+- Kept field notes usable without a site for fast capture
+- Added associated-site selection, reassignment, and removal in the field-note editor
+- Added site-preselected field-note creation from Site Detail
+- Added Site Detail with site-scoped field notes and per-site note counts
+- Added site labels and site-name search to the main Field Notes list
+- Added assigned/unassigned coverage across migration, DAO, repository, ViewModel, UI state, and Compose UI layers
 
 ### v0.9.0 — Sync Simulation
 - Not implemented yet
@@ -161,7 +164,7 @@ Even before sync exists, Room is treated as the durable source for app data. The
 
 Field notes were implemented first as the smallest useful slice of the larger GroundWork concept. Sites were added next as a separate local foundation, with their own domain model, Room persistence, repository, list/editor UI, and tests.
 
-The relationship between field notes and sites is intentionally delayed until both foundations are stable. Field notes will later be able to belong to sites while still supporting fast unassigned capture.
+The relationship between field notes and sites was introduced only after both foundations were stable. The relationship is optional so field notes can belong to a site without sacrificing fast unassigned capture.
 
 ### Route and screen separation
 
@@ -193,8 +196,12 @@ DAO, repository, ViewModel, and UI state tests are added before sync simulation.
 - `SitesListViewModel` observes the site repository and exposes list UI state
 - `FieldNotesListScreen` renders loading, empty, error, content, and no-match states
 - `SitesListScreen` renders loading, empty, error, content, and no-match states
-- Field notes can be searched by title and body
+- Field notes can be searched by title, body, and associated site name
 - Field notes can be filtered by status
+- Field notes can be assigned, reassigned, or returned to an unassigned state
+- New field notes created from Site Detail start with that site selected
+- Site Detail shows notes belonging to the selected site
+- Deleting a site preserves its field notes as unassigned
 - Sites can be created, edited, deleted, listed, searched, and filtered locally
 - Sites support status and priority modeling
 - Bottom navigation switches between Field Notes and Sites
@@ -203,7 +210,7 @@ DAO, repository, ViewModel, and UI state tests are added before sync simulation.
 - `FieldNoteEditorScreen` supports creating and editing field notes
 - `SiteEditorScreen` supports creating and editing sites
 - Field note cards can open existing notes for editing
-- Site cards can open existing sites for editing
+- Site cards open Site Detail, where the site can be edited and its field notes managed
 - New field notes and sites can be saved locally and shown in their lists
 - Existing field notes and sites can be updated without duplicating records
 - Existing field notes and sites can be deleted from editor screens
@@ -214,15 +221,14 @@ DAO, repository, ViewModel, and UI state tests are added before sync simulation.
 - DAO tests cover local Room persistence, deletion, ordering behavior, site-specific field note queries, and unassigned field note queries
 - Repository tests cover field note and site persistence through in-memory Room databases
 - `FieldNotesListViewModel` tests cover search, filtering, combined criteria, repository updates, clearing criteria, and error state behavior
-- `FieldNoteEditorViewModel` tests cover create, edit, delete, discard, and error flows
+- `FieldNoteEditorViewModel` tests cover create, edit, delete, discard, site selection, assigned/unassigned saves, reassignment, preselected-site creation, and error flows
 - `SitesListViewModel` tests cover search, status filtering, priority filtering, combined criteria, repository updates, clearing criteria, and error state behavior
 - `SiteEditorViewModel` tests cover create, edit, delete, discard, load, and error flows
 - UI state tests cover list/editor state behavior for field notes and sites
+- Compose UI tests cover Site Card behavior, Sites filters, and associated-site selection in the field-note editor
 
 ## What Is Intentionally Not Built Yet
 
-- Associating field notes with sites
-- Site-aware field note creation and editing flows
 - Real sync
 - Sync status UI
 - Conflict resolution
@@ -241,14 +247,16 @@ Implemented tests:
 - DAO tests using an in-memory Room database for field notes and sites
 - Repository tests using an in-memory Room database for field notes and sites
 - `FieldNotesListViewModel` tests for initial data, search, status filtering, combined search/filter criteria, body search, repository updates, clearing criteria, and error state
-- `FieldNoteEditorViewModel` tests for create, edit, delete, discard, and error flows
+- `FieldNoteEditorViewModel` tests for create, edit, delete, discard, site selection, assigned/unassigned saves, reassignment, preselected-site creation, and error flows
 - `SitesListViewModel` tests for initial data, search, status filtering, priority filtering, combined criteria, repository updates, clearing criteria, and error state
 - `SiteEditorViewModel` tests for create, edit, delete, discard, load, and error flows
 - UI state tests for field notes and sites list/editor state models
+- Migration, DAO, and repository tests for assigned, unassigned, orphaned, and site-deletion relationship behavior
+- Compose UI tests for Site Card content/click behavior, independent Sites filters, and the field-note associated-site selector
 
 Planned next tests:
-- Field note/site association tests across DAO, repository, and ViewModel layers
-- Basic Compose UI tests only after the core local workflow becomes stable enough to justify emulator cost
+- Sync queue, retry, and state-transition coverage when v0.9.0 begins
+- Conflict-case coverage when v1.0 begins
 
 GitHub Actions runs local unit tests and debug builds. Instrumented Android tests are maintained, but emulator reliability is handled separately from the core local unit-test gate.
 
@@ -264,12 +272,6 @@ Future performance work may include:
 - Macro-benchmark coverage for startup and list scrolling
 
 ## Roadmap
-
-### v0.8.0 — Field note and site relationship
-- Associate field notes with sites using an optional `siteId`
-- Keep unassigned field notes available for fast capture
-- Add site-aware editor/list behavior
-- Add DAO, repository, ViewModel, and UI state tests for assigned and unassigned notes
 
 ### v0.9.0 — Offline sync simulation
 - Sync queue
@@ -300,9 +302,9 @@ Future performance work may include:
 
 Sync is a major part of the long-term app direction, but it is intentionally delayed. The first priority is to make the local source of truth, repository boundary, and UI state flow correct before introducing remote state, retries, or conflict handling.
 
-### Delaying field note/site association
+### Sequencing field note/site association
 
-Sites are now implemented as their own local foundation, but the relationship between sites and field notes is delayed until v0.8.0. This keeps v0.7.0 focused on validating the Sites model, persistence, list/editor UI, navigation, and tests before adding cross-feature behavior.
+Sites were implemented as their own local foundation before the relationship between sites and field notes was added in v0.8.0. This kept v0.7.0 focused on validating the Sites model, persistence, list/editor UI, navigation, and tests before adding cross-feature behavior.
 
 ### Avoiding premature modularization
 

@@ -35,6 +35,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -52,6 +53,11 @@ import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
 import com.nabadi.groundwork.ui.components.GroundWorkPrimaryButton
 import com.nabadi.groundwork.ui.components.TechnicalLabel
 import com.nabadi.groundwork.ui.format.absoluteDateTimeLabel
+
+internal const val FIELD_NOTE_SITE_SELECTOR_TAG = "field_note_site_selector"
+internal const val FIELD_NOTE_UNASSIGNED_SITE_OPTION_TAG = "field_note_site_option_unassigned"
+internal fun fieldNoteSiteOptionTag(siteId: SiteId): String =
+    "field_note_site_option_${siteId.value}"
 
 @Composable
 fun FieldNoteEditorScreen(
@@ -118,6 +124,14 @@ fun FieldNoteEditorScreen(
                 availableSites = uiState.availableSites,
                 onAssociatedSiteChange = onAssociatedSiteChange,
             )
+            uiState.siteOptionsErrorMessage?.let { errorMessage ->
+                Text(
+                    text = errorMessage,
+                    modifier = Modifier.padding(top = dimensionResource(R.dimen.spacing_card_content)),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_form_section)))
 
             FieldNoteStatusChips(
@@ -295,6 +309,7 @@ private fun AssociatedSiteField(
     val selectedSiteLabel = availableSites
         .find { it.id == selectedSiteId }
         ?.name
+        ?: selectedSiteId?.value
         ?: unassignedLabel
 
     FormSection(
@@ -314,6 +329,7 @@ private fun AssociatedSiteField(
                         type = ExposedDropdownMenuAnchorType.PrimaryNotEditable,
                         enabled = true,
                     )
+                    .testTag(FIELD_NOTE_SITE_SELECTOR_TAG)
                     .fillMaxWidth(),
                 readOnly = true,
                 textStyle = MaterialTheme.typography.bodyLarge,
@@ -329,6 +345,7 @@ private fun AssociatedSiteField(
             ) {
                 DropdownMenuItem(
                     text = { Text(text = unassignedLabel) },
+                    modifier = Modifier.testTag(FIELD_NOTE_UNASSIGNED_SITE_OPTION_TAG),
                     onClick = {
                         onAssociatedSiteChange(null)
                         expanded = false
@@ -338,6 +355,7 @@ private fun AssociatedSiteField(
                 availableSites.forEach { site ->
                     DropdownMenuItem(
                         text = { Text(text = site.name) },
+                        modifier = Modifier.testTag(fieldNoteSiteOptionTag(site.id)),
                         onClick = {
                             onAssociatedSiteChange(site.id)
                             expanded = false
@@ -613,6 +631,51 @@ private fun FieldNoteEditorScreenPreview_DarkMode_Error() {
 }
 
 @Preview(
+    name = "Site Options Error",
+    showBackground = true,
+    apiLevel = PREVIEW_API_LEVEL,
+)
+@Composable
+private fun FieldNoteEditorScreenPreview_SiteOptionsError() {
+    GroundWorkPreviewSurface {
+        FieldNoteEditorScreen(
+            uiState = siteOptionsErrorPreviewState,
+            onTitleChange = {},
+            onAssociatedSiteChange = {},
+            onStatusChange = {},
+            onBodyChange = {},
+            onBackClick = {},
+            onSaveClick = {},
+            onDeleteClick = {},
+            onDiscardClick = {},
+        )
+    }
+}
+
+@Preview(
+    name = "Dark Mode - Site Options Error",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    apiLevel = PREVIEW_API_LEVEL,
+)
+@Composable
+private fun FieldNoteEditorScreenPreview_DarkMode_SiteOptionsError() {
+    GroundWorkPreviewSurface {
+        FieldNoteEditorScreen(
+            uiState = siteOptionsErrorPreviewState,
+            onTitleChange = {},
+            onAssociatedSiteChange = {},
+            onStatusChange = {},
+            onBodyChange = {},
+            onBackClick = {},
+            onSaveClick = {},
+            onDeleteClick = {},
+            onDiscardClick = {},
+        )
+    }
+}
+
+@Preview(
     name = "Editing",
     showBackground = true,
     apiLevel = PREVIEW_API_LEVEL,
@@ -743,6 +806,14 @@ private val errorPreviewState = FieldNoteEditorUiState(
     updatedAt = 1698798840000L,
     isSaving = false,
     errorMessage = "Unable to save this field note.",
+)
+
+private val siteOptionsErrorPreviewState = FieldNoteEditorUiState(
+    title = "North gate safety check",
+    siteId = SiteId("site-north-gate"),
+    body = "Loose temporary fencing reported near the north access point.",
+    status = FieldNoteStatus.ACTIVE,
+    siteOptionsErrorMessage = "Unable to load sites.",
 )
 
 private val editingPreviewState = FieldNoteEditorUiState(

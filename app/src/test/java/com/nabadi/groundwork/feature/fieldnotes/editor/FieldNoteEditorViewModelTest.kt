@@ -9,6 +9,7 @@ import com.nabadi.groundwork.data.repository.FakeFieldNoteRepository
 import com.nabadi.groundwork.data.repository.FakeSiteRepository
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
 import com.nabadi.groundwork.domain.model.SiteId
+import com.nabadi.groundwork.feature.sites.TestSite
 import com.nabadi.groundwork.navigation.GroundWorkRoute
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -40,6 +41,69 @@ class FieldNoteEditorViewModelTest {
         assertEquals(siteId, state.siteId)
         assertFalse(state.isEditing)
         assertFalse(state.isLoading)
+    }
+
+    @Test
+    fun `site detail creation route preselects site and saves assigned field note`() = runTest {
+        val siteId = SiteId("site-001")
+        val repository = FakeFieldNoteRepository()
+        val route = GroundWorkRoute.fieldNoteEditor(siteId = siteId)
+        val viewModel = FieldNoteEditorViewModel(
+            fieldNoteRepository = repository,
+            siteRepository = FakeSiteRepository(),
+            savedStateHandle = SavedStateHandle(
+                initialState = mapOf(GroundWorkRoute.SITE_ID_ARG to siteId.value),
+            ),
+        )
+
+        assertEquals("field_note_editor?siteId=site-001", route)
+        assertEquals(siteId, viewModel.uiState.value.siteId)
+
+        viewModel.onTitleChange("North gate issue")
+        viewModel.saveFieldNote(onSaved = {})
+
+        assertEquals(siteId, repository.observeFieldNotes().first().single().siteId)
+    }
+
+    @Test
+    fun `available sites are exposed as editor options`() = runTest {
+        val sites = listOf(
+            TestSite.site(id = "site-001", name = "North Warehouse"),
+            TestSite.site(id = "site-002", name = "South Terminal"),
+        )
+        val viewModel = FieldNoteEditorViewModel(
+            fieldNoteRepository = FakeFieldNoteRepository(),
+            siteRepository = FakeSiteRepository().apply { setSites(sites) },
+            savedStateHandle = SavedStateHandle(),
+        )
+
+        viewModel.uiState.test {
+            val state = skipItemsUntil { it.availableSites.size == sites.size }
+
+            assertEquals(sites.map { it.id }.toSet(), state.availableSites.map { it.id }.toSet())
+            assertEquals(sites.map { it.name }.toSet(), state.availableSites.map { it.name }.toSet())
+            assertNull(state.siteOptionsErrorMessage)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `site repository failure keeps unassigned capture available and exposes error`() = runTest {
+        val viewModel = FieldNoteEditorViewModel(
+            fieldNoteRepository = FakeFieldNoteRepository(),
+            siteRepository = FakeSiteRepository().apply { setShouldThrowError(true) },
+            savedStateHandle = SavedStateHandle(),
+        )
+
+        viewModel.uiState.test {
+            val state = skipItemsUntil { it.siteOptionsErrorMessage != null }
+
+            assertEquals("Unable to load sites.", state.siteOptionsErrorMessage)
+            assertTrue(state.availableSites.isEmpty())
+            assertNull(state.siteId)
+            assertFalse(state.isBusy)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -131,6 +195,22 @@ class FieldNoteEditorViewModelTest {
     }
 
     @Test
+    fun `onAssociatedSiteChange assigns and clears site`() = runTest {
+        val viewModel = FieldNoteEditorViewModel(
+            fieldNoteRepository = FakeFieldNoteRepository(),
+            siteRepository = FakeSiteRepository(),
+            savedStateHandle = SavedStateHandle(),
+        )
+        val siteId = SiteId("site-001")
+
+        viewModel.onAssociatedSiteChange(siteId)
+        assertEquals(siteId, viewModel.uiState.value.siteId)
+
+        viewModel.onAssociatedSiteChange(null)
+        assertNull(viewModel.uiState.value.siteId)
+    }
+
+    @Test
     fun `saveFieldNote saves new active field note`() = runTest {
         val repository = FakeFieldNoteRepository()
         val viewModel = FieldNoteEditorViewModel(
@@ -149,6 +229,7 @@ class FieldNoteEditorViewModelTest {
         assertEquals("North gate issue", savedFieldNote.title)
         assertEquals("Loose fencing near the north access point.", savedFieldNote.body)
         assertEquals(FieldNoteStatus.ACTIVE, savedFieldNote.status)
+        assertNull(savedFieldNote.siteId)
         assertTrue(savedFieldNote.id.value.isNotBlank())
         assertTrue(savedFieldNote.createdAt > 0L)
         assertTrue(savedFieldNote.updatedAt > 0L)
@@ -210,6 +291,65 @@ class FieldNoteEditorViewModelTest {
             assertEquals(existingFieldNote.createdAt, savedFieldNote.createdAt)
             assertTrue(savedFieldNote.updatedAt >= existingFieldNote.updatedAt)
             assertTrue(onSavedCalled)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `saveFieldNote can reassign an existing field note`() = runTest {
+        val existingFieldNote = fieldNote(
+            id = "field-note-001",
+            siteId = "site-001",
+        )
+        val repository = FakeFieldNoteRepository().apply {
+            setFieldNotes(listOf(existingFieldNote))
+        }
+        val viewModel = FieldNoteEditorViewModel(
+            fieldNoteRepository = repository,
+            siteRepository = FakeSiteRepository(),
+            savedStateHandle = SavedStateHandle(
+                mapOf(GroundWorkRoute.FIELD_NOTE_ID_ARG to existingFieldNote.id.value),
+            ),
+        )
+
+        viewModel.uiState.test {
+            skipItemsUntilLoaded()
+
+            viewModel.onAssociatedSiteChange(SiteId("site-002"))
+            viewModel.saveFieldNote(onSaved = {})
+
+            assertEquals(
+                SiteId("site-002"),
+                repository.observeFieldNotes().first().single().siteId,
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `saveFieldNote can make an existing field note unassigned`() = runTest {
+        val existingFieldNote = fieldNote(
+            id = "field-note-001",
+            siteId = "site-001",
+        )
+        val repository = FakeFieldNoteRepository().apply {
+            setFieldNotes(listOf(existingFieldNote))
+        }
+        val viewModel = FieldNoteEditorViewModel(
+            fieldNoteRepository = repository,
+            siteRepository = FakeSiteRepository(),
+            savedStateHandle = SavedStateHandle(
+                mapOf(GroundWorkRoute.FIELD_NOTE_ID_ARG to existingFieldNote.id.value),
+            ),
+        )
+
+        viewModel.uiState.test {
+            skipItemsUntilLoaded()
+
+            viewModel.onAssociatedSiteChange(null)
+            viewModel.saveFieldNote(onSaved = {})
+
+            assertNull(repository.observeFieldNotes().first().single().siteId)
             cancelAndIgnoreRemainingEvents()
         }
     }
