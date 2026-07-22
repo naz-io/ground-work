@@ -2,6 +2,7 @@ package com.nabadi.groundwork.feature.sites.detail
 
 import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.feature.fieldnotes.TestFieldNote
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -125,5 +126,17 @@ class SiteDetailUiStateTest {
         )
 
         assertTrue(state.hasNotes)
+    }
+
+    @Test
+    fun `noteCount matches the number of field notes`() {
+        val state = SiteDetailUiState(
+            fieldNotes = listOf(
+                TestFieldNote.fieldNote(id = "note-001"),
+                TestFieldNote.fieldNote(id = "note-002"),
+            ),
+        )
+
+        assertEquals(2, state.noteCount)
     }
 }

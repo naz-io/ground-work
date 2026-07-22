@@ -31,4 +31,7 @@ data class SiteDetailUiState(
 
     val hasNotes: Boolean
         get() = fieldNotes.isNotEmpty()
+
+    val noteCount: Int
+        get() = fieldNotes.size
 }

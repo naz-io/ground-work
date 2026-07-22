@@ -106,11 +106,18 @@
     <string name="site_editor_delete">DELETE SITE</string>
 
     <!-- Site detail screen -->
-    <string name="site_detail_title">SITE DETAILS</string>
-    <string name="site_detail_edit_site">Edit site</string>
-    <string name="site_detail_add_note">Add a field note for this site</string>
-    <string name="site_detail_notes_title">FIELD NOTES (%1$d)</string>
-    <string name="site_detail_notes_empty">No field notes are assigned to this site yet.</string>
+    <string name="site_detail_title">SITE DETAIL</string>
+    <string name="site_detail_note_count_label">FIELD NOTES</string>
+    <string name="site_detail_location_label">SITE LOCATION</string>
+    <string name="site_detail_add_note_action">ADD NOTE FOR THIS SITE</string>
+    <string name="site_detail_edit_site_action">EDIT SITE DETAILS</string>
+    <string name="site_detail_information_title">SITE INFORMATION</string>
+    <string name="site_detail_site_id_label">Site ID</string>
+    <string name="site_detail_notes_section_title">SITE NOTES</string>
+    <string name="site_detail_notes_count">%1$d NOTES</string>
+    <string name="site_detail_notes_empty_title">NO SITE-SPECIFIC NOTES YET</string>
+    <string name="site_detail_notes_empty_description">Document inspections, hazards, and observations for this site.</string>
+    <string name="site_detail_notes_create_first">CREATE FIRST NOTE</string>
 
     <!-- Site status labels -->
     <string name="site_status_active">ACTIVE</string>

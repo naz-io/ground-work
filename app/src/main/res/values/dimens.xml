@@ -18,6 +18,16 @@
     <dimen name="spacing_card_content">4dp</dimen>
     <dimen name="border_card_strong">2dp</dimen>
 
+    <!-- Site detail -->
+    <dimen name="padding_site_detail_badge_horizontal">8dp</dimen>
+    <dimen name="padding_site_detail_badge_vertical">4dp</dimen>
+    <dimen name="padding_site_detail_metric">12dp</dimen>
+    <dimen name="height_site_detail_location_panel">160dp</dimen>
+    <dimen name="size_site_detail_location_icon">40dp</dimen>
+    <dimen name="height_site_detail_secondary_action">52dp</dimen>
+    <dimen name="padding_site_detail_empty_state">24dp</dimen>
+    <dimen name="size_site_detail_empty_icon">48dp</dimen>
+
     <!-- Field note card -->
     <dimen name="border_field_note_card">1dp</dimen>
     <dimen name="padding_field_note_card_header_vertical">8dp</dimen>
