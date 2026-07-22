@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.nabadi.groundwork.TestFieldNotes.fieldNoteEntity
 import com.nabadi.groundwork.TestSites.siteEntity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -18,6 +19,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class SiteDaoTest {
     private lateinit var dao: SiteDao
+    private lateinit var fieldNoteDao: FieldNoteDao
     private lateinit var db: GroundWorkDatabase
 
     @Before
@@ -28,6 +30,7 @@ class SiteDaoTest {
             GroundWorkDatabase::class.java,
         ).build()
         dao = db.siteDao()
+        fieldNoteDao = db.fieldNoteDao()
     }
 
     @After
@@ -157,5 +160,23 @@ class SiteDaoTest {
 
         val sites = dao.observeSites().first()
         assertEquals(emptyList<SiteEntity>(), sites)
+    }
+
+    @Test
+    fun `deleteSite preserves its field notes as unassigned`() = runTest {
+        val site = siteEntity(id = "site-1")
+        val fieldNote = fieldNoteEntity(id = "note-1", siteId = site.id)
+        dao.upsertSite(site)
+        fieldNoteDao.upsertFieldNote(fieldNote)
+
+        dao.deleteSite(site.id)
+
+        val savedFieldNote = fieldNoteDao.getFieldNote(fieldNote.id)
+        assertNotNull(savedFieldNote)
+        assertNull(savedFieldNote?.siteId)
+        assertEquals(
+            listOf(fieldNote.copy(siteId = null)),
+            fieldNoteDao.observeUnassignedFieldNotes().first(),
+        )
     }
 }

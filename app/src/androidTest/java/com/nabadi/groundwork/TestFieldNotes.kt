@@ -10,7 +10,7 @@ object TestFieldNotes {
 
     fun fieldNote(
         id: String,
-        siteId: String? = "site-test",
+        siteId: String? = null,
         title: String = "Test Field Note",
         body: String = "This is a test field note.",
         status: FieldNoteStatus = FieldNoteStatus.DRAFT,
@@ -28,7 +28,7 @@ object TestFieldNotes {
 
     fun fieldNoteEntity(
         id: String,
-        siteId: String? = "site-test",
+        siteId: String? = null,
         title: String = "Test Field Note",
         body: String = "This is a test field note.",
         status: String = "DRAFT",

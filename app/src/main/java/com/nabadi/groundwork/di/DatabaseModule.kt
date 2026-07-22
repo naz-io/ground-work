@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.nabadi.groundwork.data.local.FieldNoteDao
 import com.nabadi.groundwork.data.local.GroundWorkDatabase
+import com.nabadi.groundwork.data.local.MIGRATION_1_2
 import com.nabadi.groundwork.data.local.SiteDao
 import dagger.Module
 import dagger.Provides
@@ -26,6 +27,7 @@ object DatabaseModule {
             klass = GroundWorkDatabase::class.java,
             name = "groundwork.db"
         )
+            .addMigrations(MIGRATION_1_2)
             .build()
 
     @Provides
@@ -40,5 +42,4 @@ object DatabaseModule {
     ): SiteDao =
         database.siteDao()
 }
-
 

@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nabadi.groundwork.TestFieldNotes.fieldNoteEntity
+import com.nabadi.groundwork.TestSites.siteEntity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -18,6 +19,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class FieldNoteDaoTest {
     private lateinit var dao: FieldNoteDao
+    private lateinit var siteDao: SiteDao
     private lateinit var db: GroundWorkDatabase
 
     @Before
@@ -28,6 +30,7 @@ class FieldNoteDaoTest {
             GroundWorkDatabase::class.java,
         ).build()
         dao = db.fieldNoteDao()
+        siteDao = db.siteDao()
     }
 
     @After
@@ -56,6 +59,9 @@ class FieldNoteDaoTest {
 
     @Test
     fun `observeFieldNotesForSite emits notes assigned to site ordered by updatedAt descending`() = runTest {
+        siteDao.upsertSite(siteEntity(id = "site-1"))
+        siteDao.upsertSite(siteEntity(id = "site-2"))
+
         val olderAssignedNote = fieldNoteEntity(
             id = "1",
             siteId = "site-1",
@@ -94,7 +100,7 @@ class FieldNoteDaoTest {
     fun `observeFieldNotesForSite emits empty list for site with no notes`() = runTest {
         val entity = fieldNoteEntity(
             id = "1",
-            siteId = "site-1",
+            siteId = null,
         )
         dao.upsertFieldNote(entity)
 
@@ -105,6 +111,8 @@ class FieldNoteDaoTest {
 
     @Test
     fun `observeUnassignedFieldNotes emits unassigned notes ordered by updatedAt descending`() = runTest {
+        siteDao.upsertSite(siteEntity(id = "site-1"))
+
         val olderUnassignedNote = fieldNoteEntity(
             id = "1",
             siteId = null,
@@ -134,6 +142,8 @@ class FieldNoteDaoTest {
 
     @Test
     fun `getFieldNote returns saved field note`() = runTest {
+        siteDao.upsertSite(siteEntity(id = "site-1"))
+
         val entity = fieldNoteEntity(
             id = "1",
             siteId = "site-1",
@@ -165,6 +175,8 @@ class FieldNoteDaoTest {
 
     @Test
     fun `upsertFieldNote replaces existing note with same id`() = runTest {
+        siteDao.upsertSite(siteEntity(id = "site-1"))
+
         val originalEntity = fieldNoteEntity(
             id = "1",
             siteId = null,

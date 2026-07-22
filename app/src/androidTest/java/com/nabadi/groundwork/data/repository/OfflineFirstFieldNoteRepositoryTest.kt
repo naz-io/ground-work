@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.nabadi.groundwork.TestFieldNotes.fieldNote
+import com.nabadi.groundwork.TestSites.siteEntity
 import com.nabadi.groundwork.data.local.GroundWorkDatabase
 import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
@@ -55,6 +56,8 @@ class OfflineFirstFieldNoteRepositoryTest {
 
     @Test
     fun `saveFieldNote updates existing field note with same id`() = runTest {
+        database.siteDao().upsertSite(siteEntity(id = "site-1"))
+
         val originalFieldNote = fieldNote(
             id = "1",
             siteId = null,
@@ -103,6 +106,9 @@ class OfflineFirstFieldNoteRepositoryTest {
 
     @Test
     fun `observeFieldNotesForSite emits field notes assigned to site ordered by updatedAt descending`() = runTest {
+        database.siteDao().upsertSite(siteEntity(id = "site-1"))
+        database.siteDao().upsertSite(siteEntity(id = "site-2"))
+
         val olderAssignedFieldNote = fieldNote(
             id = "1",
             siteId = "site-1",
@@ -142,7 +148,7 @@ class OfflineFirstFieldNoteRepositoryTest {
     fun `observeFieldNotesForSite emits empty list for site with no field notes`() = runTest {
         val fieldNote = fieldNote(
             id = "1",
-            siteId = "site-1",
+            siteId = null,
         )
         repository.saveFieldNote(fieldNote)
 
@@ -153,6 +159,8 @@ class OfflineFirstFieldNoteRepositoryTest {
 
     @Test
     fun `observeUnassignedFieldNotes emits unassigned field notes ordered by updatedAt descending`() = runTest {
+        database.siteDao().upsertSite(siteEntity(id = "site-1"))
+
         val olderUnassignedFieldNote = fieldNote(
             id = "1",
             siteId = null,
