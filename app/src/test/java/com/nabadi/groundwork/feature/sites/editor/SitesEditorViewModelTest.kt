@@ -155,9 +155,9 @@ class SitesEditorViewModelTest {
             savedStateHandle = SavedStateHandle(),
         )
 
-        viewModel.onPriorityChange(SitePriority.URGENT)
+        viewModel.onPriorityChange(SitePriority.HIGH)
 
-        assertEquals(SitePriority.URGENT, viewModel.uiState.value.priority)
+        assertEquals(SitePriority.HIGH, viewModel.uiState.value.priority)
     }
 
     @Test
@@ -247,7 +247,7 @@ class SitesEditorViewModelTest {
             viewModel.onNameChange("Updated site")
             viewModel.onLocationChange("Updated location")
             viewModel.onDescriptionChange("Updated description")
-            viewModel.onPriorityChange(SitePriority.URGENT)
+            viewModel.onPriorityChange(SitePriority.HIGH)
             viewModel.onStatusChange(SiteStatus.ARCHIVED)
             viewModel.saveSite(onSaved = { onSavedCalled = true })
 
@@ -256,7 +256,7 @@ class SitesEditorViewModelTest {
             assertEquals("Updated site", savedSite.name)
             assertEquals("Updated location", savedSite.location)
             assertEquals("Updated description", savedSite.description)
-            assertEquals(SitePriority.URGENT, savedSite.priority)
+            assertEquals(SitePriority.HIGH, savedSite.priority)
             assertEquals(SiteStatus.ARCHIVED, savedSite.status)
             assertEquals(existingSite.createdAt, savedSite.createdAt)
             assertTrue(savedSite.updatedAt >= existingSite.updatedAt)

@@ -13,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.NoteAlt
 import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -150,14 +149,12 @@ private fun SitePriorityBadge(
     modifier: Modifier = Modifier,
 ) {
     val containerColor = when (priority) {
-        SitePriority.URGENT -> MaterialTheme.colorScheme.errorContainer
         SitePriority.HIGH -> MaterialTheme.colorScheme.primaryContainer
         SitePriority.NORMAL,
         SitePriority.LOW,
         -> MaterialTheme.colorScheme.surfaceVariant
     }
     val contentColor = when (priority) {
-        SitePriority.URGENT -> MaterialTheme.colorScheme.onErrorContainer
         SitePriority.HIGH -> MaterialTheme.colorScheme.onPrimaryContainer
         SitePriority.NORMAL,
         SitePriority.LOW,
@@ -178,13 +175,6 @@ private fun SitePriorityBadge(
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_icon_text)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (priority == SitePriority.URGENT) {
-                Icon(
-                    imageVector = Icons.Filled.Warning,
-                    contentDescription = null,
-                    modifier = Modifier.size(dimensionResource(R.dimen.size_icon_small)),
-                )
-            }
             Text(
                 text = stringResource(priority.labelResId),
                 style = MaterialTheme.typography.labelSmall,

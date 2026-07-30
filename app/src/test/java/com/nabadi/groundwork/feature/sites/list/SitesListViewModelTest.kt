@@ -159,8 +159,8 @@ class SitesListViewModelTest {
             ),
             TestSite.site(
                 id = "2",
-                name = "Urgent site",
-                priority = SitePriority.URGENT,
+                name = "High-priority site",
+                priority = SitePriority.HIGH,
             ),
         )
         repository.setSites(sites)
@@ -168,12 +168,12 @@ class SitesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onPriorityFilterChange(priority = SitePriority.URGENT)
+            viewModel.onPriorityFilterChange(priority = SitePriority.HIGH)
 
             val filteredState = awaitItem()
-            assertEquals(SitePriority.URGENT, filteredState.selectedPriority)
+            assertEquals(SitePriority.HIGH, filteredState.selectedPriority)
             assertEquals(1, filteredState.sites.size)
-            assertEquals(SitePriority.URGENT, filteredState.sites[0].priority)
+            assertEquals(SitePriority.HIGH, filteredState.sites[0].priority)
         }
     }
 
@@ -184,13 +184,13 @@ class SitesListViewModelTest {
                 id = "1",
                 name = "North Warehouse",
                 status = SiteStatus.ACTIVE,
-                priority = SitePriority.URGENT,
+                priority = SitePriority.HIGH,
             ),
             TestSite.site(
                 id = "2",
                 name = "North Yard",
                 status = SiteStatus.ARCHIVED,
-                priority = SitePriority.URGENT,
+                priority = SitePriority.HIGH,
             ),
             TestSite.site(
                 id = "3",
@@ -210,13 +210,13 @@ class SitesListViewModelTest {
             viewModel.onStatusFilterChange(status = SiteStatus.ACTIVE)
             awaitItem()
 
-            viewModel.onPriorityFilterChange(priority = SitePriority.URGENT)
+            viewModel.onPriorityFilterChange(priority = SitePriority.HIGH)
             val finalState = awaitItem()
 
             assertEquals(1, finalState.sites.size)
             assertEquals("North", finalState.searchQuery)
             assertEquals(SiteStatus.ACTIVE, finalState.selectedStatus)
-            assertEquals(SitePriority.URGENT, finalState.selectedPriority)
+            assertEquals(SitePriority.HIGH, finalState.selectedPriority)
             assertEquals("North Warehouse", finalState.sites[0].name)
         }
     }
@@ -373,7 +373,7 @@ class SitesListViewModelTest {
                 id = "1",
                 name = "North Warehouse",
                 status = SiteStatus.ACTIVE,
-                priority = SitePriority.URGENT,
+                priority = SitePriority.HIGH,
             ),
             TestSite.site(
                 id = "2",
@@ -393,7 +393,7 @@ class SitesListViewModelTest {
             viewModel.onStatusFilterChange(status = SiteStatus.ACTIVE)
             awaitItem()
 
-            viewModel.onPriorityFilterChange(priority = SitePriority.URGENT)
+            viewModel.onPriorityFilterChange(priority = SitePriority.HIGH)
             awaitItem()
 
             viewModel.onClearCriteriaClick()
@@ -446,8 +446,8 @@ class SitesListViewModelTest {
             ),
             TestSite.site(
                 id = "2",
-                name = "Urgent site",
-                priority = SitePriority.URGENT,
+                name = "High-priority site",
+                priority = SitePriority.HIGH,
             ),
         )
         repository.setSites(sites)
@@ -455,7 +455,7 @@ class SitesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onPriorityFilterChange(priority = SitePriority.URGENT)
+            viewModel.onPriorityFilterChange(priority = SitePriority.HIGH)
             awaitItem()
 
             viewModel.onPriorityFilterChange(priority = null)

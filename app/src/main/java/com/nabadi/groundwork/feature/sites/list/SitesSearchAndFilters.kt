@@ -214,7 +214,6 @@ private fun SitePriorityFilters(
 }
 
 internal val sitePriorityFilterOrder = listOf(
-    SitePriority.URGENT,
     SitePriority.HIGH,
     SitePriority.NORMAL,
     SitePriority.LOW,
@@ -316,7 +315,7 @@ private fun SitesSearchAndFiltersPreview_PriorityCriteria() {
     GroundWorkPreviewSurface {
         SitesSearchAndFilters(
             selectedStatus = null,
-            selectedPriority = SitePriority.URGENT,
+            selectedPriority = SitePriority.HIGH,
             searchQuery = "",
             onSearchQueryChange = {},
             onStatusFilterChange = {},

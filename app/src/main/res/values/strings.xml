@@ -127,5 +127,4 @@
     <string name="site_priority_low">LOW</string>
     <string name="site_priority_normal">NORMAL</string>
     <string name="site_priority_high">HIGH</string>
-    <string name="site_priority_urgent">URGENT</string>
 </resources>

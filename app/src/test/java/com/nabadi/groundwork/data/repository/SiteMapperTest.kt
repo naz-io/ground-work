@@ -17,7 +17,7 @@ class SiteMapperTest {
             name = "Test Site",
             description = "This is a test site.",
             location = "Test Location",
-            priority = "URGENT",
+            priority = "HIGH",
             status = "ACTIVE",
             createdAt = 1_734_220_800_000L,
             updatedAt = 1_734_224_400_000L,
@@ -28,7 +28,7 @@ class SiteMapperTest {
         assertEquals("Test Site", site.name)
         assertEquals("This is a test site.", site.description)
         assertEquals("Test Location", site.location)
-        assertEquals(SitePriority.URGENT, site.priority)
+        assertEquals(SitePriority.HIGH, site.priority)
         assertEquals(SiteStatus.ACTIVE, site.status)
         assertEquals(1_734_220_800_000L, site.createdAt)
         assertEquals(1_734_224_400_000L, site.updatedAt)
@@ -41,7 +41,7 @@ class SiteMapperTest {
             name = "Test Site",
             description = "This is a test site.",
             location = "Test Location",
-            priority = SitePriority.URGENT,
+            priority = SitePriority.HIGH,
             status = SiteStatus.ACTIVE,
             createdAt = 1_734_220_800_000L,
             updatedAt = 1_734_224_400_000L,
@@ -52,7 +52,7 @@ class SiteMapperTest {
         assertEquals("Test Site", entity.name)
         assertEquals("This is a test site.", entity.description)
         assertEquals("Test Location", entity.location)
-        assertEquals("URGENT", entity.priority)
+        assertEquals("HIGH", entity.priority)
         assertEquals("ACTIVE", entity.status)
         assertEquals(1_734_220_800_000L, entity.createdAt)
         assertEquals(1_734_224_400_000L, entity.updatedAt)

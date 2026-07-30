@@ -204,6 +204,9 @@ DAO, repository, ViewModel, and UI state tests are added before sync simulation.
 - Deleting a site preserves its field notes as unassigned
 - Sites can be created, edited, deleted, listed, searched, and filtered locally
 - Sites support status and priority modeling
+
+Site priority represents long-term operational importance. Urgency is intentionally not modeled on Site because urgency usually belongs to time-sensitive issues, tasks, or incidents associated with a site.
+
 - Bottom navigation switches between Field Notes and Sites
 - Search and filters can be combined
 - No-match states are shown when active search/filter criteria return no results

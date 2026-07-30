@@ -42,12 +42,12 @@ class SitesSearchAndFiltersTest {
         composeTestRule.onNodeWithText("STATUS").assertIsDisplayed()
         composeTestRule.onNodeWithText("PRIORITY").assertIsDisplayed()
         composeTestRule.onNodeWithText("ACTIVE").performClick()
-        composeTestRule.onNodeWithText("URGENT").performClick()
+        composeTestRule.onNodeWithText("HIGH").performClick()
         composeTestRule.onNodeWithContentDescription("Clear site search").performClick()
 
         composeTestRule.runOnIdle {
             assertEquals(SiteStatus.ACTIVE, selectedStatus)
-            assertEquals(SitePriority.URGENT, selectedPriority)
+            assertEquals(SitePriority.HIGH, selectedPriority)
             assertEquals("", updatedSearchQuery)
         }
     }

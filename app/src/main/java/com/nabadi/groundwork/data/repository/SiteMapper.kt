@@ -29,4 +29,3 @@ fun Site.toEntity(): SiteEntity =
         createdAt = createdAt,
         updatedAt = updatedAt,
     )
-

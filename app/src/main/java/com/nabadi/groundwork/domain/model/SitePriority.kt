@@ -4,5 +4,4 @@ enum class SitePriority {
     LOW,
     NORMAL,
     HIGH,
-    URGENT,
 }

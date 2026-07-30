@@ -29,7 +29,7 @@ class SiteCardTest {
             name = "North Basin Facility",
             description = "Main storage facility with recurring access issues.",
             location = "North Basin Sector A",
-            priority = SitePriority.URGENT,
+            priority = SitePriority.HIGH,
             status = SiteStatus.ACTIVE,
             updatedAt = 0L,
         )
@@ -45,7 +45,7 @@ class SiteCardTest {
         }
 
         composeTestRule.onNodeWithText("SITE #GW-4901").assertIsDisplayed()
-        composeTestRule.onNodeWithText("URGENT").assertIsDisplayed()
+        composeTestRule.onNodeWithText("HIGH").assertIsDisplayed()
         composeTestRule.onNodeWithText("North Basin Facility")
             .assertIsDisplayed()
             .assertHasClickAction()

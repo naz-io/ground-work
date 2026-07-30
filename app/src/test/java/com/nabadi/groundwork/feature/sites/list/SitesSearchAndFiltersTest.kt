@@ -10,7 +10,6 @@ class SitesSearchAndFiltersTest {
     fun `priority filters follow the design order`() {
         assertEquals(
             listOf(
-                SitePriority.URGENT,
                 SitePriority.HIGH,
                 SitePriority.NORMAL,
                 SitePriority.LOW,

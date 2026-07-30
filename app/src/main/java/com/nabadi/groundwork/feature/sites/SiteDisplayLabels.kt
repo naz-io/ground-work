@@ -15,5 +15,4 @@ internal val SitePriority.labelResId: Int
         SitePriority.LOW -> R.string.site_priority_low
         SitePriority.NORMAL -> R.string.site_priority_normal
         SitePriority.HIGH -> R.string.site_priority_high
-        SitePriority.URGENT -> R.string.site_priority_urgent
     }
