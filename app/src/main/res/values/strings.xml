@@ -121,7 +121,6 @@
 
     <!-- Site status labels -->
     <string name="site_status_active">ACTIVE</string>
-    <string name="site_status_completed">COMPLETED</string>
     <string name="site_status_archived">ARCHIVED</string>
 
     <!-- Site priority labels -->

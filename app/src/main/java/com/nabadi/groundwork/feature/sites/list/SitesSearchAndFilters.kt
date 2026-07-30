@@ -296,7 +296,7 @@ private fun SitesSearchAndFiltersPreview_ActiveCriteria() {
 private fun SitesSearchAndFiltersPreview_StatusCriteria() {
     GroundWorkPreviewSurface {
         SitesSearchAndFilters(
-            selectedStatus = SiteStatus.COMPLETED,
+            selectedStatus = SiteStatus.ARCHIVED,
             selectedPriority = null,
             searchQuery = "",
             onSearchQueryChange = {},

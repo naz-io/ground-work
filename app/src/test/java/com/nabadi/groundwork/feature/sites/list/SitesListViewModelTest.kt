@@ -189,7 +189,7 @@ class SitesListViewModelTest {
             TestSite.site(
                 id = "2",
                 name = "North Yard",
-                status = SiteStatus.COMPLETED,
+                status = SiteStatus.ARCHIVED,
                 priority = SitePriority.URGENT,
             ),
             TestSite.site(

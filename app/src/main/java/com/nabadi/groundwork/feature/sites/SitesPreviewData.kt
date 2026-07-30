@@ -95,7 +95,7 @@ internal val previewSites = listOf(
         description = "Roof inspection area with HVAC vibration reports and safety railing follow-up.",
         location = "Admin Building · Roof Level",
         priority = SitePriority.LOW,
-        status = SiteStatus.COMPLETED,
+        status = SiteStatus.ARCHIVED,
         createdAt = 0,
         updatedAt = previewNowMillis - 30 * 24 * 60 * 60 * 1000, // 30 days ago
     ),

@@ -59,21 +59,21 @@ class SiteMapperTest {
     }
 
     @Test
-    fun `toEntity maps completed status to entity status value`() {
+    fun `toEntity maps archived status to entity status value`() {
         val site = Site(
             id = SiteId("2"),
-            name = "Completed Site",
-            description = "Completed remediation site.",
+            name = "Archived Site",
+            description = "Archived remediation site.",
             location = "West Yard",
             priority = SitePriority.NORMAL,
-            status = SiteStatus.COMPLETED,
+            status = SiteStatus.ARCHIVED,
             createdAt = 1_734_220_800_000L,
             updatedAt = 1_734_224_400_000L,
         )
 
         val entity = site.toEntity()
 
-        assertEquals("COMPLETED", entity.status)
+        assertEquals("ARCHIVED", entity.status)
     }
 
     @Test

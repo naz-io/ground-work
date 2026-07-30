@@ -248,7 +248,7 @@ class SitesEditorViewModelTest {
             viewModel.onLocationChange("Updated location")
             viewModel.onDescriptionChange("Updated description")
             viewModel.onPriorityChange(SitePriority.URGENT)
-            viewModel.onStatusChange(SiteStatus.COMPLETED)
+            viewModel.onStatusChange(SiteStatus.ARCHIVED)
             viewModel.saveSite(onSaved = { onSavedCalled = true })
 
             val savedSite = repository.observeSites().first().single()
@@ -257,7 +257,7 @@ class SitesEditorViewModelTest {
             assertEquals("Updated location", savedSite.location)
             assertEquals("Updated description", savedSite.description)
             assertEquals(SitePriority.URGENT, savedSite.priority)
-            assertEquals(SiteStatus.COMPLETED, savedSite.status)
+            assertEquals(SiteStatus.ARCHIVED, savedSite.status)
             assertEquals(existingSite.createdAt, savedSite.createdAt)
             assertTrue(savedSite.updatedAt >= existingSite.updatedAt)
             assertTrue(onSavedCalled)

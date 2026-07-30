@@ -7,7 +7,6 @@ import com.nabadi.groundwork.domain.model.SiteStatus
 internal val SiteStatus.labelResId: Int
     get() = when (this) {
         SiteStatus.ACTIVE -> R.string.site_status_active
-        SiteStatus.COMPLETED -> R.string.site_status_completed
         SiteStatus.ARCHIVED -> R.string.site_status_archived
     }
 
