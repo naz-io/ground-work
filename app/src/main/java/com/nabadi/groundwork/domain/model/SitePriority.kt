@@ -4,11 +4,4 @@ enum class SitePriority {
     LOW,
     NORMAL,
     HIGH,
-
-    ;
-
-    companion object {
-        fun fromStorage(value: String): SitePriority =
-            entries.firstOrNull { it.name == value } ?: NORMAL
-    }
 }

@@ -7,9 +7,9 @@ import com.nabadi.groundwork.domain.model.SyncOperation
 import com.nabadi.groundwork.domain.model.SyncState
 
 fun SyncMetadataEntity.toDomain() = SyncMetadata(
-    state = SyncState.fromStorage(state),
+    state = state.toPersistedEnumOrNull() ?: SyncState.FAILED,
     lastSyncedAt = lastSyncedAt,
-    failure = SyncOperation.fromStorage(failedOperation)
+    failure = failedOperation.toPersistedEnumOrNull<SyncOperation>()
         ?.let { operation ->
             errorMessage?.let { message ->
                 SyncFailure(operation = operation, message = message)

@@ -6,11 +6,4 @@ enum class SyncState {
     PENDING_UPDATE,
     PENDING_DELETE,
     FAILED,
-
-    ;
-
-    companion object {
-        fun fromStorage(value: String): SyncState =
-            entries.firstOrNull { it.name == value } ?: FAILED
-    }
 }
