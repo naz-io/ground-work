@@ -41,9 +41,10 @@ class OfflineFirstFieldNoteRepository @Inject constructor(
     override suspend fun deleteFieldNote(id: FieldNoteId) {
         val existingFieldNote = fieldNoteDao.getFieldNoteForSync(id.value)?.toDomain() ?: return
 
-        when (existingFieldNote.syncMetadata.state) {
-            SyncState.PENDING_CREATE -> fieldNoteDao.deleteFieldNote(id.value)
-            SyncState.PENDING_DELETE -> Unit
+        when {
+            existingFieldNote.syncMetadata.state == SyncState.PENDING_CREATE ||
+                existingFieldNote.syncMetadata.failedCreate -> fieldNoteDao.deleteFieldNote(id.value)
+            existingFieldNote.syncMetadata.state == SyncState.PENDING_DELETE -> Unit
             else -> fieldNoteDao.upsertFieldNote(
                 existingFieldNote.copy(
                     syncMetadata = existingFieldNote.syncMetadata.markPendingDelete(),

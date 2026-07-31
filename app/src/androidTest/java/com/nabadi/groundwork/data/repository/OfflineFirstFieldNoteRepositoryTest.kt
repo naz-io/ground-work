@@ -11,6 +11,8 @@ import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
 import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.model.SyncMetadata
+import com.nabadi.groundwork.domain.model.SyncFailure
+import com.nabadi.groundwork.domain.model.SyncOperation
 import com.nabadi.groundwork.domain.model.SyncState
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -63,7 +65,7 @@ class OfflineFirstFieldNoteRepositoryTest {
             syncMetadata = SyncMetadata(
                 state = SyncState.FAILED,
                 lastSyncedAt = 100L,
-                errorMessage = "Server unavailable",
+                failure = SyncFailure(SyncOperation.UPDATE, "Server unavailable"),
             ),
         )
 
@@ -255,6 +257,29 @@ class OfflineFirstFieldNoteRepositoryTest {
         val savedFieldNote = repository.getFieldNote(fieldNote.id)
 
         assertNull(savedFieldNote)
+    }
+
+    @Test
+    fun `failed delete is hidden from regular field note reads`() = runTest {
+        val failedDelete = fieldNote(
+            id = "failed-delete-note",
+            syncMetadata = SyncMetadata(
+                state = SyncState.FAILED,
+                failure = SyncFailure(SyncOperation.DELETE, "Server unavailable"),
+            ),
+        )
+        database.fieldNoteDao().upsertFieldNote(failedDelete.toEntity())
+
+        assertNull(repository.getFieldNote(failedDelete.id))
+        assertEquals(emptyList<FieldNote>(), repository.observeFieldNotes().first())
+        assertEquals(
+            SyncOperation.DELETE,
+            database.fieldNoteDao().getFieldNoteForSync(failedDelete.id.value)
+                ?.toDomain()
+                ?.syncMetadata
+                ?.failure
+                ?.operation,
+        )
     }
 
     @Test

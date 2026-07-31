@@ -30,9 +30,10 @@ class OfflineFirstSiteRepository @Inject constructor(
     override suspend fun deleteSite(id: SiteId) {
         val existingSite = siteDao.getSiteForSync(id.value)?.toDomain() ?: return
 
-        when (existingSite.syncMetadata.state) {
-            SyncState.PENDING_CREATE -> siteDao.deleteSite(id.value)
-            SyncState.PENDING_DELETE -> Unit
+        when {
+            existingSite.syncMetadata.state == SyncState.PENDING_CREATE ||
+                existingSite.syncMetadata.failedCreate -> siteDao.deleteSite(id.value)
+            existingSite.syncMetadata.state == SyncState.PENDING_DELETE -> Unit
             else -> siteDao.upsertSite(
                 existingSite.copy(
                     syncMetadata = existingSite.syncMetadata.markPendingDelete(),

@@ -9,6 +9,8 @@ import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.data.local.GroundWorkDatabase
 import com.nabadi.groundwork.domain.model.Site
 import com.nabadi.groundwork.domain.model.SyncMetadata
+import com.nabadi.groundwork.domain.model.SyncFailure
+import com.nabadi.groundwork.domain.model.SyncOperation
 import com.nabadi.groundwork.domain.model.SyncState
 import com.nabadi.groundwork.domain.repository.SiteRepository
 import kotlinx.coroutines.flow.first
@@ -59,7 +61,7 @@ class OfflineFirstSiteRepositoryTest {
             syncMetadata = SyncMetadata(
                 state = SyncState.PENDING_UPDATE,
                 lastSyncedAt = 100L,
-                errorMessage = "Waiting for network",
+                failure = SyncFailure(SyncOperation.UPDATE, "Waiting for network"),
             ),
         )
 
@@ -163,6 +165,22 @@ class OfflineFirstSiteRepositoryTest {
         val savedSite = repository.getSite(site.id)
 
         assertNull(savedSite)
+    }
+
+    @Test
+    fun `deleteSite removes a failed create`() = runTest {
+        val failedCreate = site(
+            id = "failed-create-site",
+            syncMetadata = SyncMetadata(
+                state = SyncState.FAILED,
+                failure = SyncFailure(SyncOperation.CREATE, "No connection"),
+            ),
+        )
+        database.siteDao().upsertSite(failedCreate.toEntity())
+
+        repository.deleteSite(failedCreate.id)
+
+        assertNull(database.siteDao().getSiteForSync(failedCreate.id.value))
     }
 
     @Test
