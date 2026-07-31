@@ -7,4 +7,5 @@ data class SyncMetadataEntity(
     val lastSyncedAt: Long? = null,
     val errorMessage: String? = null,
     val failedOperation: String? = null,
+    val failureOccurredAt: Long? = null,
 )

@@ -9,7 +9,7 @@ class SyncMetadataTest {
     @Test
     fun `markPendingCreate sets create state and clears a previous error`() {
         val metadata = SyncMetadata(
-            failure = SyncFailure(SyncOperation.UPDATE, "Timed out"),
+            failure = SyncFailure(SyncOperation.UPDATE, "Timed out", failedAt = 10L),
         )
 
         val result = metadata.markPendingCreate()
@@ -28,7 +28,7 @@ class SyncMetadataTest {
     @Test
     fun `markPendingUpdate restores a failed create as a create`() {
         val result = SyncMetadata(state = SyncState.PENDING_CREATE)
-            .markFailed("No connection")
+            .markFailed(message = "No connection", failedAt = 20L)
             .markPendingUpdate()
 
         assertEquals(SyncState.PENDING_CREATE, result.state)
@@ -64,7 +64,7 @@ class SyncMetadataTest {
     fun `markSynced records the completion time and clears an error`() {
         val result = SyncMetadata(
             state = SyncState.FAILED,
-            failure = SyncFailure(SyncOperation.UPDATE, "Timed out"),
+            failure = SyncFailure(SyncOperation.UPDATE, "Timed out", failedAt = 10L),
         ).markSynced(syncedAt = 123L)
 
         assertEquals(SyncState.SYNCED, result.state)
@@ -74,17 +74,19 @@ class SyncMetadataTest {
 
     @Test
     fun `markFailed records the error`() {
-        val result = SyncMetadata(state = SyncState.PENDING_UPDATE).markFailed("No connection")
+        val result = SyncMetadata(state = SyncState.PENDING_UPDATE)
+            .markFailed(message = "No connection", failedAt = 123L)
 
         assertEquals(SyncState.FAILED, result.state)
-        assertEquals(SyncFailure(SyncOperation.UPDATE, "No connection"), result.failure)
+        assertEquals(SyncFailure(SyncOperation.UPDATE, "No connection", 123L), result.failure)
     }
 
     @Test
     fun `markFailed preserves a delete operation`() {
-        val result = SyncMetadata(state = SyncState.PENDING_DELETE).markFailed("Server unavailable")
+        val result = SyncMetadata(state = SyncState.PENDING_DELETE)
+            .markFailed(message = "Server unavailable", failedAt = 456L)
 
         assertEquals(SyncState.FAILED, result.state)
-        assertEquals(SyncFailure(SyncOperation.DELETE, "Server unavailable"), result.failure)
+        assertEquals(SyncFailure(SyncOperation.DELETE, "Server unavailable", 456L), result.failure)
     }
 }

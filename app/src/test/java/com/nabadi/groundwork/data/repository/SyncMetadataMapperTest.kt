@@ -22,12 +22,27 @@ class SyncMetadataMapperTest {
             state = SyncState.FAILED.name,
             failedOperation = SyncOperation.DELETE.name,
             errorMessage = "Server unavailable",
+            failureOccurredAt = 123L,
         )
 
         assertEquals(
-            SyncFailure(SyncOperation.DELETE, "Server unavailable"),
+            SyncFailure(SyncOperation.DELETE, "Server unavailable", 123L),
             metadata.toDomain().failure,
         )
         assertEquals(metadata, metadata.toDomain().toEntity())
+    }
+
+    @Test
+    fun `toDomain keeps a missing timestamp for legacy failures`() {
+        val metadata = SyncMetadataEntity(
+            state = SyncState.FAILED.name,
+            failedOperation = SyncOperation.UPDATE.name,
+            errorMessage = "Timed out",
+        )
+
+        assertEquals(
+            SyncFailure(SyncOperation.UPDATE, "Timed out", failedAt = null),
+            metadata.toDomain().failure,
+        )
     }
 }

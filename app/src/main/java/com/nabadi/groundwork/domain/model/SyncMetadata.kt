@@ -46,7 +46,10 @@ data class SyncMetadata(
         )
     }
 
-    fun markFailed(message: String): SyncMetadata {
+    fun markFailed(
+        message: String,
+        failedAt: Long,
+    ): SyncMetadata {
         return copy(
             state = SyncState.FAILED,
             failure = SyncFailure(
@@ -54,6 +57,7 @@ data class SyncMetadata(
                     "Only pending sync operations can fail."
                 },
                 message = message,
+                failedAt = failedAt,
             ),
         )
     }

@@ -103,7 +103,7 @@ class SiteMapperTest {
         val metadata = SyncMetadata(
             state = SyncState.FAILED,
             lastSyncedAt = 100L,
-            failure = SyncFailure(SyncOperation.UPDATE, "Waiting for network"),
+            failure = SyncFailure(SyncOperation.UPDATE, "Waiting for network", failedAt = 100L),
         )
         val site = Site(
             id = SiteId("sync-site"),

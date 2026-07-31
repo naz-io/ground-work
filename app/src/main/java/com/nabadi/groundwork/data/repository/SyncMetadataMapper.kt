@@ -12,7 +12,11 @@ fun SyncMetadataEntity.toDomain() = SyncMetadata(
     failure = failedOperation.toPersistedEnumOrNull<SyncOperation>()
         ?.let { operation ->
             errorMessage?.let { message ->
-                SyncFailure(operation = operation, message = message)
+                SyncFailure(
+                    operation = operation,
+                    message = message,
+                    failedAt = failureOccurredAt,
+                )
             }
         },
 )
@@ -22,4 +26,5 @@ fun SyncMetadata.toEntity() = SyncMetadataEntity(
     lastSyncedAt = lastSyncedAt,
     errorMessage = failure?.message,
     failedOperation = failure?.operation?.name,
+    failureOccurredAt = failure?.failedAt,
 )

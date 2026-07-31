@@ -139,6 +139,39 @@ class GroundWorkDatabaseMigrationTest {
         migratedDatabase.close()
     }
 
+    @Test
+    fun `migration 4 to 5 adds nullable failure timestamp`() {
+        migrationTestHelper.createDatabase(FAILURE_TIMESTAMP_MIGRATION_DATABASE, 4).apply {
+            execSQL(
+                """
+                    INSERT INTO `sites` (
+                        `id`, `name`, `description`, `location`, `priority`, `status`,
+                        `createdAt`, `updatedAt`, `sync_state`, `sync_lastSyncedAt`,
+                        `sync_errorMessage`, `sync_failedOperation`
+                    ) VALUES (
+                        'site-1', 'Site', '', 'Location', 'NORMAL', 'ACTIVE', 1, 1,
+                        'FAILED', NULL, 'Timed out', 'UPDATE'
+                    )
+                """.trimIndent()
+            )
+            close()
+        }
+
+        val migratedDatabase = migrationTestHelper.runMigrationsAndValidate(
+            FAILURE_TIMESTAMP_MIGRATION_DATABASE,
+            5,
+            true,
+            MIGRATION_4_5,
+        )
+
+        migratedDatabase.query("SELECT `sync_failureOccurredAt` FROM `sites`").use { cursor ->
+            cursor.moveToFirst()
+            assertNull(cursor.getString(0))
+        }
+
+        migratedDatabase.close()
+    }
+
     private fun androidx.sqlite.db.SupportSQLiteDatabase.insertFieldNote(
         id: String,
         siteId: String,
@@ -158,5 +191,6 @@ class GroundWorkDatabaseMigrationTest {
         const val TEST_DATABASE = "groundwork-migration-test"
         const val SYNC_MIGRATION_DATABASE = "groundwork-sync-migration-test"
         const val FAILED_OPERATION_MIGRATION_DATABASE = "groundwork-failed-operation-migration-test"
+        const val FAILURE_TIMESTAMP_MIGRATION_DATABASE = "groundwork-failure-timestamp-migration-test"
     }
 }

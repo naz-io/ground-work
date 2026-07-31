@@ -65,7 +65,7 @@ class OfflineFirstFieldNoteRepositoryTest {
             syncMetadata = SyncMetadata(
                 state = SyncState.FAILED,
                 lastSyncedAt = 100L,
-                failure = SyncFailure(SyncOperation.UPDATE, "Server unavailable"),
+                failure = SyncFailure(SyncOperation.UPDATE, "Server unavailable", failedAt = 100L),
             ),
         )
 
@@ -265,7 +265,7 @@ class OfflineFirstFieldNoteRepositoryTest {
             id = "failed-delete-note",
             syncMetadata = SyncMetadata(
                 state = SyncState.FAILED,
-                failure = SyncFailure(SyncOperation.DELETE, "Server unavailable"),
+                failure = SyncFailure(SyncOperation.DELETE, "Server unavailable", failedAt = 100L),
             ),
         )
         database.fieldNoteDao().upsertFieldNote(failedDelete.toEntity())

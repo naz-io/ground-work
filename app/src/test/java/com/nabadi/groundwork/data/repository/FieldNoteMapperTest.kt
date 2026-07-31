@@ -118,7 +118,7 @@ class FieldNoteMapperTest {
         val metadata = SyncMetadata(
             state = SyncState.FAILED,
             lastSyncedAt = 100L,
-            failure = SyncFailure(SyncOperation.UPDATE, "Server unavailable"),
+            failure = SyncFailure(SyncOperation.UPDATE, "Server unavailable", failedAt = 100L),
         )
         val fieldNote = FieldNote(
             id = FieldNoteId("sync-note"),

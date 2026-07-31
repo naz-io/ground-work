@@ -61,7 +61,7 @@ class OfflineFirstSiteRepositoryTest {
             syncMetadata = SyncMetadata(
                 state = SyncState.PENDING_UPDATE,
                 lastSyncedAt = 100L,
-                failure = SyncFailure(SyncOperation.UPDATE, "Waiting for network"),
+                failure = SyncFailure(SyncOperation.UPDATE, "Waiting for network", failedAt = 100L),
             ),
         )
 
@@ -173,7 +173,7 @@ class OfflineFirstSiteRepositoryTest {
             id = "failed-create-site",
             syncMetadata = SyncMetadata(
                 state = SyncState.FAILED,
-                failure = SyncFailure(SyncOperation.CREATE, "No connection"),
+                failure = SyncFailure(SyncOperation.CREATE, "No connection", failedAt = 100L),
             ),
         )
         database.siteDao().upsertSite(failedCreate.toEntity())
