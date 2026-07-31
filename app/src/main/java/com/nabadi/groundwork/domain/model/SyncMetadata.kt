@@ -3,21 +3,27 @@ package com.nabadi.groundwork.domain.model
 data class SyncMetadata(
     val state: SyncState = SyncState.SYNCED,
     val lastSyncedAt: Long? = null,
-    val errorMessage: String? = null,
+    val failure: SyncFailure? = null,
 ) {
     fun markPendingCreate(): SyncMetadata {
         return copy(
             state = SyncState.PENDING_CREATE,
-            errorMessage = null,
+            failure = null,
         )
     }
 
     fun markPendingUpdate(): SyncMetadata {
-        return when (state) {
-            SyncState.PENDING_CREATE -> copy(errorMessage = null)
+        return when {
+            state == SyncState.PENDING_CREATE -> copy(
+                failure = null,
+            )
+            failedCreate -> copy(
+                state = SyncState.PENDING_CREATE,
+                failure = null,
+            )
             else -> copy(
                 state = SyncState.PENDING_UPDATE,
-                errorMessage = null,
+                failure = null,
             )
         }
     }
@@ -27,7 +33,7 @@ data class SyncMetadata(
             SyncState.PENDING_CREATE -> this
             else -> copy(
                 state = SyncState.PENDING_DELETE,
-                errorMessage = null,
+                failure = null,
             )
         }
     }
@@ -36,14 +42,32 @@ data class SyncMetadata(
         return copy(
             state = SyncState.SYNCED,
             lastSyncedAt = syncedAt,
-            errorMessage = null,
+            failure = null,
         )
     }
 
     fun markFailed(message: String): SyncMetadata {
         return copy(
             state = SyncState.FAILED,
-            errorMessage = message,
+            failure = SyncFailure(
+                operation = requireNotNull(state.toSyncOperation()) {
+                    "Only pending sync operations can fail."
+                },
+                message = message,
+            ),
         )
     }
+
+    val failedCreate: Boolean
+        get() = state == SyncState.FAILED && failure?.operation == SyncOperation.CREATE
+
+    private fun SyncState.toSyncOperation(): SyncOperation? =
+        when (this) {
+            SyncState.PENDING_CREATE -> SyncOperation.CREATE
+            SyncState.PENDING_UPDATE -> SyncOperation.UPDATE
+            SyncState.PENDING_DELETE -> SyncOperation.DELETE
+            SyncState.SYNCED,
+            SyncState.FAILED,
+            -> null
+        }
 }

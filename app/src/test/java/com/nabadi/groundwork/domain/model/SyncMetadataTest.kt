@@ -8,12 +8,14 @@ class SyncMetadataTest {
 
     @Test
     fun `markPendingCreate sets create state and clears a previous error`() {
-        val metadata = SyncMetadata(errorMessage = "Timed out")
+        val metadata = SyncMetadata(
+            failure = SyncFailure(SyncOperation.UPDATE, "Timed out"),
+        )
 
         val result = metadata.markPendingCreate()
 
         assertEquals(SyncState.PENDING_CREATE, result.state)
-        assertNull(result.errorMessage)
+        assertNull(result.failure)
     }
 
     @Test
@@ -24,11 +26,21 @@ class SyncMetadataTest {
     }
 
     @Test
+    fun `markPendingUpdate restores a failed create as a create`() {
+        val result = SyncMetadata(state = SyncState.PENDING_CREATE)
+            .markFailed("No connection")
+            .markPendingUpdate()
+
+        assertEquals(SyncState.PENDING_CREATE, result.state)
+        assertNull(result.failure)
+    }
+
+    @Test
     fun `markPendingUpdate sets update state for an existing record`() {
         val result = SyncMetadata(state = SyncState.SYNCED).markPendingUpdate()
 
         assertEquals(SyncState.PENDING_UPDATE, result.state)
-        assertNull(result.errorMessage)
+        assertNull(result.failure)
     }
 
     @Test
@@ -45,19 +57,19 @@ class SyncMetadataTest {
         val result = SyncMetadata(state = SyncState.SYNCED).markPendingDelete()
 
         assertEquals(SyncState.PENDING_DELETE, result.state)
-        assertNull(result.errorMessage)
+        assertNull(result.failure)
     }
 
     @Test
     fun `markSynced records the completion time and clears an error`() {
         val result = SyncMetadata(
             state = SyncState.FAILED,
-            errorMessage = "Timed out",
+            failure = SyncFailure(SyncOperation.UPDATE, "Timed out"),
         ).markSynced(syncedAt = 123L)
 
         assertEquals(SyncState.SYNCED, result.state)
         assertEquals(123L, result.lastSyncedAt)
-        assertNull(result.errorMessage)
+        assertNull(result.failure)
     }
 
     @Test
@@ -65,6 +77,14 @@ class SyncMetadataTest {
         val result = SyncMetadata(state = SyncState.PENDING_UPDATE).markFailed("No connection")
 
         assertEquals(SyncState.FAILED, result.state)
-        assertEquals("No connection", result.errorMessage)
+        assertEquals(SyncFailure(SyncOperation.UPDATE, "No connection"), result.failure)
+    }
+
+    @Test
+    fun `markFailed preserves a delete operation`() {
+        val result = SyncMetadata(state = SyncState.PENDING_DELETE).markFailed("Server unavailable")
+
+        assertEquals(SyncState.FAILED, result.state)
+        assertEquals(SyncFailure(SyncOperation.DELETE, "Server unavailable"), result.failure)
     }
 }

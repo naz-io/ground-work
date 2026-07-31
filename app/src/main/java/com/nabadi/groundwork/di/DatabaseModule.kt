@@ -6,6 +6,7 @@ import com.nabadi.groundwork.data.local.FieldNoteDao
 import com.nabadi.groundwork.data.local.GroundWorkDatabase
 import com.nabadi.groundwork.data.local.MIGRATION_1_2
 import com.nabadi.groundwork.data.local.MIGRATION_2_3
+import com.nabadi.groundwork.data.local.MIGRATION_3_4
 import com.nabadi.groundwork.data.local.SiteDao
 import dagger.Module
 import dagger.Provides
@@ -30,6 +31,7 @@ object DatabaseModule {
         )
             .addMigrations(MIGRATION_1_2)
             .addMigrations(MIGRATION_2_3)
+            .addMigrations(MIGRATION_3_4)
             .build()
 
     @Provides
@@ -44,4 +46,3 @@ object DatabaseModule {
     ): SiteDao =
         database.siteDao()
 }
-

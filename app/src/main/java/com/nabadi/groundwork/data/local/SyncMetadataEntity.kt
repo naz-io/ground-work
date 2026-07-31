@@ -6,4 +6,5 @@ data class SyncMetadataEntity(
     val state: String = SyncState.SYNCED.name,
     val lastSyncedAt: Long? = null,
     val errorMessage: String? = null,
+    val failedOperation: String? = null,
 )

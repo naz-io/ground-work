@@ -64,3 +64,10 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
         db.execSQL("ALTER TABLE field_notes ADD COLUMN sync_errorMessage TEXT")
     }
 }
+
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE sites ADD COLUMN sync_failedOperation TEXT")
+        db.execSQL("ALTER TABLE field_notes ADD COLUMN sync_failedOperation TEXT")
+    }
+}

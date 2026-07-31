@@ -1,6 +1,8 @@
 package com.nabadi.groundwork.data.repository
 
 import com.nabadi.groundwork.data.local.SyncMetadataEntity
+import com.nabadi.groundwork.domain.model.SyncFailure
+import com.nabadi.groundwork.domain.model.SyncOperation
 import com.nabadi.groundwork.domain.model.SyncState
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -12,5 +14,20 @@ class SyncMetadataMapperTest {
         val metadata = SyncMetadataEntity(state = "PENDING_UPLOAD").toDomain()
 
         assertEquals(SyncState.FAILED, metadata.state)
+    }
+
+    @Test
+    fun `mappers preserve failed operation`() {
+        val metadata = SyncMetadataEntity(
+            state = SyncState.FAILED.name,
+            failedOperation = SyncOperation.DELETE.name,
+            errorMessage = "Server unavailable",
+        )
+
+        assertEquals(
+            SyncFailure(SyncOperation.DELETE, "Server unavailable"),
+            metadata.toDomain().failure,
+        )
+        assertEquals(metadata, metadata.toDomain().toEntity())
     }
 }

@@ -110,6 +110,35 @@ class GroundWorkDatabaseMigrationTest {
         migratedDatabase.close()
     }
 
+    @Test
+    fun `migration 3 to 4 adds nullable failed operation`() {
+        migrationTestHelper.createDatabase(FAILED_OPERATION_MIGRATION_DATABASE, 3).apply {
+            execSQL(
+                """
+                    INSERT INTO `sites` (
+                        `id`, `name`, `description`, `location`, `priority`, `status`,
+                        `createdAt`, `updatedAt`, `sync_state`, `sync_lastSyncedAt`, `sync_errorMessage`
+                    ) VALUES ('site-1', 'Site', '', 'Location', 'NORMAL', 'ACTIVE', 1, 1, 'FAILED', NULL, 'Timed out')
+                """.trimIndent()
+            )
+            close()
+        }
+
+        val migratedDatabase = migrationTestHelper.runMigrationsAndValidate(
+            FAILED_OPERATION_MIGRATION_DATABASE,
+            4,
+            true,
+            MIGRATION_3_4,
+        )
+
+        migratedDatabase.query("SELECT `sync_failedOperation` FROM `sites`").use { cursor ->
+            cursor.moveToFirst()
+            assertNull(cursor.getString(0))
+        }
+
+        migratedDatabase.close()
+    }
+
     private fun androidx.sqlite.db.SupportSQLiteDatabase.insertFieldNote(
         id: String,
         siteId: String,
@@ -128,5 +157,6 @@ class GroundWorkDatabaseMigrationTest {
     private companion object {
         const val TEST_DATABASE = "groundwork-migration-test"
         const val SYNC_MIGRATION_DATABASE = "groundwork-sync-migration-test"
+        const val FAILED_OPERATION_MIGRATION_DATABASE = "groundwork-failed-operation-migration-test"
     }
 }

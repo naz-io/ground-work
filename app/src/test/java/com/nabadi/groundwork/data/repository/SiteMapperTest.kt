@@ -6,6 +6,8 @@ import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
 import com.nabadi.groundwork.domain.model.SyncMetadata
+import com.nabadi.groundwork.domain.model.SyncFailure
+import com.nabadi.groundwork.domain.model.SyncOperation
 import com.nabadi.groundwork.domain.model.SyncState
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -99,9 +101,9 @@ class SiteMapperTest {
     @Test
     fun `mappers preserve sync metadata`() {
         val metadata = SyncMetadata(
-            state = SyncState.PENDING_UPDATE,
+            state = SyncState.FAILED,
             lastSyncedAt = 100L,
-            errorMessage = "Waiting for network",
+            failure = SyncFailure(SyncOperation.UPDATE, "Waiting for network"),
         )
         val site = Site(
             id = SiteId("sync-site"),
