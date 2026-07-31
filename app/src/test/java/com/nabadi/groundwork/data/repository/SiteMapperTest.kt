@@ -117,4 +117,23 @@ class SiteMapperTest {
 
         assertEquals(metadata, site.toEntity().toDomain().syncMetadata)
     }
+
+    @Test
+    fun `toDomain maps unknown site values to safe defaults`() {
+        val entity = SiteEntity(
+            id = "legacy-site",
+            name = "Legacy site",
+            description = "",
+            location = "Yard",
+            priority = "CRITICAL",
+            status = "ON_HOLD",
+            createdAt = 1L,
+            updatedAt = 1L,
+        )
+
+        val site = entity.toDomain()
+
+        assertEquals(SitePriority.NORMAL, site.priority)
+        assertEquals(SiteStatus.ARCHIVED, site.status)
+    }
 }

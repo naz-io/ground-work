@@ -5,7 +5,7 @@ import com.nabadi.groundwork.domain.model.SyncMetadata
 import com.nabadi.groundwork.domain.model.SyncState
 
 fun SyncMetadataEntity.toDomain() = SyncMetadata(
-    state = SyncState.valueOf(state),
+    state = SyncState.fromStorage(state),
     lastSyncedAt = lastSyncedAt,
     errorMessage = errorMessage,
 )

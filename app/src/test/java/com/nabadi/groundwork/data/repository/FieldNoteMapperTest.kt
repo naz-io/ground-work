@@ -131,4 +131,19 @@ class FieldNoteMapperTest {
 
         assertEquals(metadata, fieldNote.toEntity().toDomain().syncMetadata)
     }
+
+    @Test
+    fun `toDomain maps an unknown field note status to archived`() {
+        val entity = FieldNoteEntity(
+            id = "unknown-status",
+            siteId = null,
+            title = "Unknown status",
+            body = "Body",
+            status = "REVIEW",
+            createdAt = 1L,
+            updatedAt = 1L,
+        )
+
+        assertEquals(FieldNoteStatus.ARCHIVED, entity.toDomain().status)
+    }
 }
