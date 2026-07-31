@@ -5,6 +5,8 @@ import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
 import com.nabadi.groundwork.domain.model.SiteId
+import com.nabadi.groundwork.domain.model.SyncMetadata
+import com.nabadi.groundwork.domain.model.SyncState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -107,5 +109,26 @@ class FieldNoteMapperTest {
         val entity = fieldNote.toEntity()
 
         assertEquals("ARCHIVED", entity.status)
+    }
+
+    @Test
+    fun `mappers preserve sync metadata`() {
+        val metadata = SyncMetadata(
+            state = SyncState.FAILED,
+            lastSyncedAt = 100L,
+            errorMessage = "Server unavailable",
+        )
+        val fieldNote = FieldNote(
+            id = FieldNoteId("sync-note"),
+            siteId = null,
+            title = "Sync note",
+            body = "Body",
+            status = FieldNoteStatus.DRAFT,
+            createdAt = 1L,
+            updatedAt = 2L,
+            syncMetadata = metadata,
+        )
+
+        assertEquals(metadata, fieldNote.toEntity().toDomain().syncMetadata)
     }
 }

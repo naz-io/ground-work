@@ -8,4 +8,5 @@ data class FieldNote(
     val status: FieldNoteStatus,
     val createdAt: Long,
     val updatedAt: Long,
+    val syncMetadata: SyncMetadata = SyncMetadata(),
 )

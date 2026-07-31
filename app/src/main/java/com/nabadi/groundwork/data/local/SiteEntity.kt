@@ -1,5 +1,6 @@
 package com.nabadi.groundwork.data.local
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -13,4 +14,6 @@ data class SiteEntity(
     val status: String,
     val createdAt: Long,
     val updatedAt: Long,
+    @Embedded(prefix = "sync_")
+    val syncMetadata: SyncMetadataEntity = SyncMetadataEntity(),
 )

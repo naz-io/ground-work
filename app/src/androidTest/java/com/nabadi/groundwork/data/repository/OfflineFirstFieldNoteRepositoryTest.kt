@@ -10,6 +10,8 @@ import com.nabadi.groundwork.data.local.GroundWorkDatabase
 import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
 import com.nabadi.groundwork.domain.model.SiteId
+import com.nabadi.groundwork.domain.model.SyncMetadata
+import com.nabadi.groundwork.domain.model.SyncState
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -52,6 +54,22 @@ class OfflineFirstFieldNoteRepositoryTest {
         val savedFieldNote = repository.getFieldNote(fieldNote.id)
 
         assertEquals(fieldNote, savedFieldNote)
+    }
+
+    @Test
+    fun `saveFieldNote preserves sync metadata`() = runTest {
+        val fieldNote = fieldNote(
+            id = "sync-note",
+            syncMetadata = SyncMetadata(
+                state = SyncState.FAILED,
+                lastSyncedAt = 100L,
+                errorMessage = "Server unavailable",
+            ),
+        )
+
+        repository.saveFieldNote(fieldNote)
+
+        assertEquals(fieldNote, repository.getFieldNote(fieldNote.id))
     }
 
     @Test

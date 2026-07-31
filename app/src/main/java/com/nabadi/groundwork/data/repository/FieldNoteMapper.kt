@@ -15,6 +15,7 @@ fun FieldNoteEntity.toDomain(): FieldNote =
         status = FieldNoteStatus.valueOf(status),
         createdAt = createdAt,
         updatedAt = updatedAt,
+        syncMetadata = syncMetadata.toDomain(),
     )
 
 fun FieldNote.toEntity(): FieldNoteEntity =
@@ -26,4 +27,5 @@ fun FieldNote.toEntity(): FieldNoteEntity =
         status = status.name,
         createdAt = createdAt,
         updatedAt = updatedAt,
+        syncMetadata = syncMetadata.toEntity(),
     )

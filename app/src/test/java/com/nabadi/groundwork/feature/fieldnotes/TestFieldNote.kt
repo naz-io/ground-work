@@ -4,6 +4,7 @@ import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
 import com.nabadi.groundwork.domain.model.SiteId
+import com.nabadi.groundwork.domain.model.SyncMetadata
 
 object TestFieldNote {
     fun fieldNote(
@@ -14,6 +15,7 @@ object TestFieldNote {
         status: FieldNoteStatus = FieldNoteStatus.ACTIVE,
         createdAt: Long = 1_000L,
         updatedAt: Long = 2_000L,
+        syncMetadata: SyncMetadata = SyncMetadata(),
     ): FieldNote = FieldNote(
         id = FieldNoteId(id),
         siteId = siteId?.let { SiteId(it) },
@@ -22,5 +24,6 @@ object TestFieldNote {
         status = status,
         createdAt = createdAt,
         updatedAt = updatedAt,
+        syncMetadata = syncMetadata,
     )
 }

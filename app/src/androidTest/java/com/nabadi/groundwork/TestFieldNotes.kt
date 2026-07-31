@@ -1,10 +1,12 @@
 package com.nabadi.groundwork
 
 import com.nabadi.groundwork.data.local.FieldNoteEntity
+import com.nabadi.groundwork.data.local.SyncMetadataEntity
 import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
 import com.nabadi.groundwork.domain.model.SiteId
+import com.nabadi.groundwork.domain.model.SyncMetadata
 
 object TestFieldNotes {
 
@@ -16,6 +18,7 @@ object TestFieldNotes {
         status: FieldNoteStatus = FieldNoteStatus.DRAFT,
         createdAt: Long = 1L,
         updatedAt: Long = 2L,
+        syncMetadata: SyncMetadata = SyncMetadata(),
     ): FieldNote = FieldNote(
         id = FieldNoteId(id),
         siteId = siteId?.let { SiteId(it) },
@@ -24,6 +27,7 @@ object TestFieldNotes {
         status = status,
         createdAt = createdAt,
         updatedAt = updatedAt,
+        syncMetadata = syncMetadata,
     )
 
     fun fieldNoteEntity(
@@ -34,6 +38,7 @@ object TestFieldNotes {
         status: String = "DRAFT",
         createdAt: Long = 1_000L,
         updatedAt: Long = 2_000L,
+        syncMetadata: SyncMetadataEntity = SyncMetadataEntity(),
     ): FieldNoteEntity = FieldNoteEntity(
         id = id,
         siteId = siteId,
@@ -42,5 +47,6 @@ object TestFieldNotes {
         status = status,
         createdAt = createdAt,
         updatedAt = updatedAt,
+        syncMetadata = syncMetadata,
     )
 }

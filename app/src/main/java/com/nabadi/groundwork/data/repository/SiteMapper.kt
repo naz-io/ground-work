@@ -16,6 +16,7 @@ fun SiteEntity.toDomain(): Site =
         status = SiteStatus.valueOf(status),
         createdAt = createdAt,
         updatedAt = updatedAt,
+        syncMetadata = syncMetadata.toDomain(),
     )
 
 fun Site.toEntity(): SiteEntity =
@@ -28,4 +29,5 @@ fun Site.toEntity(): SiteEntity =
         status = status.name,
         createdAt = createdAt,
         updatedAt = updatedAt,
+        syncMetadata = syncMetadata.toEntity(),
     )

@@ -1,10 +1,12 @@
 package com.nabadi.groundwork
 
 import com.nabadi.groundwork.data.local.SiteEntity
+import com.nabadi.groundwork.data.local.SyncMetadataEntity
 import com.nabadi.groundwork.domain.model.Site
 import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
+import com.nabadi.groundwork.domain.model.SyncMetadata
 
 object TestSites {
 
@@ -17,6 +19,7 @@ object TestSites {
         status: SiteStatus = SiteStatus.ACTIVE,
         createdAt: Long = 1_000L,
         updatedAt: Long = 2_000L,
+        syncMetadata: SyncMetadata = SyncMetadata(),
     ): Site = Site(
         id = SiteId(id),
         name = name,
@@ -26,6 +29,7 @@ object TestSites {
         status = status,
         createdAt = createdAt,
         updatedAt = updatedAt,
+        syncMetadata = syncMetadata,
     )
 
     fun siteEntity(
@@ -37,6 +41,7 @@ object TestSites {
         status: String = "ACTIVE",
         createdAt: Long = 1_000L,
         updatedAt: Long = 2_000L,
+        syncMetadata: SyncMetadataEntity = SyncMetadataEntity(),
     ): SiteEntity = SiteEntity(
         id = id,
         name = name,
@@ -46,5 +51,6 @@ object TestSites {
         status = status,
         createdAt = createdAt,
         updatedAt = updatedAt,
+        syncMetadata = syncMetadata,
     )
 }

@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase
         FieldNoteEntity::class,
         SiteEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 abstract class GroundWorkDatabase : RoomDatabase() {

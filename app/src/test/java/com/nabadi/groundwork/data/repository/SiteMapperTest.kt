@@ -5,6 +5,8 @@ import com.nabadi.groundwork.domain.model.Site
 import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
+import com.nabadi.groundwork.domain.model.SyncMetadata
+import com.nabadi.groundwork.domain.model.SyncState
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -92,5 +94,27 @@ class SiteMapperTest {
         val entity = site.toEntity()
 
         assertEquals("LOW", entity.priority)
+    }
+
+    @Test
+    fun `mappers preserve sync metadata`() {
+        val metadata = SyncMetadata(
+            state = SyncState.PENDING_UPDATE,
+            lastSyncedAt = 100L,
+            errorMessage = "Waiting for network",
+        )
+        val site = Site(
+            id = SiteId("sync-site"),
+            name = "Sync site",
+            description = "",
+            location = "Yard",
+            priority = SitePriority.NORMAL,
+            status = SiteStatus.ACTIVE,
+            createdAt = 1L,
+            updatedAt = 2L,
+            syncMetadata = metadata,
+        )
+
+        assertEquals(metadata, site.toEntity().toDomain().syncMetadata)
     }
 }

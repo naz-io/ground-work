@@ -9,4 +9,5 @@ data class Site(
     val status: SiteStatus,
     val createdAt: Long,
     val updatedAt: Long,
+    val syncMetadata: SyncMetadata = SyncMetadata(),
 )

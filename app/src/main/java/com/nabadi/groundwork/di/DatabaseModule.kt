@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.nabadi.groundwork.data.local.FieldNoteDao
 import com.nabadi.groundwork.data.local.GroundWorkDatabase
 import com.nabadi.groundwork.data.local.MIGRATION_1_2
+import com.nabadi.groundwork.data.local.MIGRATION_2_3
 import com.nabadi.groundwork.data.local.SiteDao
 import dagger.Module
 import dagger.Provides
@@ -28,6 +29,7 @@ object DatabaseModule {
             name = "groundwork.db"
         )
             .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_2_3)
             .build()
 
     @Provides

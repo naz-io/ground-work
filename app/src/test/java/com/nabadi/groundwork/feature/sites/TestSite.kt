@@ -4,6 +4,7 @@ import com.nabadi.groundwork.domain.model.Site
 import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
+import com.nabadi.groundwork.domain.model.SyncMetadata
 
 object TestSite {
     fun site(
@@ -15,6 +16,7 @@ object TestSite {
         status: SiteStatus = SiteStatus.ACTIVE,
         createdAt: Long = 1_000L,
         updatedAt: Long = 2_000L,
+        syncMetadata: SyncMetadata = SyncMetadata(),
     ): Site = Site(
         id = SiteId(id),
         name = name,
@@ -24,5 +26,6 @@ object TestSite {
         status = status,
         createdAt = createdAt,
         updatedAt = updatedAt,
+        syncMetadata = syncMetadata,
     )
 }

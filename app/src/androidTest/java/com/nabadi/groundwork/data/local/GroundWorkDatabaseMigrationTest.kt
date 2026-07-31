@@ -68,6 +68,48 @@ class GroundWorkDatabaseMigrationTest {
         migratedDatabase.close()
     }
 
+    @Test
+    fun `migration 2 to 3 adds synced metadata to existing records`() {
+        migrationTestHelper.createDatabase(SYNC_MIGRATION_DATABASE, 2).apply {
+            execSQL(
+                """
+                    INSERT INTO `sites` (
+                        `id`, `name`, `description`, `location`,
+                        `priority`, `status`, `createdAt`, `updatedAt`
+                    ) VALUES ('site-1', 'Site', '', 'Location', 'NORMAL', 'ACTIVE', 1, 1)
+                """.trimIndent()
+            )
+            insertFieldNote(id = "note-1", siteId = "site-1")
+            close()
+        }
+
+        val migratedDatabase = migrationTestHelper.runMigrationsAndValidate(
+            SYNC_MIGRATION_DATABASE,
+            3,
+            true,
+            MIGRATION_2_3,
+        )
+
+        migratedDatabase.query(
+            "SELECT `sync_state`, `sync_lastSyncedAt`, `sync_errorMessage` FROM `sites`"
+        ).use { cursor ->
+            cursor.moveToFirst()
+            assertEquals("SYNCED", cursor.getString(0))
+            assertNull(cursor.getString(1))
+            assertNull(cursor.getString(2))
+        }
+        migratedDatabase.query(
+            "SELECT `sync_state`, `sync_lastSyncedAt`, `sync_errorMessage` FROM `field_notes`"
+        ).use { cursor ->
+            cursor.moveToFirst()
+            assertEquals("SYNCED", cursor.getString(0))
+            assertNull(cursor.getString(1))
+            assertNull(cursor.getString(2))
+        }
+
+        migratedDatabase.close()
+    }
+
     private fun androidx.sqlite.db.SupportSQLiteDatabase.insertFieldNote(
         id: String,
         siteId: String,
@@ -85,5 +127,6 @@ class GroundWorkDatabaseMigrationTest {
 
     private companion object {
         const val TEST_DATABASE = "groundwork-migration-test"
+        const val SYNC_MIGRATION_DATABASE = "groundwork-sync-migration-test"
     }
 }

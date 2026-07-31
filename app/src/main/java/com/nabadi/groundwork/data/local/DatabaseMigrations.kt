@@ -52,3 +52,15 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
         )
     }
 }
+
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE sites ADD COLUMN sync_state TEXT NOT NULL DEFAULT 'SYNCED'")
+        db.execSQL("ALTER TABLE sites ADD COLUMN sync_lastSyncedAt INTEGER")
+        db.execSQL("ALTER TABLE sites ADD COLUMN sync_errorMessage TEXT")
+
+        db.execSQL("ALTER TABLE field_notes ADD COLUMN sync_state TEXT NOT NULL DEFAULT 'SYNCED'")
+        db.execSQL("ALTER TABLE field_notes ADD COLUMN sync_lastSyncedAt INTEGER")
+        db.execSQL("ALTER TABLE field_notes ADD COLUMN sync_errorMessage TEXT")
+    }
+}

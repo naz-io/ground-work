@@ -1,5 +1,6 @@
 package com.nabadi.groundwork.data.local
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -25,4 +26,6 @@ data class FieldNoteEntity(
     val status: String,
     val createdAt: Long,
     val updatedAt: Long,
+    @Embedded(prefix = "sync_")
+    val syncMetadata: SyncMetadataEntity = SyncMetadataEntity(),
 )

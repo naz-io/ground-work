@@ -8,6 +8,8 @@ import com.nabadi.groundwork.TestSites.site
 import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.data.local.GroundWorkDatabase
 import com.nabadi.groundwork.domain.model.Site
+import com.nabadi.groundwork.domain.model.SyncMetadata
+import com.nabadi.groundwork.domain.model.SyncState
 import com.nabadi.groundwork.domain.repository.SiteRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -48,6 +50,22 @@ class OfflineFirstSiteRepositoryTest {
         val savedSite = repository.getSite(site.id)
 
         assertEquals(site, savedSite)
+    }
+
+    @Test
+    fun `saveSite preserves sync metadata`() = runTest {
+        val site = site(
+            id = "sync-site",
+            syncMetadata = SyncMetadata(
+                state = SyncState.PENDING_UPDATE,
+                lastSyncedAt = 100L,
+                errorMessage = "Waiting for network",
+            ),
+        )
+
+        repository.saveSite(site)
+
+        assertEquals(site, repository.getSite(site.id))
     }
 
     @Test
