@@ -5,6 +5,7 @@ import com.nabadi.groundwork.data.local.FieldNoteEntity
 import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
 import com.nabadi.groundwork.domain.model.SiteId
+import com.nabadi.groundwork.domain.model.SyncState
 import com.nabadi.groundwork.domain.repository.FieldNoteRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -29,11 +30,27 @@ class OfflineFirstFieldNoteRepository @Inject constructor(
     override suspend fun getFieldNote(id: FieldNoteId): FieldNote? =
         fieldNoteDao.getFieldNote(id.value)?.toDomain()
 
-    override suspend fun saveFieldNote(fieldNote: FieldNote): Unit =
-        fieldNoteDao.upsertFieldNote(fieldNote.toEntity())
+    override suspend fun saveFieldNote(fieldNote: FieldNote) {
+        val existingFieldNote = fieldNoteDao.getFieldNoteForSync(fieldNote.id.value)?.toDomain()
+        val syncMetadata = existingFieldNote?.syncMetadata?.markPendingUpdate()
+            ?: fieldNote.syncMetadata.markPendingCreate()
 
-    override suspend fun deleteFieldNote(id: FieldNoteId): Unit =
-        fieldNoteDao.deleteFieldNote(id.value)
+        fieldNoteDao.upsertFieldNote(fieldNote.copy(syncMetadata = syncMetadata).toEntity())
+    }
+
+    override suspend fun deleteFieldNote(id: FieldNoteId) {
+        val existingFieldNote = fieldNoteDao.getFieldNoteForSync(id.value)?.toDomain() ?: return
+
+        when (existingFieldNote.syncMetadata.state) {
+            SyncState.PENDING_CREATE -> fieldNoteDao.deleteFieldNote(id.value)
+            SyncState.PENDING_DELETE -> Unit
+            else -> fieldNoteDao.upsertFieldNote(
+                existingFieldNote.copy(
+                    syncMetadata = existingFieldNote.syncMetadata.markPendingDelete(),
+                ).toEntity()
+            )
+        }
+    }
 
     private fun Flow<List<FieldNoteEntity>>.toDomainFlow(): Flow<List<FieldNote>> =
         map { entities -> entities.map { it.toDomain() } }

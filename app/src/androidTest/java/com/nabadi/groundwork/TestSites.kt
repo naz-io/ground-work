@@ -7,6 +7,7 @@ import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
 import com.nabadi.groundwork.domain.model.SyncMetadata
+import com.nabadi.groundwork.domain.model.SyncState
 
 object TestSites {
 
@@ -19,7 +20,7 @@ object TestSites {
         status: SiteStatus = SiteStatus.ACTIVE,
         createdAt: Long = 1_000L,
         updatedAt: Long = 2_000L,
-        syncMetadata: SyncMetadata = SyncMetadata(),
+        syncMetadata: SyncMetadata = SyncMetadata(state = SyncState.PENDING_CREATE),
     ): Site = Site(
         id = SiteId(id),
         name = name,

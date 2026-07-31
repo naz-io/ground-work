@@ -53,7 +53,7 @@ class OfflineFirstSiteRepositoryTest {
     }
 
     @Test
-    fun `saveSite preserves sync metadata`() = runTest {
+    fun `saveSite marks a new site pending create`() = runTest {
         val site = site(
             id = "sync-site",
             syncMetadata = SyncMetadata(
@@ -65,11 +65,14 @@ class OfflineFirstSiteRepositoryTest {
 
         repository.saveSite(site)
 
-        assertEquals(site, repository.getSite(site.id))
+        assertEquals(
+            SyncState.PENDING_CREATE,
+            repository.getSite(site.id)?.syncMetadata?.state,
+        )
     }
 
     @Test
-    fun `saveSite updates existing site with same id`() = runTest {
+    fun `saveSite keeps a pending create pending when it is edited`() = runTest {
         val originalSite = site(
             id = "1",
             name = "Original site",
@@ -93,6 +96,22 @@ class OfflineFirstSiteRepositoryTest {
 
         assertEquals(updatedSite, savedSite)
         assertEquals(listOf(updatedSite), sites)
+    }
+
+    @Test
+    fun `saveSite marks an existing synced site pending update`() = runTest {
+        val existingSite = site(
+            id = "synced-site",
+            syncMetadata = SyncMetadata(state = SyncState.SYNCED),
+        )
+        database.siteDao().upsertSite(existingSite.toEntity())
+
+        repository.saveSite(existingSite.copy(name = "Edited site"))
+
+        assertEquals(
+            SyncState.PENDING_UPDATE,
+            repository.getSite(existingSite.id)?.syncMetadata?.state,
+        )
     }
 
     @Test
@@ -135,7 +154,7 @@ class OfflineFirstSiteRepositoryTest {
     }
 
     @Test
-    fun `deleteSite removes saved site`() = runTest {
+    fun `deleteSite removes a pending create`() = runTest {
         val site = site(id = "1")
         repository.saveSite(site)
 
@@ -144,6 +163,24 @@ class OfflineFirstSiteRepositoryTest {
         val savedSite = repository.getSite(site.id)
 
         assertNull(savedSite)
+    }
+
+    @Test
+    fun `deleteSite marks a synced site pending delete and hides it`() = runTest {
+        val syncedSite = site(
+            id = "synced-site",
+            syncMetadata = SyncMetadata(state = SyncState.SYNCED),
+        )
+        database.siteDao().upsertSite(syncedSite.toEntity())
+
+        repository.deleteSite(syncedSite.id)
+
+        assertNull(repository.getSite(syncedSite.id))
+        assertEquals(emptyList<Site>(), repository.observeSites().first())
+        assertEquals(
+            SyncState.PENDING_DELETE,
+            database.siteDao().getSiteForSync(syncedSite.id.value)?.toDomain()?.syncMetadata?.state,
+        )
     }
 
     @Test

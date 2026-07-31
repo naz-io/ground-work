@@ -7,11 +7,14 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SiteDao {
-    @Query("SELECT * FROM sites ORDER BY updatedAt DESC")
+    @Query("SELECT * FROM sites WHERE sync_state != 'PENDING_DELETE' ORDER BY updatedAt DESC")
     fun observeSites(): Flow<List<SiteEntity>>
 
-    @Query("SELECT * FROM sites WHERE id = :id")
+    @Query("SELECT * FROM sites WHERE id = :id AND sync_state != 'PENDING_DELETE'")
     suspend fun getSite(id: String): SiteEntity?
+
+    @Query("SELECT * FROM sites WHERE id = :id")
+    suspend fun getSiteForSync(id: String): SiteEntity?
 
     @Upsert
     suspend fun upsertSite(site: SiteEntity)

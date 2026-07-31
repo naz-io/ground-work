@@ -57,7 +57,7 @@ class OfflineFirstFieldNoteRepositoryTest {
     }
 
     @Test
-    fun `saveFieldNote preserves sync metadata`() = runTest {
+    fun `saveFieldNote marks a new note pending create`() = runTest {
         val fieldNote = fieldNote(
             id = "sync-note",
             syncMetadata = SyncMetadata(
@@ -69,11 +69,14 @@ class OfflineFirstFieldNoteRepositoryTest {
 
         repository.saveFieldNote(fieldNote)
 
-        assertEquals(fieldNote, repository.getFieldNote(fieldNote.id))
+        assertEquals(
+            SyncState.PENDING_CREATE,
+            repository.getFieldNote(fieldNote.id)?.syncMetadata?.state,
+        )
     }
 
     @Test
-    fun `saveFieldNote updates existing field note with same id`() = runTest {
+    fun `saveFieldNote keeps a pending create pending when it is edited`() = runTest {
         database.siteDao().upsertSite(siteEntity(id = "site-1"))
 
         val originalFieldNote = fieldNote(
@@ -99,6 +102,22 @@ class OfflineFirstFieldNoteRepositoryTest {
 
         assertEquals(updatedFieldNote, savedFieldNote)
         assertEquals(listOf(updatedFieldNote), fieldNotes)
+    }
+
+    @Test
+    fun `saveFieldNote marks an existing synced note pending update`() = runTest {
+        val existingFieldNote = fieldNote(
+            id = "synced-note",
+            syncMetadata = SyncMetadata(state = SyncState.SYNCED),
+        )
+        database.fieldNoteDao().upsertFieldNote(existingFieldNote.toEntity())
+
+        repository.saveFieldNote(existingFieldNote.copy(title = "Edited note"))
+
+        assertEquals(
+            SyncState.PENDING_UPDATE,
+            repository.getFieldNote(existingFieldNote.id)?.syncMetadata?.state,
+        )
     }
 
     @Test
@@ -227,7 +246,7 @@ class OfflineFirstFieldNoteRepositoryTest {
 
 
     @Test
-    fun `deleteFieldNote removes saved field note`() = runTest {
+    fun `deleteFieldNote removes a pending create`() = runTest {
         val fieldNote = fieldNote(id = "1")
         repository.saveFieldNote(fieldNote)
 
@@ -236,6 +255,28 @@ class OfflineFirstFieldNoteRepositoryTest {
         val savedFieldNote = repository.getFieldNote(fieldNote.id)
 
         assertNull(savedFieldNote)
+    }
+
+    @Test
+    fun `deleteFieldNote marks a synced note pending delete and hides it`() = runTest {
+        val syncedFieldNote = fieldNote(
+            id = "synced-note",
+            syncMetadata = SyncMetadata(state = SyncState.SYNCED),
+        )
+        database.fieldNoteDao().upsertFieldNote(syncedFieldNote.toEntity())
+
+        repository.deleteFieldNote(syncedFieldNote.id)
+
+        assertNull(repository.getFieldNote(syncedFieldNote.id))
+        assertEquals(emptyList<FieldNote>(), repository.observeFieldNotes().first())
+        assertEquals(
+            SyncState.PENDING_DELETE,
+            database.fieldNoteDao()
+                .getFieldNoteForSync(syncedFieldNote.id.value)
+                ?.toDomain()
+                ?.syncMetadata
+                ?.state,
+        )
     }
 
     @Test

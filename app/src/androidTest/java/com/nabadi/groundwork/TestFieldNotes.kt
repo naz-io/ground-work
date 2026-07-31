@@ -7,6 +7,7 @@ import com.nabadi.groundwork.domain.model.FieldNoteId
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
 import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.model.SyncMetadata
+import com.nabadi.groundwork.domain.model.SyncState
 
 object TestFieldNotes {
 
@@ -18,7 +19,7 @@ object TestFieldNotes {
         status: FieldNoteStatus = FieldNoteStatus.DRAFT,
         createdAt: Long = 1L,
         updatedAt: Long = 2L,
-        syncMetadata: SyncMetadata = SyncMetadata(),
+        syncMetadata: SyncMetadata = SyncMetadata(state = SyncState.PENDING_CREATE),
     ): FieldNote = FieldNote(
         id = FieldNoteId(id),
         siteId = siteId?.let { SiteId(it) },
