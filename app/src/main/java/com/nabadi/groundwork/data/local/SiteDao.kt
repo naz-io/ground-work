@@ -7,18 +7,10 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SiteDao {
-    @Query(
-        "SELECT * FROM sites WHERE sync_state != 'PENDING_DELETE' " +
-            "AND (sync_state != 'FAILED' OR sync_failedOperation IS NULL " +
-            "OR sync_failedOperation != 'DELETE') ORDER BY updatedAt DESC"
-    )
+    @Query("SELECT * FROM sites WHERE $NOT_DELETED ORDER BY updatedAt DESC")
     fun observeSites(): Flow<List<SiteEntity>>
 
-    @Query(
-        "SELECT * FROM sites WHERE id = :id AND sync_state != 'PENDING_DELETE' " +
-            "AND (sync_state != 'FAILED' OR sync_failedOperation IS NULL " +
-            "OR sync_failedOperation != 'DELETE')"
-    )
+    @Query("SELECT * FROM sites WHERE id = :id AND $NOT_DELETED")
     suspend fun getSite(id: String): SiteEntity?
 
     @Query("SELECT * FROM sites WHERE id = :id")
