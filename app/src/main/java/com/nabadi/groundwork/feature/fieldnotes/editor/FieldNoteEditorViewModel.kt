@@ -99,7 +99,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
                         id = existingNote?.id ?: FieldNoteId(idGenerator.newId()),
                         siteId = currentState.siteId,
                         title = currentState.title.trim(),
-                        body = currentState.body,
+                        body = currentState.body.trim(),
                         status = currentState.status,
                         createdAt = existingNote?.createdAt ?: now,
                         updatedAt = now,
