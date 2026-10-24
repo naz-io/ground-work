@@ -37,6 +37,7 @@ class OfflineFirstFieldNoteRepositoryTest {
         ).build()
 
         repository = OfflineFirstFieldNoteRepository(
+            database = database,
             fieldNoteDao = database.fieldNoteDao(),
         )
     }

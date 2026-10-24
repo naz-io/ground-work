@@ -1,7 +1,9 @@
 package com.nabadi.groundwork.data.repository
 
+import androidx.room.withTransaction
 import com.nabadi.groundwork.data.local.FieldNoteDao
 import com.nabadi.groundwork.data.local.FieldNoteEntity
+import com.nabadi.groundwork.data.local.GroundWorkDatabase
 import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
 import com.nabadi.groundwork.domain.model.SiteId
@@ -12,6 +14,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class OfflineFirstFieldNoteRepository @Inject constructor(
+    private val database: GroundWorkDatabase,
     private val fieldNoteDao: FieldNoteDao,
 ) : FieldNoteRepository {
 
@@ -31,25 +34,30 @@ class OfflineFirstFieldNoteRepository @Inject constructor(
         fieldNoteDao.getFieldNote(id.value)?.toDomain()
 
     override suspend fun saveFieldNote(fieldNote: FieldNote) {
-        val existingFieldNote = fieldNoteDao.getFieldNoteForSync(fieldNote.id.value)?.toDomain()
-        val syncMetadata = existingFieldNote?.syncMetadata?.markPendingUpdate()
-            ?: fieldNote.syncMetadata.markPendingCreate()
+        database.withTransaction {
+            val existingFieldNote = fieldNoteDao.getFieldNoteForSync(fieldNote.id.value)?.toDomain()
+            val syncMetadata = existingFieldNote?.syncMetadata?.markPendingUpdate()
+                ?: fieldNote.syncMetadata.markPendingCreate()
 
-        fieldNoteDao.upsertFieldNote(fieldNote.copy(syncMetadata = syncMetadata).toEntity())
+            fieldNoteDao.upsertFieldNote(fieldNote.copy(syncMetadata = syncMetadata).toEntity())
+        }
     }
 
     override suspend fun deleteFieldNote(id: FieldNoteId) {
-        val existingFieldNote = fieldNoteDao.getFieldNoteForSync(id.value)?.toDomain() ?: return
+        database.withTransaction {
+            val existingFieldNote = fieldNoteDao.getFieldNoteForSync(id.value)?.toDomain()
+                ?: return@withTransaction
 
-        when {
-            existingFieldNote.syncMetadata.state == SyncState.PENDING_CREATE ||
-                existingFieldNote.syncMetadata.failedCreate -> fieldNoteDao.deleteFieldNote(id.value)
-            existingFieldNote.syncMetadata.state == SyncState.PENDING_DELETE -> Unit
-            else -> fieldNoteDao.upsertFieldNote(
-                existingFieldNote.copy(
-                    syncMetadata = existingFieldNote.syncMetadata.markPendingDelete(),
-                ).toEntity()
-            )
+            when {
+                existingFieldNote.syncMetadata.state == SyncState.PENDING_CREATE ||
+                    existingFieldNote.syncMetadata.failedCreate -> fieldNoteDao.deleteFieldNote(id.value)
+                existingFieldNote.syncMetadata.state == SyncState.PENDING_DELETE -> Unit
+                else -> fieldNoteDao.upsertFieldNote(
+                    existingFieldNote.copy(
+                        syncMetadata = existingFieldNote.syncMetadata.markPendingDelete(),
+                    ).toEntity()
+                )
+            }
         }
     }
 
