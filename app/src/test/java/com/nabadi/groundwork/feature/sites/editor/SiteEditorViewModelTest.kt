@@ -148,7 +148,7 @@ class SiteEditorViewModelTest {
     }
 
     @Test
-    fun `saveSite trims the site name`() = runTest {
+    fun `saveSite trims the site name location and description`() = runTest {
         val repository = FakeSiteRepository()
         val viewModel = SiteEditorViewModel(
             siteRepository = repository,
@@ -158,9 +158,14 @@ class SiteEditorViewModelTest {
         )
 
         viewModel.onNameChange("  North Warehouse  ")
+        viewModel.onLocationChange(" Sector A ")
+        viewModel.onDescriptionChange("Main storage facility.\n")
         viewModel.saveSite(onSaved = {})
 
-        assertEquals("North Warehouse", repository.observeSites().first().single().name)
+        val savedSite = repository.observeSites().first().single()
+        assertEquals("North Warehouse", savedSite.name)
+        assertEquals("Sector A", savedSite.location)
+        assertEquals("Main storage facility.", savedSite.description)
     }
 
     @Test

@@ -102,8 +102,8 @@ class SiteEditorViewModel @AssistedInject constructor(
                     Site(
                         id = existingSite?.id ?: SiteId(idGenerator.newId()),
                         name = currentState.name.trim(),
-                        description = currentState.description,
-                        location = currentState.location,
+                        description = currentState.description.trim(),
+                        location = currentState.location.trim(),
                         priority = currentState.priority,
                         status = currentState.status,
                         createdAt = existingSite?.createdAt ?: now,

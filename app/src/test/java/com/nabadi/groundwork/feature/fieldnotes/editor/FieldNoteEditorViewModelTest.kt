@@ -274,6 +274,26 @@ class FieldNoteEditorViewModelTest {
     }
 
     @Test
+    fun `saveFieldNote trims the title and body`() = runTest {
+        val repository = FakeFieldNoteRepository()
+        val viewModel = FieldNoteEditorViewModel(
+            fieldNoteRepository = repository,
+            siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
+            route = GroundWorkRoute.FieldNoteEditor(),
+        )
+
+        viewModel.onTitleChange("  North gate issue ")
+        viewModel.onBodyChange("\nLoose fencing near the north access point.  \n")
+        viewModel.saveFieldNote(onSaved = {})
+
+        val savedFieldNote = repository.observeFieldNotes().first().single()
+        assertEquals("North gate issue", savedFieldNote.title)
+        assertEquals("Loose fencing near the north access point.", savedFieldNote.body)
+    }
+
+    @Test
     fun `saveFieldNote updates existing field note and preserves metadata`() = runTest {
         val existingFieldNote = fieldNote(
             id = "field-note-001",
