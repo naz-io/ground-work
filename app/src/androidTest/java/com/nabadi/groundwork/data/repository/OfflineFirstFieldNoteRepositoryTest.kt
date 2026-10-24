@@ -19,6 +19,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -247,6 +248,43 @@ class OfflineFirstFieldNoteRepositoryTest {
         assertNull(savedFieldNote)
     }
 
+
+    @Test
+    fun `saveFieldNote rejects a pending delete and leaves it deleted`() = runTest {
+        val pendingDelete = fieldNote(
+            id = "pending-delete-note",
+            syncMetadata = SyncMetadata(state = SyncState.PENDING_DELETE),
+        )
+        database.fieldNoteDao().upsertFieldNote(pendingDelete.toEntity())
+
+        val result = runCatching { repository.saveFieldNote(pendingDelete.copy(title = "Edited")) }
+
+        assertTrue(result.exceptionOrNull() is IllegalStateException)
+        assertEquals(
+            pendingDelete,
+            database.fieldNoteDao().getFieldNoteForSync(pendingDelete.id.value)?.toDomain(),
+        )
+    }
+
+    @Test
+    fun `saveFieldNote rejects a failed delete and leaves it deleted`() = runTest {
+        val failedDelete = fieldNote(
+            id = "failed-delete-note",
+            syncMetadata = SyncMetadata(
+                state = SyncState.FAILED,
+                failure = SyncFailure(SyncOperation.DELETE, "Server unavailable", failedAt = 100L),
+            ),
+        )
+        database.fieldNoteDao().upsertFieldNote(failedDelete.toEntity())
+
+        val result = runCatching { repository.saveFieldNote(failedDelete.copy(title = "Edited")) }
+
+        assertTrue(result.exceptionOrNull() is IllegalStateException)
+        assertEquals(
+            failedDelete,
+            database.fieldNoteDao().getFieldNoteForSync(failedDelete.id.value)?.toDomain(),
+        )
+    }
 
     @Test
     fun `deleteFieldNote removes a pending create`() = runTest {

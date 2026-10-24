@@ -2,6 +2,7 @@ package com.nabadi.groundwork.domain.model
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
 import org.junit.Test
 
 class SyncMetadataTest {
@@ -41,6 +42,25 @@ class SyncMetadataTest {
 
         assertEquals(SyncState.PENDING_UPDATE, result.state)
         assertNull(result.failure)
+    }
+
+    @Test
+    fun `markPendingUpdate rejects a pending delete`() {
+        val metadata = SyncMetadata(state = SyncState.PENDING_DELETE)
+
+        assertThrows(IllegalStateException::class.java) {
+            metadata.markPendingUpdate()
+        }
+    }
+
+    @Test
+    fun `markPendingUpdate rejects a failed delete`() {
+        val metadata = SyncMetadata(state = SyncState.PENDING_DELETE)
+            .markFailed(message = "Server unavailable", failedAt = 30L)
+
+        assertThrows(IllegalStateException::class.java) {
+            metadata.markPendingUpdate()
+        }
     }
 
     @Test

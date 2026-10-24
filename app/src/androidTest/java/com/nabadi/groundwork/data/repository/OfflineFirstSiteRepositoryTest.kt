@@ -20,6 +20,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -117,6 +118,23 @@ class OfflineFirstSiteRepositoryTest {
         assertEquals(
             SyncState.PENDING_UPDATE,
             repository.getSite(existingSite.id)?.syncMetadata?.state,
+        )
+    }
+
+    @Test
+    fun `saveSite rejects a pending delete and leaves it deleted`() = runTest {
+        val pendingDelete = site(
+            id = "pending-delete-site",
+            syncMetadata = SyncMetadata(state = SyncState.PENDING_DELETE),
+        )
+        database.siteDao().upsertSite(pendingDelete.toEntity())
+
+        val result = runCatching { repository.saveSite(pendingDelete.copy(name = "Edited")) }
+
+        assertTrue(result.exceptionOrNull() is IllegalStateException)
+        assertEquals(
+            pendingDelete,
+            database.siteDao().getSiteForSync(pendingDelete.id.value)?.toDomain(),
         )
     }
 
