@@ -4,9 +4,11 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.nabadi.groundwork.TestFieldNotes.fieldNote
 import com.nabadi.groundwork.TestSites.site
 import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.data.local.GroundWorkDatabase
+import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.Site
 import com.nabadi.groundwork.domain.model.SyncMetadata
 import com.nabadi.groundwork.domain.model.SyncFailure
@@ -35,7 +37,9 @@ class OfflineFirstSiteRepositoryTest {
             GroundWorkDatabase::class.java,
         ).build()
         repository = OfflineFirstSiteRepository(
+            database = database,
             siteDao = database.siteDao(),
+            fieldNoteDao = database.fieldNoteDao(),
         )
     }
 
@@ -198,6 +202,103 @@ class OfflineFirstSiteRepositoryTest {
         assertEquals(
             SyncState.PENDING_DELETE,
             database.siteDao().getSiteForSync(syncedSite.id.value)?.toDomain()?.syncMetadata?.state,
+        )
+    }
+
+    @Test
+    fun `deleteSite unassigns field notes of a synced site and marks them pending update`() = runTest {
+        val syncedSite = site(
+            id = "synced-site",
+            syncMetadata = SyncMetadata(state = SyncState.SYNCED),
+        )
+        val syncedNote = fieldNote(
+            id = "synced-note",
+            siteId = syncedSite.id.value,
+            syncMetadata = SyncMetadata(state = SyncState.SYNCED, lastSyncedAt = 100L),
+        )
+        database.siteDao().upsertSite(syncedSite.toEntity())
+        database.fieldNoteDao().upsertFieldNote(syncedNote.toEntity())
+
+        repository.deleteSite(syncedSite.id)
+
+        val expectedNote = syncedNote.copy(
+            siteId = null,
+            syncMetadata = SyncMetadata(state = SyncState.PENDING_UPDATE, lastSyncedAt = 100L),
+        )
+        assertEquals(
+            listOf(expectedNote),
+            database.fieldNoteDao().observeUnassignedFieldNotes().first().map { it.toDomain() },
+        )
+        assertEquals(
+            emptyList<FieldNote>(),
+            database.fieldNoteDao().observeFieldNotesForSite(syncedSite.id.value).first(),
+        )
+    }
+
+    @Test
+    fun `deleteSite keeps unassigned pending create notes pending create`() = runTest {
+        val syncedSite = site(
+            id = "synced-site",
+            syncMetadata = SyncMetadata(state = SyncState.SYNCED),
+        )
+        val pendingCreateNote = fieldNote(
+            id = "pending-create-note",
+            siteId = syncedSite.id.value,
+            syncMetadata = SyncMetadata(state = SyncState.PENDING_CREATE),
+        )
+        database.siteDao().upsertSite(syncedSite.toEntity())
+        database.fieldNoteDao().upsertFieldNote(pendingCreateNote.toEntity())
+
+        repository.deleteSite(syncedSite.id)
+
+        assertEquals(
+            pendingCreateNote.copy(siteId = null),
+            database.fieldNoteDao().getFieldNoteForSync(pendingCreateNote.id.value)?.toDomain(),
+        )
+    }
+
+    @Test
+    fun `deleteSite leaves pending delete notes of the site untouched`() = runTest {
+        val syncedSite = site(
+            id = "synced-site",
+            syncMetadata = SyncMetadata(state = SyncState.SYNCED),
+        )
+        val pendingDeleteNote = fieldNote(
+            id = "pending-delete-note",
+            siteId = syncedSite.id.value,
+            syncMetadata = SyncMetadata(state = SyncState.PENDING_DELETE),
+        )
+        database.siteDao().upsertSite(syncedSite.toEntity())
+        database.fieldNoteDao().upsertFieldNote(pendingDeleteNote.toEntity())
+
+        repository.deleteSite(syncedSite.id)
+
+        assertEquals(
+            pendingDeleteNote,
+            database.fieldNoteDao().getFieldNoteForSync(pendingDeleteNote.id.value)?.toDomain(),
+        )
+    }
+
+    @Test
+    fun `deleteSite unassigns field notes of a pending create site and marks them pending update`() = runTest {
+        val pendingCreateSite = site(id = "pending-create-site")
+        val syncedNote = fieldNote(
+            id = "synced-note",
+            siteId = pendingCreateSite.id.value,
+            syncMetadata = SyncMetadata(state = SyncState.SYNCED),
+        )
+        database.siteDao().upsertSite(pendingCreateSite.toEntity())
+        database.fieldNoteDao().upsertFieldNote(syncedNote.toEntity())
+
+        repository.deleteSite(pendingCreateSite.id)
+
+        assertNull(database.siteDao().getSiteForSync(pendingCreateSite.id.value))
+        assertEquals(
+            syncedNote.copy(
+                siteId = null,
+                syncMetadata = SyncMetadata(state = SyncState.PENDING_UPDATE),
+            ),
+            database.fieldNoteDao().getFieldNoteForSync(syncedNote.id.value)?.toDomain(),
         )
     }
 

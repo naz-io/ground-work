@@ -1,5 +1,8 @@
 package com.nabadi.groundwork.data.repository
 
+import androidx.room.withTransaction
+import com.nabadi.groundwork.data.local.FieldNoteDao
+import com.nabadi.groundwork.data.local.GroundWorkDatabase
 import com.nabadi.groundwork.data.local.SiteDao
 import com.nabadi.groundwork.data.local.SiteEntity
 import com.nabadi.groundwork.domain.model.Site
@@ -11,7 +14,9 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class OfflineFirstSiteRepository @Inject constructor(
+    private val database: GroundWorkDatabase,
     private val siteDao: SiteDao,
+    private val fieldNoteDao: FieldNoteDao,
 ) : SiteRepository {
     override fun observeSites(): Flow<List<Site>> =
         siteDao.observeSites().toDomainFlow()
@@ -28,18 +33,42 @@ class OfflineFirstSiteRepository @Inject constructor(
     }
 
     override suspend fun deleteSite(id: SiteId) {
-        val existingSite = siteDao.getSiteForSync(id.value)?.toDomain() ?: return
+        database.withTransaction {
+            val existingSite = siteDao.getSiteForSync(id.value)?.toDomain()
+                ?: return@withTransaction
 
-        when {
-            existingSite.syncMetadata.state == SyncState.PENDING_CREATE ||
-                existingSite.syncMetadata.failedCreate -> siteDao.deleteSite(id.value)
-            existingSite.syncMetadata.state == SyncState.PENDING_DELETE -> Unit
-            else -> siteDao.upsertSite(
-                existingSite.copy(
-                    syncMetadata = existingSite.syncMetadata.markPendingDelete(),
-                ).toEntity()
-            )
+            if (existingSite.syncMetadata.state == SyncState.PENDING_DELETE) return@withTransaction
+
+            // A pending delete keeps the site row, so ON DELETE SET NULL never fires.
+            // Unassign the notes explicitly so they stay visible and sync their new site.
+            unassignFieldNotes(id)
+
+            if (
+                existingSite.syncMetadata.state == SyncState.PENDING_CREATE ||
+                existingSite.syncMetadata.failedCreate
+            ) {
+                siteDao.deleteSite(id.value)
+            } else {
+                siteDao.upsertSite(
+                    existingSite.copy(
+                        syncMetadata = existingSite.syncMetadata.markPendingDelete(),
+                    ).toEntity()
+                )
+            }
         }
+    }
+
+    private suspend fun unassignFieldNotes(siteId: SiteId) {
+        fieldNoteDao.getFieldNotesForSite(siteId.value)
+            .map { it.toDomain() }
+            .forEach { fieldNote ->
+                fieldNoteDao.upsertFieldNote(
+                    fieldNote.copy(
+                        siteId = null,
+                        syncMetadata = fieldNote.syncMetadata.markPendingUpdate(),
+                    ).toEntity()
+                )
+            }
     }
 
     private fun Flow<List<SiteEntity>>.toDomainFlow(): Flow<List<Site>> =
