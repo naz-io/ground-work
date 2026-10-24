@@ -13,6 +13,8 @@ data class SyncMetadata(
     }
 
     fun markPendingUpdate(): SyncMetadata {
+        check(!isDeleted) { "Deleted records cannot be updated." }
+
         return when {
             state == SyncState.PENDING_CREATE -> copy(
                 failure = null,
@@ -64,6 +66,10 @@ data class SyncMetadata(
 
     val failedCreate: Boolean
         get() = state == SyncState.FAILED && failure?.operation == SyncOperation.CREATE
+
+    val isDeleted: Boolean
+        get() = state == SyncState.PENDING_DELETE ||
+            (state == SyncState.FAILED && failure?.operation == SyncOperation.DELETE)
 
     private fun SyncState.toSyncOperation(): SyncOperation? =
         when (this) {

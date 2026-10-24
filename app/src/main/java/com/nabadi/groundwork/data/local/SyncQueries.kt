@@ -1,6 +1,7 @@
 package com.nabadi.groundwork.data.local
 
 // Hides soft-deleted rows: pending deletes and deletes that failed and await retry.
+// Mirrors SyncMetadata.isDeleted.
 // The IS NULL check keeps FAILED rows without a recorded operation visible, since
 // comparing NULL with != never matches.
 internal const val NOT_DELETED =
