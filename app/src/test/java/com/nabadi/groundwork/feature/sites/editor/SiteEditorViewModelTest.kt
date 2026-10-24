@@ -131,6 +131,39 @@ class SitesEditorViewModelTest {
     }
 
     @Test
+    fun `clearing the name shows the required name error`() = runTest {
+        val viewModel = SiteEditorViewModel(
+            siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
+            route = GroundWorkRoute.SiteEditor(),
+        )
+        assertFalse(viewModel.uiState.value.showNameRequiredError)
+
+        viewModel.onNameChange("North Warehouse")
+        assertFalse(viewModel.uiState.value.showNameRequiredError)
+
+        viewModel.onNameChange("")
+        assertTrue(viewModel.uiState.value.showNameRequiredError)
+    }
+
+    @Test
+    fun `saveSite trims the site name`() = runTest {
+        val repository = FakeSiteRepository()
+        val viewModel = SiteEditorViewModel(
+            siteRepository = repository,
+            clock = clock,
+            idGenerator = idGenerator,
+            route = GroundWorkRoute.SiteEditor(),
+        )
+
+        viewModel.onNameChange("  North Warehouse  ")
+        viewModel.saveSite(onSaved = {})
+
+        assertEquals("North Warehouse", repository.observeSites().first().single().name)
+    }
+
+    @Test
     fun `onLocationChange updates location`() = runTest {
         val viewModel = SiteEditorViewModel(
             siteRepository = FakeSiteRepository(),

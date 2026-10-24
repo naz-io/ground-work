@@ -12,6 +12,7 @@ data class SiteEditorUiState(
     val priority: SitePriority = SitePriority.NORMAL,
     val status: SiteStatus = SiteStatus.ACTIVE,
     val isEditing: Boolean = false,
+    val isNameEdited: Boolean = false,
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
     val isDeleting: Boolean = false,
@@ -22,6 +23,9 @@ data class SiteEditorUiState(
 
     val canSave: Boolean
         get() = !isBusy && name.isNotBlank()
+
+    val showNameRequiredError: Boolean
+        get() = isNameEdited && name.isBlank()
 }
 
 enum class SiteEditorError(@StringRes val messageRes: Int) {
