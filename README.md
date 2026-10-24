@@ -43,7 +43,7 @@ This project is designed to showcase:
 
 ## Current Progress
 
-Git tags are created only for stable checkpoints. The latest stable tag is `v0.8.0`, representing the field-note/site relationship, site-aware creation and editing flows, Site Detail, and assigned/unassigned test coverage. `main` also contains the untagged v0.9.0 work described below.
+Git tags are created only for stable checkpoints. The latest stable tag is `v0.8.0`, representing the field-note/site relationship, site-aware creation and editing flows, Site Detail, and assigned/unassigned test coverage. The pre-release tag `v0.9.0-alpha` marks the completed sync groundwork described below, before the sync engine itself.
 
 ### v0.1 — Project Setup
 - Created Android project
@@ -136,7 +136,7 @@ Git tags are created only for stable checkpoints. The latest stable tag is `v0.8
 - Added site labels and site-name search to the main Field Notes list
 - Added assigned/unassigned coverage across migration, DAO, repository, ViewModel, UI state, and Compose UI layers
 
-### v0.9.0 — Sync Simulation (in progress, untagged)
+### v0.9.0 — Sync Simulation (in progress; groundwork tagged `v0.9.0-alpha`)
 
 Sync groundwork:
 - Added `SyncMetadata` to field notes and sites, with `SYNCED`, `PENDING_CREATE`, `PENDING_UPDATE`, `PENDING_DELETE`, and `FAILED` states
@@ -180,7 +180,8 @@ Remaining for v0.9.0:
 - Keep composables mostly stateless
 - Keep Room entities separate from domain models
 - Associate field notes with sites after both local foundations are stable
-- Build architecture that can support sites and sync later
+- Track local changes with sync metadata and sync them against a simulated remote source
+- Detect and resolve conflicts between local and simulated remote changes
 
 ### Out of scope for v1
 - Real backend
@@ -190,8 +191,7 @@ Remaining for v0.9.0:
 - GPS
 - Push notifications
 - Multi-user collaboration
-- Real sync
-- Conflict resolution
+- Sync with a real server (sync and conflict handling run against a simulated remote source)
 
 ## Architecture Decisions
 
