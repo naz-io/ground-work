@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
@@ -50,9 +51,10 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    // Raises the transitive kotlinx-serialization version. Test classpaths are pinned to
-    // the app's versions, and room-testing's MigrationTestHelper needs a newer runtime.
+    // Aligns kotlinx-serialization versions. Test classpaths are pinned to the app's
+    // versions, and room-testing's MigrationTestHelper needs a newer runtime.
     implementation(platform(libs.kotlinx.serialization.bom))
+    implementation(libs.kotlinx.serialization.core)
 
     // Compose
     implementation(platform(libs.androidx.compose.bom))
@@ -64,6 +66,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
 
     // Hilt/ Navigation  / Hilt Compose
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.hilt.compiler)

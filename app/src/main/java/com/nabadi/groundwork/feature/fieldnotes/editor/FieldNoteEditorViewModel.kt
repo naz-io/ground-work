@@ -1,6 +1,5 @@
 package com.nabadi.groundwork.feature.fieldnotes.editor
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nabadi.groundwork.domain.IdGenerator
@@ -11,6 +10,9 @@ import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.repository.FieldNoteRepository
 import com.nabadi.groundwork.domain.repository.SiteRepository
 import com.nabadi.groundwork.navigation.GroundWorkRoute
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,22 +21,18 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Clock
-import javax.inject.Inject
 
-@HiltViewModel
-class FieldNoteEditorViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = FieldNoteEditorViewModel.Factory::class)
+class FieldNoteEditorViewModel @AssistedInject constructor(
+    @Assisted route: GroundWorkRoute.FieldNoteEditor,
     private val fieldNoteRepository: FieldNoteRepository,
     private val siteRepository: SiteRepository,
     private val clock: Clock,
     private val idGenerator: IdGenerator,
-    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val initialSiteId: SiteId? =
-        savedStateHandle.get<String>(GroundWorkRoute.SITE_ID_ARG)?.let(::SiteId)
-
-    private val fieldNoteId: FieldNoteId? =
-        savedStateHandle.get<String>(GroundWorkRoute.FIELD_NOTE_ID_ARG)?.let(::FieldNoteId)
+    private val initialSiteId: SiteId? = route.siteId?.let(::SiteId)
+    private val fieldNoteId: FieldNoteId? = route.fieldNoteId?.let(::FieldNoteId)
     private var existingFieldNote: FieldNote? = null
 
     private val _uiState = MutableStateFlow(FieldNoteEditorUiState(siteId = initialSiteId))
@@ -248,5 +246,10 @@ class FieldNoteEditorViewModel @Inject constructor(
                 error = error,
             )
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(route: GroundWorkRoute.FieldNoteEditor): FieldNoteEditorViewModel
     }
 }

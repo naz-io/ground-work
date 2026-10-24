@@ -1,6 +1,5 @@
 package com.nabadi.groundwork.feature.sites.editor
 
-import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.nabadi.groundwork.MainDispatcherRule
@@ -48,9 +47,7 @@ class SitesEditorViewModelTest {
             siteRepository = repository,
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(
-                initialState = mapOf(GroundWorkRoute.SITE_ID_ARG to existingSite.id.value),
-            ),
+            route = GroundWorkRoute.SiteEditor(siteId = existingSite.id.value),
         )
 
         viewModel.uiState.test {
@@ -81,9 +78,7 @@ class SitesEditorViewModelTest {
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(
-                initialState = mapOf(GroundWorkRoute.SITE_ID_ARG to "missing-id"),
-            ),
+            route = GroundWorkRoute.SiteEditor(siteId = "missing-id"),
         )
 
         viewModel.uiState.test {
@@ -107,9 +102,7 @@ class SitesEditorViewModelTest {
             siteRepository = repository,
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(
-                initialState = mapOf(GroundWorkRoute.SITE_ID_ARG to "site-001"),
-            ),
+            route = GroundWorkRoute.SiteEditor(siteId = "site-001"),
         )
 
         viewModel.uiState.test {
@@ -129,7 +122,7 @@ class SitesEditorViewModelTest {
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.SiteEditor(),
         )
 
         viewModel.onNameChange("North Warehouse")
@@ -143,7 +136,7 @@ class SitesEditorViewModelTest {
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.SiteEditor(),
         )
 
         viewModel.onLocationChange("Sector A")
@@ -157,7 +150,7 @@ class SitesEditorViewModelTest {
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.SiteEditor(),
         )
 
         viewModel.onDescriptionChange("Recurring loading-bay access issue.")
@@ -174,7 +167,7 @@ class SitesEditorViewModelTest {
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.SiteEditor(),
         )
 
         viewModel.onPriorityChange(SitePriority.HIGH)
@@ -188,7 +181,7 @@ class SitesEditorViewModelTest {
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.SiteEditor(),
         )
 
         viewModel.onStatusChange(SiteStatus.ARCHIVED)
@@ -203,7 +196,7 @@ class SitesEditorViewModelTest {
             siteRepository = repository,
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.SiteEditor(),
         )
         var onSavedCalled = false
 
@@ -234,7 +227,7 @@ class SitesEditorViewModelTest {
             siteRepository = repository,
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.SiteEditor(),
         )
         var onSavedCalled = false
 
@@ -265,9 +258,7 @@ class SitesEditorViewModelTest {
             siteRepository = repository,
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(
-                initialState = mapOf(GroundWorkRoute.SITE_ID_ARG to existingSite.id.value),
-            ),
+            route = GroundWorkRoute.SiteEditor(siteId = existingSite.id.value),
         )
         var onSavedCalled = false
 
@@ -305,9 +296,7 @@ class SitesEditorViewModelTest {
             siteRepository = repository,
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(
-                initialState = mapOf(GroundWorkRoute.SITE_ID_ARG to existingSite.id.value),
-            ),
+            route = GroundWorkRoute.SiteEditor(siteId = existingSite.id.value),
         )
         var onDeletedCalled = false
 
@@ -330,7 +319,7 @@ class SitesEditorViewModelTest {
             siteRepository = repository,
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.SiteEditor(),
         )
         var onDeletedCalled = false
 
@@ -348,7 +337,7 @@ class SitesEditorViewModelTest {
             siteRepository = repository,
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.SiteEditor(),
         )
         var onDiscardedCalled = false
 
@@ -371,7 +360,7 @@ class SitesEditorViewModelTest {
             siteRepository = repository,
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.SiteEditor(),
         )
         var onSavedCalled = false
 
@@ -394,9 +383,7 @@ class SitesEditorViewModelTest {
             siteRepository = repository,
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(
-                initialState = mapOf(GroundWorkRoute.SITE_ID_ARG to existingSite.id.value),
-            ),
+            route = GroundWorkRoute.SiteEditor(siteId = existingSite.id.value),
         )
         var onDeletedCalled = false
 
@@ -423,7 +410,7 @@ class SitesEditorViewModelTest {
             siteRepository = repository,
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.SiteEditor(),
         )
 
         viewModel.onNameChange("North Warehouse")
