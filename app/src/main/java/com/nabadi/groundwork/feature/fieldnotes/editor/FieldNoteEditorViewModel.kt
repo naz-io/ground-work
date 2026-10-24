@@ -3,6 +3,7 @@ package com.nabadi.groundwork.feature.fieldnotes.editor
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nabadi.groundwork.domain.IdGenerator
 import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
@@ -17,13 +18,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.UUID
+import java.time.Clock
 import javax.inject.Inject
 
 @HiltViewModel
 class FieldNoteEditorViewModel @Inject constructor(
     private val fieldNoteRepository: FieldNoteRepository,
     private val siteRepository: SiteRepository,
+    private val clock: Clock,
+    private val idGenerator: IdGenerator,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -91,11 +94,11 @@ class FieldNoteEditorViewModel @Inject constructor(
 
             runCatching {
                 val existingNote = existingFieldNote
-                val now = System.currentTimeMillis()
+                val now = clock.millis()
 
                 fieldNoteRepository.saveFieldNote(
                     FieldNote(
-                        id = existingNote?.id ?: FieldNoteId(UUID.randomUUID().toString()),
+                        id = existingNote?.id ?: FieldNoteId(idGenerator.newId()),
                         siteId = currentState.siteId,
                         title = currentState.title.trim(),
                         body = currentState.body,
