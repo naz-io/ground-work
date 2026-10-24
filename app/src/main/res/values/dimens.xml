@@ -57,12 +57,6 @@
 
     <!-- Chips -->
     <dimen name="spacing_chip">8dp</dimen>
-    <dimen name="height_status_chip">42dp</dimen>
-    <dimen name="height_filter_chip">42dp</dimen>
-    <dimen name="padding_filter_chip_horizontal">16dp</dimen>
-
-    <!-- Error messages -->
-    <dimen name="height_error_message_area">48dp</dimen>
 
     <!-- Bottom actions -->
     <dimen name="padding_bottom_action_horizontal">24dp</dimen>

@@ -102,7 +102,6 @@
     <string name="site_editor_create_site">CREATE NEW SITE</string>
     <string name="site_editor_save_changes">SAVE CHANGES</string>
     <string name="site_editor_discard_draft">DISCARD DRAFT</string>
-    <string name="site_editor_cancel_changes">CANCEL &amp; DISCARD CHANGES</string>
     <string name="site_editor_delete">DELETE SITE</string>
 
     <!-- Site detail screen -->
