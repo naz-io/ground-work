@@ -98,6 +98,7 @@
     <string name="site_editor_edit_title">EDIT SITE</string>
     <string name="site_editor_name_label">SITE NAME</string>
     <string name="site_editor_name_hint">e.g. Northeast Excavation Hub</string>
+    <string name="site_editor_name_required">Site name is required</string>
     <string name="site_editor_description_label">SITE DESCRIPTION</string>
     <string name="site_editor_description_hint">Enter site conditions, hazard notes, and primary objectives…</string>
     <string name="site_editor_location_label">LOCATION</string>

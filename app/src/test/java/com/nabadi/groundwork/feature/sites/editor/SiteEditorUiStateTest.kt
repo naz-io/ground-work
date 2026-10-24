@@ -56,6 +56,27 @@ class SiteEditorUiStateTest {
     }
 
     @Test
+    fun `showNameRequiredError is false for a blank name that was not edited`() {
+        val state = SiteEditorUiState(name = "")
+
+        assertFalse(state.showNameRequiredError)
+    }
+
+    @Test
+    fun `showNameRequiredError is true when an edited name is blank`() {
+        val state = SiteEditorUiState(name = "   ", isNameEdited = true)
+
+        assertTrue(state.showNameRequiredError)
+    }
+
+    @Test
+    fun `showNameRequiredError is false when an edited name is not blank`() {
+        val state = SiteEditorUiState(name = "Client site", isNameEdited = true)
+
+        assertFalse(state.showNameRequiredError)
+    }
+
+    @Test
     fun `canSave is false while loading`() {
         val state = SiteEditorUiState(
             name = "Client site",

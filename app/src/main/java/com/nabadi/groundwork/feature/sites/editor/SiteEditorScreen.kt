@@ -116,6 +116,7 @@ fun SiteEditorScreen(
                     name = uiState.name,
                     onValueChange = onNameChange,
                     enabled = areFieldsEnabled,
+                    showRequiredError = uiState.showNameRequiredError,
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_form_section)))
 
@@ -272,6 +273,7 @@ private fun SiteNameField(
     name: String,
     onValueChange: (String) -> Unit,
     enabled: Boolean,
+    showRequiredError: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -286,6 +288,12 @@ private fun SiteNameField(
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = {
                     Text(text = stringResource(R.string.site_editor_name_hint))
+                },
+                isError = showRequiredError,
+                supportingText = if (showRequiredError) {
+                    { Text(text = stringResource(R.string.site_editor_name_required)) }
+                } else {
+                    null
                 },
                 textStyle = MaterialTheme.typography.bodyLarge,
                 maxLines = 2,

@@ -45,6 +45,7 @@ class SiteEditorViewModel @AssistedInject constructor(
         _uiState.update { currentState ->
             currentState.copy(
                 name = name,
+                isNameEdited = true,
                 error = null,
             )
         }
@@ -100,7 +101,7 @@ class SiteEditorViewModel @AssistedInject constructor(
                 siteRepository.saveSite(
                     Site(
                         id = existingSite?.id ?: SiteId(idGenerator.newId()),
-                        name = currentState.name,
+                        name = currentState.name.trim(),
                         description = currentState.description,
                         location = currentState.location,
                         priority = currentState.priority,
