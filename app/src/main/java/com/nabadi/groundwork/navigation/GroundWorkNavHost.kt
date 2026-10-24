@@ -75,6 +75,9 @@ fun GroundWorkNavHost(
                 onEditorFinished = {
                     navController.popBackStack()
                 },
+                onSiteDeleted = {
+                    navController.popBackToSitesList()
+                },
             )
         }
     }

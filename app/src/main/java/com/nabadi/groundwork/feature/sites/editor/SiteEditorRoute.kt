@@ -11,6 +11,7 @@ import com.nabadi.groundwork.navigation.GroundWorkRoute
 fun SiteEditorRoute(
     route: GroundWorkRoute.SiteEditor,
     onEditorFinished: () -> Unit,
+    onSiteDeleted: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SiteEditorViewModel = hiltViewModel<SiteEditorViewModel, SiteEditorViewModel.Factory>(
         creationCallback = { factory -> factory.create(route) },
@@ -28,7 +29,7 @@ fun SiteEditorRoute(
         onSaveClick = { viewModel.saveSite(onSaved = onEditorFinished) },
         onDestructiveActionClick = {
             if (uiState.isEditing) {
-                viewModel.deleteSite(onDeleted = onEditorFinished)
+                viewModel.deleteSite(onDeleted = onSiteDeleted)
             } else {
                 viewModel.discardSite(onDiscarded = onEditorFinished)
             }
