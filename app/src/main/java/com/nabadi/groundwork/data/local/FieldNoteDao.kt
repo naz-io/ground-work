@@ -23,6 +23,14 @@ interface FieldNoteDao {
     fun observeFieldNotesForSite(siteId: String): Flow<List<FieldNoteEntity>>
 
     @Query(
+        "SELECT * FROM field_notes WHERE siteId = :siteId " +
+            "AND sync_state != 'PENDING_DELETE' " +
+            "AND (sync_state != 'FAILED' OR sync_failedOperation IS NULL " +
+            "OR sync_failedOperation != 'DELETE')"
+    )
+    suspend fun getFieldNotesForSite(siteId: String): List<FieldNoteEntity>
+
+    @Query(
         "SELECT * FROM field_notes WHERE siteId IS NULL " +
             "AND sync_state != 'PENDING_DELETE' " +
             "AND (sync_state != 'FAILED' OR sync_failedOperation IS NULL " +
