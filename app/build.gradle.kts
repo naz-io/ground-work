@@ -50,6 +50,9 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    // Raises the transitive kotlinx-serialization version. Test classpaths are pinned to
+    // the app's versions, and room-testing's MigrationTestHelper needs a newer runtime.
+    implementation(platform(libs.kotlinx.serialization.bom))
 
     // Compose
     implementation(platform(libs.androidx.compose.bom))
