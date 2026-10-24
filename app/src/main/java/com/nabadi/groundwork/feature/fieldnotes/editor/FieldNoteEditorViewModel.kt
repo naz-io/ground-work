@@ -53,7 +53,7 @@ class FieldNoteEditorViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(
                 title = title,
-                errorMessage = null,
+                error = null,
             )
         }
     }
@@ -62,7 +62,7 @@ class FieldNoteEditorViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(
                 siteId = siteId,
-                errorMessage = null,
+                error = null,
             )
         }
     }
@@ -71,7 +71,7 @@ class FieldNoteEditorViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(
                 body = body,
-                errorMessage = null,
+                error = null,
             )
         }
     }
@@ -80,7 +80,7 @@ class FieldNoteEditorViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 status = status,
-                errorMessage = null,
+                error = null,
             )
         }
     }
@@ -113,7 +113,7 @@ class FieldNoteEditorViewModel @Inject constructor(
             }.onFailure {
                 updateSavingState(
                     isSaving = false,
-                    errorMessage = "Unable to save field note.",
+                    error = FieldNoteEditorError.SAVE_FAILED,
                 )
             }
         }
@@ -135,7 +135,7 @@ class FieldNoteEditorViewModel @Inject constructor(
             }.onFailure {
                 updateDeletingState(
                     isDeleting = false,
-                    errorMessage = "Unable to delete field note.",
+                    error = FieldNoteEditorError.DELETE_FAILED,
                 )
             }
         }
@@ -155,7 +155,7 @@ class FieldNoteEditorViewModel @Inject constructor(
                     _uiState.update { currentState ->
                         currentState.copy(
                             availableSites = emptyList(),
-                            siteOptionsErrorMessage = "Unable to load sites.",
+                            siteOptionsLoadFailed = true,
                         )
                     }
                 }
@@ -168,7 +168,7 @@ class FieldNoteEditorViewModel @Inject constructor(
                                     name = site.name,
                                 )
                             },
-                            siteOptionsErrorMessage = null,
+                            siteOptionsLoadFailed = false,
                         )
                     }
                 }
@@ -186,7 +186,7 @@ class FieldNoteEditorViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = "Field note not found.",
+                            error = FieldNoteEditorError.NOT_FOUND,
                             isEditing = false,
                         )
                     }
@@ -201,14 +201,14 @@ class FieldNoteEditorViewModel @Inject constructor(
                             updatedAt = fieldNote.updatedAt,
                             isEditing = true,
                             isLoading = false,
-                            errorMessage = null,
+                            error = null,
                         )
                     }
                 }
             }.onFailure {
                 updateLoadingState(
                     isLoading = false,
-                    errorMessage = "Unable to load field note.",
+                    error = FieldNoteEditorError.LOAD_FAILED,
                 )
             }
         }
@@ -216,36 +216,36 @@ class FieldNoteEditorViewModel @Inject constructor(
 
     private fun updateLoadingState(
         isLoading: Boolean,
-        errorMessage: String? = null,
+        error: FieldNoteEditorError? = null,
     ) {
         _uiState.update {
             it.copy(
                 isLoading = isLoading,
-                errorMessage = errorMessage,
+                error = error,
             )
         }
     }
 
     private fun updateSavingState(
         isSaving: Boolean,
-        errorMessage: String? = null,
+        error: FieldNoteEditorError? = null,
     ) {
         _uiState.update {
             it.copy(
                 isSaving = isSaving,
-                errorMessage = errorMessage,
+                error = error,
             )
         }
     }
 
     private fun updateDeletingState(
         isDeleting: Boolean,
-        errorMessage: String? = null,
+        error: FieldNoteEditorError? = null,
     ) {
         _uiState.update {
             it.copy(
                 isDeleting = isDeleting,
-                errorMessage = errorMessage,
+                error = error,
             )
         }
     }

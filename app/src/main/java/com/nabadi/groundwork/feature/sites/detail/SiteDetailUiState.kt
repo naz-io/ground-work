@@ -1,5 +1,7 @@
 package com.nabadi.groundwork.feature.sites.detail
 
+import androidx.annotation.StringRes
+import com.nabadi.groundwork.R
 import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.model.SitePriority
@@ -14,14 +16,14 @@ data class SiteDetailUiState(
     val description: String = "",
     val fieldNotes: List<FieldNote> = emptyList(),
     val isLoading: Boolean = false,
-    val errorMessage: String? = null,
-    val notesErrorMessage: String? = null,
+    val error: SiteDetailError? = null,
+    val notesLoadFailed: Boolean = false,
 ) {
     val isBusy: Boolean
         get() = isLoading
 
     val isError: Boolean
-        get() = errorMessage != null
+        get() = error != null
 
     val canEdit: Boolean
         get() = siteId != null && !isBusy && !isError
@@ -34,4 +36,9 @@ data class SiteDetailUiState(
 
     val noteCount: Int
         get() = fieldNotes.size
+}
+
+enum class SiteDetailError(@StringRes val messageRes: Int) {
+    NOT_FOUND(R.string.site_detail_error_not_found),
+    LOAD_FAILED(R.string.site_detail_error_load_failed),
 }

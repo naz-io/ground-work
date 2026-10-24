@@ -402,13 +402,13 @@ class FieldNotesListViewModelTest {
 
         errorViewModel.uiState.test {
             val state = awaitItem()
-            if (state.errorMessage == null) {
+            if (state.error == null) {
                 val nextState = awaitItem()
-                assertNotNull(nextState.errorMessage)
-                assertEquals("Unable to load field notes.", nextState.errorMessage)
+                assertNotNull(nextState.error)
+                assertEquals(FieldNotesListError.LOAD_FAILED, nextState.error)
             } else {
-                assertNotNull(state.errorMessage)
-                assertEquals("Unable to load field notes.", state.errorMessage)
+                assertNotNull(state.error)
+                assertEquals(FieldNotesListError.LOAD_FAILED, state.error)
             }
         }
     }

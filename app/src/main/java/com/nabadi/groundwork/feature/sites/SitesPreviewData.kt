@@ -4,6 +4,7 @@ import com.nabadi.groundwork.domain.model.Site
 import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
+import com.nabadi.groundwork.feature.sites.editor.SiteEditorError
 import com.nabadi.groundwork.feature.sites.editor.SiteEditorUiState
 internal const val previewNowMillis = 1_735_689_600_000L
 
@@ -151,7 +152,7 @@ internal val errorSiteEditorPreviewState = SiteEditorUiState(
     description = "Tunnel inspection route with lighting issues and confined-space safety notes.",
     isSaving = false,
     isEditing = false,
-    errorMessage = "Unable to save site.",
+    error = SiteEditorError.SAVE_FAILED,
 )
 
 internal val editingSiteEditorPreviewState = SiteEditorUiState(

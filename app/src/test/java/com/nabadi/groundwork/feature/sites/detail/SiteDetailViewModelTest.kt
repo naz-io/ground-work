@@ -11,6 +11,7 @@ import com.nabadi.groundwork.feature.fieldnotes.TestFieldNote
 import com.nabadi.groundwork.navigation.GroundWorkRoute
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Rule
@@ -47,7 +48,7 @@ class SiteDetailViewModelTest {
             assertEquals(existingSite.priority, loadedState.priority)
             assertEquals(existingSite.status, loadedState.status)
             assertFalse(loadedState.isLoading)
-            assertNull(loadedState.errorMessage)
+            assertNull(loadedState.error)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -101,7 +102,7 @@ class SiteDetailViewModelTest {
 
             val updatedState = skipItemsUntil { it.name == updatedSite.name }
             assertEquals(updatedSite.location, updatedState.location)
-            assertNull(updatedState.errorMessage)
+            assertNull(updatedState.error)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -122,8 +123,8 @@ class SiteDetailViewModelTest {
 
             siteRepository.setSites(emptyList())
 
-            val deletedState = skipItemsUntil { it.errorMessage != null }
-            assertEquals("Site not found.", deletedState.errorMessage)
+            val deletedState = skipItemsUntil { it.error != null }
+            assertEquals(SiteDetailError.NOT_FOUND, deletedState.error)
             assertNull(deletedState.siteId)
             cancelAndIgnoreRemainingEvents()
         }
@@ -143,11 +144,11 @@ class SiteDetailViewModelTest {
         )
 
         viewModel.uiState.test {
-            val state = skipItemsUntil { it.notesErrorMessage != null && !it.isLoading }
+            val state = skipItemsUntil { it.notesLoadFailed && !it.isLoading }
 
             assertEquals(existingSite.name, state.name)
-            assertNull(state.errorMessage)
-            assertEquals("Unable to load site notes.", state.notesErrorMessage)
+            assertNull(state.error)
+            assertTrue(state.notesLoadFailed)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -158,7 +159,7 @@ class SiteDetailViewModelTest {
 
         val state = viewModel.uiState.value
 
-        assertEquals("Site not found.", state.errorMessage)
+        assertEquals(SiteDetailError.NOT_FOUND, state.error)
         assertFalse(state.isLoading)
     }
 
@@ -168,10 +169,10 @@ class SiteDetailViewModelTest {
 
         viewModel.uiState.test {
             val errorState = skipItemsUntil { state ->
-                !state.isLoading && state.errorMessage != null
+                !state.isLoading && state.error != null
             }
 
-            assertEquals("Site not found.", errorState.errorMessage)
+            assertEquals(SiteDetailError.NOT_FOUND, errorState.error)
             assertFalse(errorState.isLoading)
             cancelAndIgnoreRemainingEvents()
         }
@@ -188,10 +189,10 @@ class SiteDetailViewModelTest {
 
         viewModel.uiState.test {
             val errorState = skipItemsUntil { state ->
-                !state.isLoading && state.errorMessage != null
+                !state.isLoading && state.error != null
             }
 
-            assertEquals("Unable to load site.", errorState.errorMessage)
+            assertEquals(SiteDetailError.LOAD_FAILED, errorState.error)
             assertFalse(errorState.isLoading)
             cancelAndIgnoreRemainingEvents()
         }

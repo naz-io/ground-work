@@ -94,7 +94,7 @@ fun SiteDetailScreen(
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = uiState.errorMessage.orEmpty(),
+                    text = uiState.error?.let { stringResource(it.messageRes) }.orEmpty(),
                     color = MaterialTheme.colorScheme.error,
                 )
             }
@@ -169,9 +169,9 @@ private fun SiteDetailContent(
         }
         item { SiteInformation(uiState = uiState) }
         item { SiteNotesHeader(noteCount = uiState.noteCount) }
-        if (uiState.notesErrorMessage != null) {
+        if (uiState.notesLoadFailed) {
             item {
-                SiteNotesError(message = uiState.notesErrorMessage)
+                SiteNotesError(message = stringResource(R.string.site_detail_error_notes_load_failed))
             }
         } else if (!uiState.hasNotes) {
             item {
@@ -614,7 +614,7 @@ private fun SiteDetailScreenPreview_Loading() {
 @Composable
 private fun SiteDetailScreenPreview_SiteError() {
     SiteDetailScreenPreview(
-        uiState = SiteDetailUiState(errorMessage = "Unable to load site."),
+        uiState = SiteDetailUiState(error = SiteDetailError.LOAD_FAILED),
     )
 }
 
@@ -633,7 +633,7 @@ private fun SiteDetailScreenPreview_SiteError() {
 private fun SiteDetailScreenPreview_FieldNotesError() {
     SiteDetailScreenPreview(
         uiState = previewSites.first().toDetailPreviewState(
-            notesErrorMessage = "Unable to load site notes.",
+            notesLoadFailed = true,
         ),
     )
 }
@@ -673,7 +673,7 @@ private fun SiteDetailScreenPreview(uiState: SiteDetailUiState) {
 
 private fun Site.toDetailPreviewState(
     fieldNotes: List<FieldNote> = emptyList(),
-    notesErrorMessage: String? = null,
+    notesLoadFailed: Boolean = false,
 ): SiteDetailUiState = SiteDetailUiState(
     siteId = id,
     name = name,
@@ -682,7 +682,7 @@ private fun Site.toDetailPreviewState(
     status = status,
     description = description,
     fieldNotes = fieldNotes,
-    notesErrorMessage = notesErrorMessage,
+    notesLoadFailed = notesLoadFailed,
 )
 
 private fun previewFieldNotesFor(

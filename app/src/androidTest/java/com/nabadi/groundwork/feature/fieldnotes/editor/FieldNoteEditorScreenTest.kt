@@ -78,7 +78,7 @@ class FieldNoteEditorScreenTest {
                 FieldNoteEditorScreen(
                     uiState = FieldNoteEditorUiState(
                         siteId = siteId,
-                        siteOptionsErrorMessage = "Unable to load sites.",
+                        siteOptionsLoadFailed = true,
                     ),
                     onTitleChange = {},
                     onAssociatedSiteChange = {},

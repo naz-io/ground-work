@@ -32,14 +32,14 @@ class SiteDetailUiStateTest {
 
     @Test
     fun `isError is true when error message exists`() {
-        val state = SiteDetailUiState(errorMessage = "Unable to load site.")
+        val state = SiteDetailUiState(error = SiteDetailError.LOAD_FAILED)
 
         assertTrue(state.isError)
     }
 
     @Test
     fun `field note error does not make the whole site state an error`() {
-        val state = SiteDetailUiState(notesErrorMessage = "Unable to load site notes.")
+        val state = SiteDetailUiState(notesLoadFailed = true)
 
         assertFalse(state.isError)
     }
@@ -72,7 +72,7 @@ class SiteDetailUiStateTest {
     fun `canEdit is false when site has a fatal error`() {
         val state = SiteDetailUiState(
             siteId = SiteId("site-001"),
-            errorMessage = "Unable to load site.",
+            error = SiteDetailError.LOAD_FAILED,
         )
 
         assertFalse(state.canEdit)
@@ -106,7 +106,7 @@ class SiteDetailUiStateTest {
     fun `canAddFieldNote is false when site has a fatal error`() {
         val state = SiteDetailUiState(
             siteId = SiteId("site-001"),
-            errorMessage = "Unable to load site.",
+            error = SiteDetailError.LOAD_FAILED,
         )
 
         assertFalse(state.canAddFieldNote)

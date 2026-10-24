@@ -59,7 +59,7 @@ class FieldNotesListViewModel @Inject constructor(
                 isLoading = false,
                 searchQuery = searchQuery.value,
                 selectedStatus = selectedStatus.value,
-                errorMessage = "Unable to load field notes.",
+                error = FieldNotesListError.LOAD_FAILED,
             )
         )
     }.stateIn(
