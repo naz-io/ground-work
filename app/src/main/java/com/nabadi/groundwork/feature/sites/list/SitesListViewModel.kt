@@ -63,7 +63,7 @@ class SitesListViewModel @Inject constructor(
                     searchQuery = searchQuery.value,
                     selectedStatus = selectedStatus.value,
                     selectedPriority = selectedPriority.value,
-                    errorMessage = "Unable to load sites.",
+                    error = SitesListError.LOAD_FAILED,
                 )
             )
         }.stateIn(

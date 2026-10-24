@@ -66,7 +66,7 @@ class FieldNotesListUiStateTest {
 
     @Test
     fun `isError is true when error message exists`() {
-        val state = FieldNotesListUiState(errorMessage = "Unable to load field notes.")
+        val state = FieldNotesListUiState(error = FieldNotesListError.LOAD_FAILED)
 
         assertTrue(state.isError)
     }
@@ -86,7 +86,7 @@ class FieldNotesListUiStateTest {
         val state = FieldNotesListUiState(
             isLoading = false,
             fieldNoteItems = emptyList(),
-            errorMessage = "Unable to load field notes.",
+            error = FieldNotesListError.LOAD_FAILED,
         )
 
         assertFalse(state.shouldShowEmptyState)

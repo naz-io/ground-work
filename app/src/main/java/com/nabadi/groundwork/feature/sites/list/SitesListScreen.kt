@@ -78,7 +78,7 @@ fun SitesListScreen(
         ) {
             when {
                 uiState.isLoading -> GroundWorkLoadingState()
-                uiState.isError -> ErrorState(errorMessage = uiState.errorMessage.orEmpty())
+                uiState.error != null -> ErrorState(error = uiState.error)
                 uiState.shouldShowEmptyState -> EmptySitesState()
                 uiState.shouldShowNoMatchesState -> SitesNoMatchesContent(
                     selectedStatus = uiState.selectedStatus,
@@ -135,11 +135,11 @@ private fun SitesTopBar(
 
 @Composable
 private fun ErrorState(
-    errorMessage: String,
+    error: SitesListError,
     modifier: Modifier = Modifier,
 ) {
     Text(
-        text = stringResource(R.string.sites_list_error, errorMessage),
+        text = stringResource(error.messageRes),
         modifier = modifier,
         color = MaterialTheme.colorScheme.error,
     )
@@ -545,7 +545,7 @@ private fun SitesListScreenPreview_Error() {
         SitesListScreen(
             uiState = SitesListUiState(
                 isLoading = false,
-                errorMessage = "Could not load sites.",
+                error = SitesListError.LOAD_FAILED,
             ),
             onSearchQueryChange = {},
             onStatusFilterChange = {},
@@ -569,7 +569,7 @@ private fun SitesListScreenPreview_Error_Dark() {
         SitesListScreen(
             uiState = SitesListUiState(
                 isLoading = false,
-                errorMessage = "Could not load sites.",
+                error = SitesListError.LOAD_FAILED,
             ),
             onSearchQueryChange = {},
             onStatusFilterChange = {},

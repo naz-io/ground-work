@@ -70,7 +70,7 @@ class SitesEditorViewModelTest {
             assertEquals(existingSite.status, loadedState.status)
             assertTrue(loadedState.isEditing)
             assertFalse(loadedState.isLoading)
-            assertNull(loadedState.errorMessage)
+            assertNull(loadedState.error)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -88,10 +88,10 @@ class SitesEditorViewModelTest {
 
         viewModel.uiState.test {
             val errorState = skipItemsUntil { state ->
-                !state.isLoading && state.errorMessage != null
+                !state.isLoading && state.error != null
             }
 
-            assertEquals("Site not found.", errorState.errorMessage)
+            assertEquals(SiteEditorError.NOT_FOUND, errorState.error)
             assertFalse(errorState.isEditing)
             assertFalse(errorState.isLoading)
             cancelAndIgnoreRemainingEvents()
@@ -114,10 +114,10 @@ class SitesEditorViewModelTest {
 
         viewModel.uiState.test {
             val errorState = skipItemsUntil { state ->
-                !state.isLoading && state.errorMessage != null
+                !state.isLoading && state.error != null
             }
 
-            assertEquals("Unable to load site.", errorState.errorMessage)
+            assertEquals(SiteEditorError.LOAD_FAILED, errorState.error)
             assertFalse(errorState.isLoading)
             cancelAndIgnoreRemainingEvents()
         }
@@ -380,7 +380,7 @@ class SitesEditorViewModelTest {
 
         val state = viewModel.uiState.value
         assertFalse(state.isSaving)
-        assertEquals("Unable to save site.", state.errorMessage)
+        assertEquals(SiteEditorError.SAVE_FAILED, state.error)
         assertFalse(onSavedCalled)
     }
 
@@ -408,7 +408,7 @@ class SitesEditorViewModelTest {
 
             val state = viewModel.uiState.value
             assertFalse(state.isDeleting)
-            assertEquals("Unable to delete site.", state.errorMessage)
+            assertEquals(SiteEditorError.DELETE_FAILED, state.error)
             assertFalse(onDeletedCalled)
             cancelAndIgnoreRemainingEvents()
         }
@@ -431,7 +431,7 @@ class SitesEditorViewModelTest {
         viewModel.onNameChange("Updated site")
 
         assertEquals("Updated site", viewModel.uiState.value.name)
-        assertNull(viewModel.uiState.value.errorMessage)
+        assertNull(viewModel.uiState.value.error)
     }
 
     private suspend fun ReceiveTurbine<SiteEditorUiState>.skipItemsUntilLoaded(): SiteEditorUiState =

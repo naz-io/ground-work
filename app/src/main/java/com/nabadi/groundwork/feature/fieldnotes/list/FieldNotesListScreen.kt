@@ -82,10 +82,8 @@ fun FieldNotesListScreen(
         ) {
             when {
                 uiState.isLoading -> GroundWorkLoadingState()
-                uiState.isError -> uiState.errorMessage?.let {
-                    ErrorState(
-                        errorMessage = it,
-                    )
+                uiState.isError -> uiState.error?.let { error ->
+                    ErrorState(error = error)
                 }
 
                 uiState.shouldShowEmptyState -> EmptyFieldNotesState()
@@ -304,11 +302,11 @@ private fun NoMatchingFieldNoteItemsState(
 
 @Composable
 private fun ErrorState(
-    errorMessage: String,
+    error: FieldNotesListError,
     modifier: Modifier = Modifier,
 ) {
     Text(
-        text = stringResource(R.string.field_notes_list_error, errorMessage),
+        text = stringResource(error.messageRes),
         modifier = modifier,
         color = MaterialTheme.colorScheme.error,
     )
@@ -498,7 +496,7 @@ private fun FieldNotesListScreenPreview_Error() {
     GroundWorkTheme {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(
-                errorMessage = "Could not connect to the server.",
+                error = FieldNotesListError.LOAD_FAILED,
                 isLoading = false,
             ),
             onSearchQueryChange = {},
@@ -520,7 +518,7 @@ private fun FieldNotesListScreenPreview_Error_Dark() {
     GroundWorkTheme {
         FieldNotesListScreen(
             uiState = FieldNotesListUiState(
-                errorMessage = "Could not connect to the server.",
+                error = FieldNotesListError.LOAD_FAILED,
                 isLoading = false,
             ),
             onSearchQueryChange = {},
@@ -540,7 +538,7 @@ private fun FieldNotesListScreenPreview_Error_Dark() {
 private fun ErrorStatePreview() {
     GroundWorkPreviewSurface {
         ErrorState(
-            errorMessage = "Could not connect to the server.",
+            error = FieldNotesListError.LOAD_FAILED,
         )
     }
 }
@@ -554,7 +552,7 @@ private fun ErrorStatePreview() {
 private fun ErrorStatePreview_Dark() {
     GroundWorkPreviewSurface {
         ErrorState(
-            errorMessage = "Could not connect to the server.",
+            error = FieldNotesListError.LOAD_FAILED,
         )
     }
 }

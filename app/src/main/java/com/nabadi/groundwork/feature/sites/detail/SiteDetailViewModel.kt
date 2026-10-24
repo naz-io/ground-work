@@ -37,7 +37,7 @@ class SiteDetailViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     isLoading = false,
-                    errorMessage = "Site not found.",
+                    error = SiteDetailError.NOT_FOUND,
                 )
             }
         }
@@ -51,7 +51,7 @@ class SiteDetailViewModel @Inject constructor(
                 .catch {
                     updateLoadingState(
                         isLoading = false,
-                        errorMessage = "Unable to load site.",
+                        error = SiteDetailError.LOAD_FAILED,
                     )
                 }
                 .collect { sites ->
@@ -61,7 +61,7 @@ class SiteDetailViewModel @Inject constructor(
                             it.copy(
                                 siteId = null,
                                 isLoading = false,
-                                errorMessage = "Site not found.",
+                                error = SiteDetailError.NOT_FOUND,
                             )
                         }
                     } else {
@@ -74,7 +74,7 @@ class SiteDetailViewModel @Inject constructor(
                                 priority = site.priority,
                                 status = site.status,
                                 isLoading = false,
-                                errorMessage = null,
+                                error = null,
                             )
                         }
                     }
@@ -87,14 +87,14 @@ class SiteDetailViewModel @Inject constructor(
             fieldNoteRepository.observeFieldNotesForSite(id)
                 .catch {
                     _uiState.update { state ->
-                        state.copy(notesErrorMessage = "Unable to load site notes.")
+                        state.copy(notesLoadFailed = true)
                     }
                 }
                 .collect { fieldNotes ->
                     _uiState.update { state ->
                         state.copy(
                             fieldNotes = fieldNotes,
-                            notesErrorMessage = null,
+                            notesLoadFailed = false,
                         )
                     }
                 }
@@ -103,12 +103,12 @@ class SiteDetailViewModel @Inject constructor(
 
     private fun updateLoadingState(
         isLoading: Boolean,
-        errorMessage: String? = null,
+        error: SiteDetailError? = null,
     ) {
         _uiState.update {
             it.copy(
                 isLoading = isLoading,
-                errorMessage = errorMessage,
+                error = error,
             )
         }
     }

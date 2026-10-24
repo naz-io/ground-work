@@ -147,14 +147,14 @@ fun SiteEditorScreen(
                     modifier = Modifier.weight(1f),
                 )
 
-                if (!uiState.errorMessage.isNullOrBlank()) {
+                uiState.error?.let { error ->
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = dimensionResource(R.dimen.spacing_list_item)),
                         contentAlignment = Alignment.Center,
                     ) {
-                        SiteEditorErrorMessage(errorMessage = uiState.errorMessage)
+                        SiteEditorErrorMessage(errorMessage = stringResource(error.messageRes))
                     }
                 }
             }

@@ -96,7 +96,7 @@ class FieldNoteEditorViewModelTest {
 
             assertEquals(sites.map { it.id }.toSet(), state.availableSites.map { it.id }.toSet())
             assertEquals(sites.map { it.name }.toSet(), state.availableSites.map { it.name }.toSet())
-            assertNull(state.siteOptionsErrorMessage)
+            assertFalse(state.siteOptionsLoadFailed)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -112,9 +112,9 @@ class FieldNoteEditorViewModelTest {
         )
 
         viewModel.uiState.test {
-            val state = skipItemsUntil { it.siteOptionsErrorMessage != null }
+            val state = skipItemsUntil { it.siteOptionsLoadFailed }
 
-            assertEquals("Unable to load sites.", state.siteOptionsErrorMessage)
+            assertTrue(state.siteOptionsLoadFailed)
             assertTrue(state.availableSites.isEmpty())
             assertNull(state.siteId)
             assertFalse(state.isBusy)
@@ -156,7 +156,7 @@ class FieldNoteEditorViewModelTest {
             assertEquals(existingFieldNote.updatedAt, loadedState.updatedAt)
             assertTrue(loadedState.isEditing)
             assertFalse(loadedState.isLoading)
-            assertNull(loadedState.errorMessage)
+            assertNull(loadedState.error)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -175,10 +175,10 @@ class FieldNoteEditorViewModelTest {
 
         viewModel.uiState.test {
             val errorState = skipItemsUntil { state ->
-                !state.isLoading && state.errorMessage != null
+                !state.isLoading && state.error != null
             }
 
-            assertEquals("Field note not found.", errorState.errorMessage)
+            assertEquals(FieldNoteEditorError.NOT_FOUND, errorState.error)
             assertFalse(errorState.isEditing)
             assertFalse(errorState.isLoading)
             cancelAndIgnoreRemainingEvents()
@@ -459,7 +459,7 @@ class FieldNoteEditorViewModelTest {
 
         val state = viewModel.uiState.value
         assertFalse(state.isSaving)
-        assertEquals("Unable to save field note.", state.errorMessage)
+        assertEquals(FieldNoteEditorError.SAVE_FAILED, state.error)
         assertFalse(onSavedCalled)
     }
 
@@ -481,7 +481,7 @@ class FieldNoteEditorViewModelTest {
         viewModel.onTitleChange("Updated title")
 
         assertEquals("Updated title", viewModel.uiState.value.title)
-        assertNull(viewModel.uiState.value.errorMessage)
+        assertNull(viewModel.uiState.value.error)
     }
 
     private suspend fun ReceiveTurbine<FieldNoteEditorUiState>.skipItemsUntilLoaded(): FieldNoteEditorUiState =

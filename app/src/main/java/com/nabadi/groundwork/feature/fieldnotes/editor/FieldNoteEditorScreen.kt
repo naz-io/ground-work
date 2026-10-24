@@ -124,9 +124,9 @@ fun FieldNoteEditorScreen(
                 availableSites = uiState.availableSites,
                 onAssociatedSiteChange = onAssociatedSiteChange,
             )
-            uiState.siteOptionsErrorMessage?.let { errorMessage ->
+            if (uiState.siteOptionsLoadFailed) {
                 Text(
-                    text = errorMessage,
+                    text = stringResource(R.string.field_note_editor_error_sites_load_failed),
                     modifier = Modifier.padding(top = dimensionResource(R.dimen.spacing_card_content)),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
@@ -148,8 +148,8 @@ fun FieldNoteEditorScreen(
             )
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_form_section)))
 
-            uiState.errorMessage?.let { errorMessage ->
-                FieldNoteEditorErrorMessage(errorMessage = errorMessage)
+            uiState.error?.let { error ->
+                FieldNoteEditorErrorMessage(error = error)
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_form_section)))
             }
         }
@@ -422,11 +422,11 @@ private fun FieldNoteBodyField(
 
 @Composable
 private fun FieldNoteEditorErrorMessage(
-    errorMessage: String,
+    error: FieldNoteEditorError,
     modifier: Modifier = Modifier,
 ) {
     Text(
-        text = errorMessage,
+        text = stringResource(error.messageRes),
         modifier = modifier.fillMaxWidth(),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.error,
@@ -805,7 +805,7 @@ private val errorPreviewState = FieldNoteEditorUiState(
     status = FieldNoteStatus.ACTIVE,
     updatedAt = 1698798840000L,
     isSaving = false,
-    errorMessage = "Unable to save this field note.",
+    error = FieldNoteEditorError.SAVE_FAILED,
 )
 
 private val siteOptionsErrorPreviewState = FieldNoteEditorUiState(
@@ -813,7 +813,7 @@ private val siteOptionsErrorPreviewState = FieldNoteEditorUiState(
     siteId = SiteId("site-north-gate"),
     body = "Loose temporary fencing reported near the north access point.",
     status = FieldNoteStatus.ACTIVE,
-    siteOptionsErrorMessage = "Unable to load sites.",
+    siteOptionsLoadFailed = true,
 )
 
 private val editingPreviewState = FieldNoteEditorUiState(

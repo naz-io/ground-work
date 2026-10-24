@@ -1,5 +1,7 @@
 package com.nabadi.groundwork.feature.fieldnotes.list
 
+import androidx.annotation.StringRes
+import com.nabadi.groundwork.R
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
 
 data class FieldNotesListUiState(
@@ -7,7 +9,7 @@ data class FieldNotesListUiState(
     val searchQuery: String = "",
     val selectedStatus: FieldNoteStatus? = null,
     val fieldNoteItems: List<FieldNoteListItemUiState> = emptyList(),
-    val errorMessage: String? = null,
+    val error: FieldNotesListError? = null,
 ) {
     val isSearching: Boolean
         get() = searchQuery.isNotBlank()
@@ -22,5 +24,9 @@ data class FieldNotesListUiState(
         get() = !isLoading && !isError && !hasActiveCriteria && fieldNoteItems.isEmpty()
 
     val isError: Boolean
-        get() = errorMessage != null
+        get() = error != null
+}
+
+enum class FieldNotesListError(@StringRes val messageRes: Int) {
+    LOAD_FAILED(R.string.field_notes_list_error_load_failed),
 }

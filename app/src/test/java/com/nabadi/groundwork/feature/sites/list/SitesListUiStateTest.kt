@@ -30,7 +30,7 @@ class SitesListUiStateTest {
 
     @Test
     fun `isError is true when error message exists`() {
-        val state = SitesListUiState(errorMessage = "Unable to load sites.")
+        val state = SitesListUiState(error = SitesListError.LOAD_FAILED)
 
         assertTrue(state.isError)
     }
@@ -111,7 +111,7 @@ class SitesListUiStateTest {
     fun `error state does not show empty state no matches state or content`() {
         val state = SitesListUiState(
             isLoading = false,
-            errorMessage = "Unable to load sites.",
+            error = SitesListError.LOAD_FAILED,
         )
 
         assertFalse(state.shouldShowEmptyState)

@@ -45,7 +45,7 @@ class SiteEditorViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(
                 name = name,
-                errorMessage = null,
+                error = null,
             )
         }
     }
@@ -54,7 +54,7 @@ class SiteEditorViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(
                 description = description,
-                errorMessage = null,
+                error = null,
             )
         }
     }
@@ -63,7 +63,7 @@ class SiteEditorViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(
                 location = location,
-                errorMessage = null,
+                error = null,
             )
         }
     }
@@ -72,7 +72,7 @@ class SiteEditorViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(
                 status = status,
-                errorMessage = null,
+                error = null,
             )
         }
     }
@@ -81,7 +81,7 @@ class SiteEditorViewModel @Inject constructor(
         _uiState.update { currentState ->
             currentState.copy(
                 priority = priority,
-                errorMessage = null,
+                error = null,
             )
         }
     }
@@ -116,7 +116,7 @@ class SiteEditorViewModel @Inject constructor(
             }.onFailure {
                 updateSavingState(
                     isSaving = false,
-                    errorMessage = "Unable to save site.",
+                    error = SiteEditorError.SAVE_FAILED,
                 )
             }
         }
@@ -138,7 +138,7 @@ class SiteEditorViewModel @Inject constructor(
             }.onFailure {
                 updateDeletingState(
                     isDeleting = false,
-                    errorMessage = "Unable to delete site.",
+                    error = SiteEditorError.DELETE_FAILED,
                 )
             }
         }
@@ -162,7 +162,7 @@ class SiteEditorViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = "Site not found.",
+                            error = SiteEditorError.NOT_FOUND,
                             isEditing = false,
                         )
                     }
@@ -177,14 +177,14 @@ class SiteEditorViewModel @Inject constructor(
                             status = site.status,
                             isEditing = true,
                             isLoading = false,
-                            errorMessage = null,
+                            error = null,
                         )
                     }
                 }
             }.onFailure {
                 updateLoadingState(
                     isLoading = false,
-                    errorMessage = "Unable to load site.",
+                    error = SiteEditorError.LOAD_FAILED,
                 )
             }
         }
@@ -192,36 +192,36 @@ class SiteEditorViewModel @Inject constructor(
 
     private fun updateLoadingState(
         isLoading: Boolean,
-        errorMessage: String? = null,
+        error: SiteEditorError? = null,
     ) {
         _uiState.update {
             it.copy(
                 isLoading = isLoading,
-                errorMessage = errorMessage,
+                error = error,
             )
         }
     }
 
     private fun updateSavingState(
         isSaving: Boolean,
-        errorMessage: String? = null,
+        error: SiteEditorError? = null,
     ) {
         _uiState.update {
             it.copy(
                 isSaving = isSaving,
-                errorMessage = errorMessage,
+                error = error,
             )
         }
     }
 
     private fun updateDeletingState(
         isDeleting: Boolean,
-        errorMessage: String? = null,
+        error: SiteEditorError? = null,
     ) {
         _uiState.update {
             it.copy(
                 isDeleting = isDeleting,
-                errorMessage = errorMessage,
+                error = error,
             )
         }
     }

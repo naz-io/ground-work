@@ -474,13 +474,13 @@ class SitesListViewModelTest {
 
         errorViewModel.uiState.test {
             val state = awaitItem()
-            if (state.errorMessage == null) {
+            if (state.error == null) {
                 val nextState = awaitItem()
-                assertNotNull(nextState.errorMessage)
-                assertEquals("Unable to load sites.", nextState.errorMessage)
+                assertNotNull(nextState.error)
+                assertEquals(SitesListError.LOAD_FAILED, nextState.error)
             } else {
-                assertNotNull(state.errorMessage)
-                assertEquals("Unable to load sites.", state.errorMessage)
+                assertNotNull(state.error)
+                assertEquals(SitesListError.LOAD_FAILED, state.error)
             }
         }
     }
@@ -494,13 +494,13 @@ class SitesListViewModelTest {
 
         errorViewModel.uiState.test {
             val state = awaitItem()
-            if (state.errorMessage == null) {
+            if (state.error == null) {
                 val nextState = awaitItem()
-                assertNotNull(nextState.errorMessage)
-                assertEquals("Unable to load sites.", nextState.errorMessage)
+                assertNotNull(nextState.error)
+                assertEquals(SitesListError.LOAD_FAILED, nextState.error)
             } else {
-                assertNotNull(state.errorMessage)
-                assertEquals("Unable to load sites.", state.errorMessage)
+                assertNotNull(state.error)
+                assertEquals(SitesListError.LOAD_FAILED, state.error)
             }
         }
     }
