@@ -91,7 +91,7 @@ private fun SiteCardHeader(
                 top = dimensionResource(R.dimen.padding_card_content),
                 end = dimensionResource(R.dimen.padding_card_content),
             ),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         TechnicalLabel(
@@ -99,6 +99,9 @@ private fun SiteCardHeader(
                 R.string.sites_list_site_id_label,
                 siteId.uppercase(),
             ),
+            modifier = Modifier.weight(1f),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
         SitePriorityBadge(priority = priority)
     }
@@ -179,6 +182,8 @@ private fun SitePriorityBadge(
                 text = stringResource(priority.labelResId),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                softWrap = false,
             )
         }
     }
