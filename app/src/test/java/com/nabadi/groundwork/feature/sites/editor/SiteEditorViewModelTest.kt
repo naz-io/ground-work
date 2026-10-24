@@ -4,8 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.nabadi.groundwork.MainDispatcherRule
+import com.nabadi.groundwork.domain.IdGenerator
 import com.nabadi.groundwork.feature.sites.TestSite
 import com.nabadi.groundwork.data.repository.FakeSiteRepository
+import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
 import com.nabadi.groundwork.navigation.GroundWorkRoute
@@ -17,11 +19,17 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneOffset
 
 class SitesEditorViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
+
+    private val clock = Clock.fixed(Instant.ofEpochMilli(NOW), ZoneOffset.UTC)
+    private val idGenerator = IdGenerator { GENERATED_ID }
 
     @Test
     fun `init loads existing site when site id is provided`() = runTest {
@@ -38,6 +46,8 @@ class SitesEditorViewModelTest {
         }
         val viewModel = SiteEditorViewModel(
             siteRepository = repository,
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(
                 initialState = mapOf(GroundWorkRoute.SITE_ID_ARG to existingSite.id.value),
             ),
@@ -69,6 +79,8 @@ class SitesEditorViewModelTest {
     fun `init shows error when existing site is not found`() = runTest {
         val viewModel = SiteEditorViewModel(
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(
                 initialState = mapOf(GroundWorkRoute.SITE_ID_ARG to "missing-id"),
             ),
@@ -93,6 +105,8 @@ class SitesEditorViewModelTest {
         }
         val viewModel = SiteEditorViewModel(
             siteRepository = repository,
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(
                 initialState = mapOf(GroundWorkRoute.SITE_ID_ARG to "site-001"),
             ),
@@ -113,6 +127,8 @@ class SitesEditorViewModelTest {
     fun `onNameChange updates name`() = runTest {
         val viewModel = SiteEditorViewModel(
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
 
@@ -125,6 +141,8 @@ class SitesEditorViewModelTest {
     fun `onLocationChange updates location`() = runTest {
         val viewModel = SiteEditorViewModel(
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
 
@@ -137,6 +155,8 @@ class SitesEditorViewModelTest {
     fun `onDescriptionChange updates description`() = runTest {
         val viewModel = SiteEditorViewModel(
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
 
@@ -152,6 +172,8 @@ class SitesEditorViewModelTest {
     fun `onPriorityChange updates priority`() = runTest {
         val viewModel = SiteEditorViewModel(
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
 
@@ -164,6 +186,8 @@ class SitesEditorViewModelTest {
     fun `onStatusChange updates status`() = runTest {
         val viewModel = SiteEditorViewModel(
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
 
@@ -177,6 +201,8 @@ class SitesEditorViewModelTest {
         val repository = FakeSiteRepository()
         val viewModel = SiteEditorViewModel(
             siteRepository = repository,
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
         var onSavedCalled = false
@@ -194,9 +220,9 @@ class SitesEditorViewModelTest {
         assertEquals("Main storage facility.", savedSite.description)
         assertEquals(SitePriority.HIGH, savedSite.priority)
         assertEquals(SiteStatus.ACTIVE, savedSite.status)
-        assertTrue(savedSite.id.value.isNotBlank())
-        assertTrue(savedSite.createdAt > 0L)
-        assertTrue(savedSite.updatedAt > 0L)
+        assertEquals(SiteId(GENERATED_ID), savedSite.id)
+        assertEquals(NOW, savedSite.createdAt)
+        assertEquals(NOW, savedSite.updatedAt)
         assertTrue(onSavedCalled)
         assertEquals(SiteEditorUiState(), viewModel.uiState.value)
     }
@@ -206,6 +232,8 @@ class SitesEditorViewModelTest {
         val repository = FakeSiteRepository()
         val viewModel = SiteEditorViewModel(
             siteRepository = repository,
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
         var onSavedCalled = false
@@ -235,6 +263,8 @@ class SitesEditorViewModelTest {
         }
         val viewModel = SiteEditorViewModel(
             siteRepository = repository,
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(
                 initialState = mapOf(GroundWorkRoute.SITE_ID_ARG to existingSite.id.value),
             ),
@@ -259,7 +289,7 @@ class SitesEditorViewModelTest {
             assertEquals(SitePriority.HIGH, savedSite.priority)
             assertEquals(SiteStatus.ARCHIVED, savedSite.status)
             assertEquals(existingSite.createdAt, savedSite.createdAt)
-            assertTrue(savedSite.updatedAt >= existingSite.updatedAt)
+            assertEquals(NOW, savedSite.updatedAt)
             assertTrue(onSavedCalled)
             cancelAndIgnoreRemainingEvents()
         }
@@ -273,6 +303,8 @@ class SitesEditorViewModelTest {
         }
         val viewModel = SiteEditorViewModel(
             siteRepository = repository,
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(
                 initialState = mapOf(GroundWorkRoute.SITE_ID_ARG to existingSite.id.value),
             ),
@@ -296,6 +328,8 @@ class SitesEditorViewModelTest {
         val repository = FakeSiteRepository()
         val viewModel = SiteEditorViewModel(
             siteRepository = repository,
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
         var onDeletedCalled = false
@@ -312,6 +346,8 @@ class SitesEditorViewModelTest {
         val repository = FakeSiteRepository()
         val viewModel = SiteEditorViewModel(
             siteRepository = repository,
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
         var onDiscardedCalled = false
@@ -333,6 +369,8 @@ class SitesEditorViewModelTest {
         }
         val viewModel = SiteEditorViewModel(
             siteRepository = repository,
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
         var onSavedCalled = false
@@ -354,6 +392,8 @@ class SitesEditorViewModelTest {
         }
         val viewModel = SiteEditorViewModel(
             siteRepository = repository,
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(
                 initialState = mapOf(GroundWorkRoute.SITE_ID_ARG to existingSite.id.value),
             ),
@@ -381,6 +421,8 @@ class SitesEditorViewModelTest {
         }
         val viewModel = SiteEditorViewModel(
             siteRepository = repository,
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
 
@@ -405,3 +447,6 @@ class SitesEditorViewModelTest {
         return item
     }
 }
+
+private const val NOW = 1_750_000_000_000L
+private const val GENERATED_ID = "generated-id"

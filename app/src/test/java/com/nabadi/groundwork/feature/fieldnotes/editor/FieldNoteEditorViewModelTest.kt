@@ -4,9 +4,11 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.nabadi.groundwork.MainDispatcherRule
+import com.nabadi.groundwork.domain.IdGenerator
 import com.nabadi.groundwork.feature.fieldnotes.TestFieldNote.fieldNote
 import com.nabadi.groundwork.data.repository.FakeFieldNoteRepository
 import com.nabadi.groundwork.data.repository.FakeSiteRepository
+import com.nabadi.groundwork.domain.model.FieldNoteId
 import com.nabadi.groundwork.domain.model.FieldNoteStatus
 import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.feature.sites.TestSite
@@ -19,11 +21,17 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneOffset
 
 class FieldNoteEditorViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
+
+    private val clock = Clock.fixed(Instant.ofEpochMilli(NOW), ZoneOffset.UTC)
+    private val idGenerator = IdGenerator { GENERATED_ID }
 
     @Test
     fun `init preselects site when site id is provided for a new field note`() = runTest {
@@ -31,6 +39,8 @@ class FieldNoteEditorViewModelTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = FakeFieldNoteRepository(),
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(
                 initialState = mapOf(GroundWorkRoute.SITE_ID_ARG to siteId.value),
             ),
@@ -51,6 +61,8 @@ class FieldNoteEditorViewModelTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = repository,
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(
                 initialState = mapOf(GroundWorkRoute.SITE_ID_ARG to siteId.value),
             ),
@@ -74,6 +86,8 @@ class FieldNoteEditorViewModelTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = FakeFieldNoteRepository(),
             siteRepository = FakeSiteRepository().apply { setSites(sites) },
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
 
@@ -92,6 +106,8 @@ class FieldNoteEditorViewModelTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = FakeFieldNoteRepository(),
             siteRepository = FakeSiteRepository().apply { setShouldThrowError(true) },
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
 
@@ -121,6 +137,8 @@ class FieldNoteEditorViewModelTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = fieldNoteRepository,
             siteRepository = siteRepository,
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(
                 initialState = mapOf(GroundWorkRoute.FIELD_NOTE_ID_ARG to existingFieldNote.id.value),
             ),
@@ -148,6 +166,8 @@ class FieldNoteEditorViewModelTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = FakeFieldNoteRepository(),
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(
                 initialState = mapOf(GroundWorkRoute.FIELD_NOTE_ID_ARG to "missing-id"),
             ),
@@ -170,6 +190,8 @@ class FieldNoteEditorViewModelTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = FakeFieldNoteRepository(),
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
 
@@ -183,6 +205,8 @@ class FieldNoteEditorViewModelTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = FakeFieldNoteRepository(),
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
 
@@ -199,6 +223,8 @@ class FieldNoteEditorViewModelTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = FakeFieldNoteRepository(),
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
         val siteId = SiteId("site-001")
@@ -216,6 +242,8 @@ class FieldNoteEditorViewModelTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = repository,
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
         var onSavedCalled = false
@@ -230,9 +258,9 @@ class FieldNoteEditorViewModelTest {
         assertEquals("Loose fencing near the north access point.", savedFieldNote.body)
         assertEquals(FieldNoteStatus.ACTIVE, savedFieldNote.status)
         assertNull(savedFieldNote.siteId)
-        assertTrue(savedFieldNote.id.value.isNotBlank())
-        assertTrue(savedFieldNote.createdAt > 0L)
-        assertTrue(savedFieldNote.updatedAt > 0L)
+        assertEquals(FieldNoteId(GENERATED_ID), savedFieldNote.id)
+        assertEquals(NOW, savedFieldNote.createdAt)
+        assertEquals(NOW, savedFieldNote.updatedAt)
         assertTrue(onSavedCalled)
         assertEquals(FieldNoteEditorUiState(), viewModel.uiState.value)
     }
@@ -243,6 +271,8 @@ class FieldNoteEditorViewModelTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = repository,
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
 
@@ -270,6 +300,8 @@ class FieldNoteEditorViewModelTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = repository,
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(
                 mapOf(GroundWorkRoute.FIELD_NOTE_ID_ARG to existingFieldNote.id.value),
             ),
@@ -289,7 +321,7 @@ class FieldNoteEditorViewModelTest {
             assertEquals("Updated body", savedFieldNote.body)
             assertEquals(FieldNoteStatus.DRAFT, savedFieldNote.status)
             assertEquals(existingFieldNote.createdAt, savedFieldNote.createdAt)
-            assertTrue(savedFieldNote.updatedAt >= existingFieldNote.updatedAt)
+            assertEquals(NOW, savedFieldNote.updatedAt)
             assertTrue(onSavedCalled)
             cancelAndIgnoreRemainingEvents()
         }
@@ -307,6 +339,8 @@ class FieldNoteEditorViewModelTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = repository,
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(
                 mapOf(GroundWorkRoute.FIELD_NOTE_ID_ARG to existingFieldNote.id.value),
             ),
@@ -338,6 +372,8 @@ class FieldNoteEditorViewModelTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = repository,
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(
                 mapOf(GroundWorkRoute.FIELD_NOTE_ID_ARG to existingFieldNote.id.value),
             ),
@@ -363,6 +399,8 @@ class FieldNoteEditorViewModelTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = repository,
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(
                 initialState = mapOf(GroundWorkRoute.FIELD_NOTE_ID_ARG to existingFieldNote.id.value),
             ),
@@ -387,6 +425,8 @@ class FieldNoteEditorViewModelTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = repository,
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
         var onDiscardedCalled = false
@@ -408,6 +448,8 @@ class FieldNoteEditorViewModelTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = repository,
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
         var onSavedCalled = false
@@ -429,6 +471,8 @@ class FieldNoteEditorViewModelTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = repository,
             siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = idGenerator,
             savedStateHandle = SavedStateHandle(),
         )
 
@@ -453,3 +497,6 @@ class FieldNoteEditorViewModelTest {
         return item
     }
 }
+
+private const val NOW = 1_750_000_000_000L
+private const val GENERATED_ID = "generated-id"

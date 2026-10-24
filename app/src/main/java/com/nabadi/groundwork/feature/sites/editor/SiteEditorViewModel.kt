@@ -3,6 +3,7 @@ package com.nabadi.groundwork.feature.sites.editor
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nabadi.groundwork.domain.IdGenerator
 import com.nabadi.groundwork.domain.model.Site
 import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.model.SitePriority
@@ -15,12 +16,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.UUID
+import java.time.Clock
 import javax.inject.Inject
 
 @HiltViewModel
 class SiteEditorViewModel @Inject constructor(
     private val siteRepository: SiteRepository,
+    private val clock: Clock,
+    private val idGenerator: IdGenerator,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -92,11 +95,11 @@ class SiteEditorViewModel @Inject constructor(
 
             runCatching {
                 val existingSite = existingSite
-                val now = System.currentTimeMillis()
+                val now = clock.millis()
 
                 siteRepository.saveSite(
                     Site(
-                        id = existingSite?.id ?: SiteId(UUID.randomUUID().toString()),
+                        id = existingSite?.id ?: SiteId(idGenerator.newId()),
                         name = currentState.name,
                         description = currentState.description,
                         location = currentState.location,
