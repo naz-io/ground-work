@@ -2,7 +2,7 @@
 
 GroundWork is an offline-first Android app for field operations teams working in low-connectivity environments.
 
-The long-term product direction includes site management, field notes, reports, local sync visibility, and conflict-aware offline workflows. The current implementation provides a local-first foundation in which field notes can optionally belong to sites while remaining available for fast unassigned capture.
+The long-term product direction includes site management, field notes, reports, local sync visibility, and conflict-aware offline workflows. The current implementation provides a local-first foundation in which field notes can optionally belong to sites while remaining available for fast unassigned capture, and every local change is already tracked with sync metadata so a sync layer can be added behind the repositories.
 
 ## Project Goal
 
@@ -10,7 +10,18 @@ The goal of this project is not to build another generic notes app. The goal is 
 
 The current version focuses on getting the local foundation right: creating, editing, deleting, listing, searching, and filtering field notes and sites using a clean Compose UI, a Room-backed data layer, ViewModel-managed state, and repository contracts between the domain and data layers.
 
-Future versions will extend this foundation with sync simulation, retry handling, conflict resolution, attachments, and performance work. These are intentionally delayed until the local relationship model and state flow are stable.
+The sync groundwork is in place: records carry pending/failed/synced state, deletes are soft until they sync, and repository writes are transactional. The next step is the sync simulation itself (fake remote source, sync worker, retry), followed by conflict resolution, attachments, and performance work.
+
+## Tech Stack
+
+- Kotlin 2.4, Jetpack Compose with Material 3
+- Room 2.8 with exported schemas and tested migrations
+- Hilt for dependency injection, including assisted injection for route-scoped ViewModels
+- Navigation Compose 2.10 with type-safe `@Serializable` routes
+- Coroutines and Flow for observable local data
+- JUnit 4, Turbine, kotlinx-coroutines-test, Room testing, and Compose UI tests
+- AGP 9.4, Gradle 9.8, minSdk 30, targetSdk 37, R8 shrinking for release builds
+- GitHub Actions for unit tests, debug builds, and emulator-based instrumented tests
 
 ## Seniority Signals
 
@@ -21,13 +32,18 @@ This project is designed to showcase:
 - Explicit UI state modeling with ViewModels and Compose
 - Repository-driven data access instead of direct database access from UI
 - Route/screen separation for previewable, stateless Compose UI
-- Scope control: field-note/site association was added only after both local foundations were stable, while sync, conflict resolution, and attachments remain intentionally delayed
+- Type-safe navigation, with typed routes passed into ViewModels through Hilt assisted injection
+- Sync state modeled as domain behavior (`SyncMetadata`) rather than scattered flags
+- Data-integrity rules enforced at the repository layer: transactional read-then-write, soft deletes, and protection against reviving deleted records
+- Typed UI errors resolved to string resources in the UI, keeping ViewModels free of display text
+- Injected `Clock` and `IdGenerator` so time- and ID-dependent behavior is tested with exact values
+- Scope control: field-note/site association was added only after both local foundations were stable, and sync is being built in layers (metadata first, sync engine next)
 - A roadmap that grows complexity intentionally instead of adding features randomly
-- Local and instrumented tests for mappers, DAOs, repositories, ViewModels, UI state models, and key Compose interactions
+- Local and instrumented tests for the domain model, mappers, migrations, DAOs, repositories, ViewModels, UI state models, and key Compose interactions, all run in CI
 
 ## Current Progress
 
-Git tags are created only for stable checkpoints. The latest stable tag is `v0.8.0`, representing the field-note/site relationship, site-aware creation and editing flows, Site Detail, and assigned/unassigned test coverage.
+Git tags are created only for stable checkpoints. The latest stable tag is `v0.8.0`, representing the field-note/site relationship, site-aware creation and editing flows, Site Detail, and assigned/unassigned test coverage. `main` also contains the untagged v0.9.0 work described below.
 
 ### v0.1 — Project Setup
 - Created Android project
@@ -120,8 +136,39 @@ Git tags are created only for stable checkpoints. The latest stable tag is `v0.8
 - Added site labels and site-name search to the main Field Notes list
 - Added assigned/unassigned coverage across migration, DAO, repository, ViewModel, UI state, and Compose UI layers
 
-### v0.9.0 — Sync Simulation
-- Not implemented yet
+### v0.9.0 — Sync Simulation (in progress, untagged)
+
+Sync groundwork:
+- Added `SyncMetadata` to field notes and sites, with `SYNCED`, `PENDING_CREATE`, `PENDING_UPDATE`, `PENDING_DELETE`, and `FAILED` states
+- Modeled state transitions as domain behavior: editing an unsynced create stays a create, a failed create is retried as a create, and deleting a never-synced record removes it outright
+- Recorded structured sync failures with the failed operation, message, and failure time
+- Made deletes of synced records soft: rows are marked `PENDING_DELETE` and hidden from the UI until sync completes; failed deletes stay hidden and can be retried
+- Rejected updates to records that are pending or failed deletes so a save cannot revive a deleted record
+- Unassigned a deleted site's visible field notes and marked them pending update in the same transaction, since soft deletes do not trigger `ON DELETE SET NULL`
+- Ran every repository read-then-write path in a database transaction
+- Defined the "not deleted" visibility rule once as a shared SQL fragment used by all UI-facing queries
+- Decoded unknown persisted enum values to safe defaults in the data layer
+- Added Room migrations 2→3, 3→4, and 4→5 for sync columns, with migration tests
+
+Architecture and quality:
+- Moved navigation to type-safe `@Serializable` routes; Site Detail now always has a site ID
+- Passed typed routes into editor and detail ViewModels through Hilt assisted injection instead of `SavedStateHandle` lookups
+- Replaced hard-coded ViewModel error strings with per-screen error types resolved from string resources
+- Injected `java.time.Clock` and an `IdGenerator` into the editor ViewModels
+- Trimmed site names on save and showed a "Site name is required" hint once the name is edited and left blank
+- Simplified site status to Active/Archived and site priority to Low/Normal/High
+
+Build and CI:
+- Upgraded AGP, Gradle, Kotlin, KSP, Room, Compose, and Navigation
+- Enabled R8 code and resource shrinking for release builds
+- Moved the instrumented test job to Ubuntu with KVM so emulator tests run in CI again
+- Cancelled superseded CI runs for the same branch or pull request
+
+Remaining for v0.9.0:
+- Fake remote data source with controllable failures
+- Sync worker that processes pending changes and records success or failure
+- Guard against losing a local edit made while an upload is in flight
+- Manual retry and a sync status indicator in the UI
 
 ## MVP Scope
 
@@ -174,24 +221,49 @@ Compose screens separate ViewModel-connected routes from stateless screen conten
 
 ViewModels observe repository contracts rather than reading from Room directly. This preserves the architecture boundary between UI and persistence and keeps the future sync implementation behind the repository layer.
 
+### Sync metadata before a sync engine
+
+Every field note and site carries `SyncMetadata` (state, last sync time, and structured failure). Repositories set it on every write, so the local database already knows what needs to be created, updated, or deleted remotely before any sync code exists. The transition rules live on `SyncMetadata` itself and are unit tested, so a future sync worker only has to call `markSynced` or `markFailed`.
+
+### Soft deletes
+
+Deleting a record that has already synced marks it `PENDING_DELETE` instead of removing the row, so the delete can still be sent to a server. Records that were never synced are deleted outright. UI-facing DAO queries hide deleted rows through one shared `NOT_DELETED` SQL fragment, which mirrors `SyncMetadata.isDeleted`; `...ForSync` queries still see them. Because a soft-deleted site keeps its row, the site repository unassigns the site's notes explicitly rather than relying on the `ON DELETE SET NULL` foreign key.
+
+### Transactional repository writes
+
+Saves and deletes read the current sync state and then write. Each of these paths runs inside a Room transaction so a future sync worker cannot change the row between the read and the write. Transactions do not cover network calls, so the sync worker will still need its own check before marking a record synced.
+
+### Type-safe navigation and route-scoped ViewModels
+
+Destinations are `@Serializable` classes under `GroundWorkRoute`, so arguments are checked at compile time and required arguments, such as Site Detail's site ID, cannot be missing. Route composables read their typed route from the back stack and pass it to the ViewModel through a Hilt assisted factory. ViewModels therefore take a plain route object, which keeps them free of `SavedStateHandle` key lookups and lets local unit tests construct them directly.
+
+### Typed UI errors
+
+ViewModels expose per-screen error enums (for example `SiteEditorError.SAVE_FAILED`) instead of display strings. Each error carries its string resource, and screens resolve the text with `stringResource`. This keeps user-facing text in string resources, ready for translation, and lets tests assert on error values rather than English sentences.
+
+### Injected time and IDs
+
+Editor ViewModels receive a `java.time.Clock` and an `IdGenerator` from Hilt instead of calling `System.currentTimeMillis()` and `UUID.randomUUID()` directly. Tests use a fixed clock and a predictable ID, which matters for upcoming sync and conflict logic that depends on timestamps.
+
 ### ViewModel-level search and filtering
 
 Search and filtering currently run in list ViewModels over observed local data. This keeps the first implementation simple, testable, and easy to combine with UI state. DAO-backed search or Room FTS can be introduced later if larger datasets make in-memory filtering inappropriate.
 
 ### Testable local foundation before sync
 
-DAO, repository, ViewModel, and UI state tests are added before sync simulation.
+Domain, migration, DAO, repository, ViewModel, UI state, and Compose tests were in place before the sync simulation begins, so sync can be added against a well-covered local layer.
 
 ## What Works Now
 
-- Android project builds successfully
-- GitHub repository is connected
+- Debug and R8-minified release builds succeed with no compiler warnings or lint issues
+- GitHub Actions runs unit tests, a debug build, and instrumented tests on an emulator for every push and pull request
 - Project structure separates domain, data, dependency injection, navigation, and feature UI concerns
-- Room is configured with schema export enabled
+- Room is configured with schema export enabled, and every migration (1→2 through 4→5) is tested
 - Field notes can be persisted through the Room DAO and repository layer
 - Sites can be persisted through the Room DAO and repository layer
 - Repository implementations map between Room entities and domain models
-- Hilt provides database, DAO, and repository dependencies
+- Hilt provides database, DAO, repository, clock, and ID generator dependencies
+- Every create, update, and delete is recorded as a pending sync change, and deletes of synced records are soft until sync completes
 - `FieldNotesListViewModel` observes the field note repository and exposes list UI state
 - `SitesListViewModel` observes the site repository and exposes list UI state
 - `FieldNotesListScreen` renders loading, empty, error, content, and no-match states
@@ -201,9 +273,10 @@ DAO, repository, ViewModel, and UI state tests are added before sync simulation.
 - Field notes can be assigned, reassigned, or returned to an unassigned state
 - New field notes created from Site Detail start with that site selected
 - Site Detail shows notes belonging to the selected site
-- Deleting a site preserves its field notes as unassigned
+- Deleting a site preserves its field notes as unassigned and marks them for sync
 - Sites can be created, edited, deleted, listed, searched, and filtered locally
-- Sites support status and priority modeling
+- Sites require a name; names are trimmed on save, and a hint appears when the name is cleared
+- Sites support status (Active/Archived) and priority (Low/Normal/High)
 
 Site priority represents long-term operational importance. Urgency is intentionally not modeled on Site because urgency usually belongs to time-sensitive issues, tasks, or incidents associated with a site.
 
@@ -218,22 +291,13 @@ Site priority represents long-term operational importance. Urgency is intentiona
 - Existing field notes and sites can be updated without duplicating records
 - Existing field notes and sites can be deleted from editor screens
 - Unsaved drafts can be discarded without creating or deleting persisted data
+- Error messages come from string resources, selected by typed ViewModel errors
 - Preview data reflects the field-operations product direction
-- Mapper tests cover `FieldNoteEntity` ↔ `FieldNote` conversion
-- Mapper tests cover `SiteEntity` ↔ `Site` conversion
-- DAO tests cover local Room persistence, deletion, ordering behavior, site-specific field note queries, and unassigned field note queries
-- Repository tests cover field note and site persistence through in-memory Room databases
-- `FieldNotesListViewModel` tests cover search, filtering, combined criteria, repository updates, clearing criteria, and error state behavior
-- `FieldNoteEditorViewModel` tests cover create, edit, delete, discard, site selection, assigned/unassigned saves, reassignment, preselected-site creation, and error flows
-- `SitesListViewModel` tests cover search, status filtering, priority filtering, combined criteria, repository updates, clearing criteria, and error state behavior
-- `SiteEditorViewModel` tests cover create, edit, delete, discard, load, and error flows
-- UI state tests cover list/editor state behavior for field notes and sites
-- Compose UI tests cover Site Card behavior, Sites filters, and associated-site selection in the field-note editor
 
 ## What Is Intentionally Not Built Yet
 
-- Real sync
-- Sync status UI
+- Sync worker and fake remote data source (sync metadata is tracked, but nothing is sent yet)
+- Sync status UI and manual retry
 - Conflict resolution
 - Attachments and evidence capture
 - Maps/GPS
@@ -242,26 +306,33 @@ Site priority represents long-term operational importance. Urgency is intentiona
 
 ## Testing Strategy
 
-Testing currently covers the local field notes and sites foundations at the mapper, DAO, repository, ViewModel, and UI state layers. Repository and DAO tests use an in-memory Room database where Android framework behavior matters, while ViewModel and UI state tests run as local unit tests.
+Tests are split by what they need. Logic that runs on the JVM is covered by fast local unit tests; anything that depends on SQLite, Room, or Compose rendering runs as instrumented tests on an emulator. ViewModel tests use in-memory fake repositories, a fixed `Clock`, and a predictable `IdGenerator`, so saved IDs and timestamps are asserted exactly.
 
-Implemented tests:
-- Mapper tests for `FieldNoteEntity` ↔ `FieldNote`
-- Mapper tests for `SiteEntity` ↔ `Site`
-- DAO tests using an in-memory Room database for field notes and sites
-- Repository tests using an in-memory Room database for field notes and sites
-- `FieldNotesListViewModel` tests for initial data, search, status filtering, combined search/filter criteria, body search, repository updates, clearing criteria, and error state
-- `FieldNoteEditorViewModel` tests for create, edit, delete, discard, site selection, assigned/unassigned saves, reassignment, preselected-site creation, and error flows
-- `SitesListViewModel` tests for initial data, search, status filtering, priority filtering, combined criteria, repository updates, clearing criteria, and error state
-- `SiteEditorViewModel` tests for create, edit, delete, discard, load, and error flows
-- UI state tests for field notes and sites list/editor state models
-- Migration, DAO, and repository tests for assigned, unassigned, orphaned, and site-deletion relationship behavior
-- Compose UI tests for Site Card content/click behavior, independent Sites filters, and the field-note associated-site selector
+### Local unit tests (`app/src/test`)
 
-Planned next tests:
-- Sync queue, retry, and state-transition coverage when v0.9.0 begins
+- **Domain:** `SyncMetadataTest` covers every sync state transition, including keeping unsynced creates as creates, retrying failed creates, rejecting updates to deleted records, and recording failures with their operation
+- **Mappers:** `FieldNoteMapperTest`, `SiteMapperTest`, `SyncMetadataMapperTest`, and `PersistedEnumMapperTest` cover entity ↔ domain conversion, sync metadata round trips, nullable site links, and safe defaults for unknown persisted values
+- **List ViewModels:** `FieldNotesListViewModelTest` and `SitesListViewModelTest` cover repository updates, search by title, body, description, location, and site name, status and priority filters, combined and cleared criteria, per-site note counts, and load errors
+- **Editor ViewModels:** `FieldNoteEditorViewModelTest` and `SiteEditorViewModelTest` cover load, create, edit, delete, and discard flows, exact generated IDs and timestamps, site assignment and reassignment, site preselection from Site Detail, site name trimming and the required-name hint, and typed save, delete, and load errors
+- **Site Detail:** `SiteDetailViewModelTest` covers loading a site and its notes, live updates, the site being deleted while open, and site and note load errors
+- **UI state models:** list, editor, and detail UI state tests cover derived flags such as `canSave`, `isBusy`, empty and no-match states, active criteria, and the required-name hint
+
+### Instrumented tests (`app/src/androidTest`)
+
+- **Migrations:** `GroundWorkDatabaseMigrationTest` runs every migration from version 1 to 5 against real schemas, including converting orphaned site links to unassigned and adding sync columns to existing rows
+- **DAOs:** `FieldNoteDaoTest` and `SiteDaoTest` cover persistence, ordering, site-scoped and unassigned queries, upserts, deletes, and the foreign key that unassigns notes when a site row is removed
+- **Repositories:** `OfflineFirstFieldNoteRepositoryTest` and `OfflineFirstSiteRepositoryTest` use in-memory Room databases to cover pending create/update/delete tracking, soft deletes and their visibility, rejecting saves of deleted records, and unassigning a deleted site's notes while leaving already-deleted notes untouched
+- **Compose UI:** `FieldNoteEditorScreenTest` (associated-site selection and site-loading errors), `SiteEditorScreenTest` (required-name hint), `SiteCardTest` (card content and click), and `SitesSearchAndFiltersTest` (independent status and priority filters)
+
+### Continuous integration
+
+GitHub Actions runs on every push to `main` and every pull request. The first job runs `testDebugUnitTest` and `assembleDebug`; the second runs `connectedDebugAndroidTest` on an API 30 emulator on Ubuntu with KVM. A newer push to the same branch or pull request cancels the run in progress.
+
+### Planned next tests
+
+- Sync worker coverage: successful sync, failures and retry, and a local edit made while an upload is in flight
 - Conflict-case coverage when v1.0 begins
-
-GitHub Actions runs local unit tests and debug builds. Instrumented Android tests are maintained, but emulator reliability is handled separately from the core local unit-test gate.
+- End-to-end navigation flows and screenshot tests for the existing previews
 
 ## Performance Notes
 
@@ -277,10 +348,11 @@ Future performance work may include:
 ## Roadmap
 
 ### v0.9.0 — Offline sync simulation
-- Sync queue
-- Pending/failed/synced states
-- Manual retry
+- Pending/failed/synced states (done)
+- Soft deletes and transactional repository writes (done)
 - Fake remote source
+- Sync worker that processes pending changes
+- Manual retry and sync status indicator
 
 ### v1.0 — Conflict handling
 - Detect local/remote conflicts
@@ -303,7 +375,7 @@ Future performance work may include:
 
 ### Delaying sync
 
-Sync is a major part of the long-term app direction, but it is intentionally delayed. The first priority is to make the local source of truth, repository boundary, and UI state flow correct before introducing remote state, retries, or conflict handling.
+Sync is a major part of the long-term app direction, but it was intentionally delayed until the local source of truth, repository boundary, and UI state flow were correct. It is now being added in layers: sync metadata, soft deletes, and transactional writes first, so the sync worker, retries, and conflict handling can build on a local model that already knows what has changed.
 
 ### Sequencing field note/site association
 
