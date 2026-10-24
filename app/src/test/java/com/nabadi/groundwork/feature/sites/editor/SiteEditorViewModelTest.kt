@@ -22,7 +22,7 @@ import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
 
-class SitesEditorViewModelTest {
+class SiteEditorViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()

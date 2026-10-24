@@ -68,7 +68,7 @@ dependencies {
     // Hilt/ Navigation  / Hilt Compose
     implementation(libs.androidx.navigation.compose)
     implementation(libs.hilt.android)
-    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
     ksp(libs.hilt.compiler)
 
     // Room

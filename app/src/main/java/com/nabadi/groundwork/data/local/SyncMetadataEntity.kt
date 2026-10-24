@@ -1,9 +1,7 @@
 package com.nabadi.groundwork.data.local
 
-import com.nabadi.groundwork.domain.model.SyncState
-
 data class SyncMetadataEntity(
-    val state: String = SyncState.SYNCED.name,
+    val state: String = "SYNCED",
     val lastSyncedAt: Long? = null,
     val errorMessage: String? = null,
     val failedOperation: String? = null,
