@@ -5,12 +5,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nabadi.groundwork.navigation.GroundWorkRoute
 
 @Composable
 fun SiteEditorRoute(
+    route: GroundWorkRoute.SiteEditor,
     onEditorFinished: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: SiteEditorViewModel = hiltViewModel(),
+    viewModel: SiteEditorViewModel = hiltViewModel<SiteEditorViewModel, SiteEditorViewModel.Factory>(
+        creationCallback = { factory -> factory.create(route) },
+    ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

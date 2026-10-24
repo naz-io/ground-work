@@ -1,6 +1,5 @@
 package com.nabadi.groundwork.feature.sites.editor
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nabadi.groundwork.domain.IdGenerator
@@ -10,6 +9,9 @@ import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
 import com.nabadi.groundwork.domain.repository.SiteRepository
 import com.nabadi.groundwork.navigation.GroundWorkRoute
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,18 +19,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Clock
-import javax.inject.Inject
 
-@HiltViewModel
-class SiteEditorViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = SiteEditorViewModel.Factory::class)
+class SiteEditorViewModel @AssistedInject constructor(
+    @Assisted route: GroundWorkRoute.SiteEditor,
     private val siteRepository: SiteRepository,
     private val clock: Clock,
     private val idGenerator: IdGenerator,
-    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val siteId: SiteId? =
-        savedStateHandle.get<String>(GroundWorkRoute.SITE_ID_ARG)?.let(::SiteId)
+    private val siteId: SiteId? = route.siteId?.let(::SiteId)
     private var existingSite: Site? = null
 
     private val _uiState = MutableStateFlow(SiteEditorUiState())
@@ -224,5 +224,10 @@ class SiteEditorViewModel @Inject constructor(
                 error = error,
             )
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(route: GroundWorkRoute.SiteEditor): SiteEditorViewModel
     }
 }

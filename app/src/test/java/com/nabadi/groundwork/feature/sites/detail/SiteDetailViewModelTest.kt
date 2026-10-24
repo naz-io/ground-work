@@ -1,6 +1,5 @@
 package com.nabadi.groundwork.feature.sites.detail
 
-import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.nabadi.groundwork.MainDispatcherRule
@@ -154,16 +153,6 @@ class SiteDetailViewModelTest {
     }
 
     @Test
-    fun `init shows site not found when site id is absent`() = runTest {
-        val viewModel = createViewModel(siteId = null)
-
-        val state = viewModel.uiState.value
-
-        assertEquals(SiteDetailError.NOT_FOUND, state.error)
-        assertFalse(state.isLoading)
-    }
-
-    @Test
     fun `init shows site not found when repository has no matching site`() = runTest {
         val viewModel = createViewModel(siteId = "missing-site")
 
@@ -201,15 +190,11 @@ class SiteDetailViewModelTest {
     private fun createViewModel(
         siteRepository: FakeSiteRepository = FakeSiteRepository(),
         fieldNoteRepository: FakeFieldNoteRepository = FakeFieldNoteRepository(),
-        siteId: String?,
+        siteId: String,
     ): SiteDetailViewModel = SiteDetailViewModel(
         siteRepository = siteRepository,
         fieldNoteRepository = fieldNoteRepository,
-        savedStateHandle = SavedStateHandle(
-            initialState = siteId?.let {
-                mapOf(GroundWorkRoute.SITE_ID_ARG to it)
-            }.orEmpty(),
-        ),
+        route = GroundWorkRoute.SiteDetail(siteId = siteId),
     )
 
     private suspend fun ReceiveTurbine<SiteDetailUiState>.skipItemsUntil(

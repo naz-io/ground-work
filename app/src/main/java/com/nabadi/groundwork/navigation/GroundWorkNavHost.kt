@@ -3,10 +3,9 @@ package com.nabadi.groundwork.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import com.nabadi.groundwork.feature.fieldnotes.editor.FieldNoteEditorRoute
 import com.nabadi.groundwork.feature.fieldnotes.list.FieldNotesListRoute
 import com.nabadi.groundwork.feature.sites.editor.SiteEditorRoute
@@ -20,86 +19,59 @@ fun GroundWorkNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = GroundWorkRoute.SITES_LIST,
+        startDestination = GroundWorkRoute.SitesList,
         modifier = modifier,
     ) {
-        composable(route = GroundWorkRoute.FIELD_NOTES_LIST) {
+        composable<GroundWorkRoute.FieldNotesList> {
             FieldNotesListRoute(
                 onFieldNoteClick = { fieldNoteId ->
-                    navController.navigate(GroundWorkRoute.fieldNoteEditor(fieldNoteId))
+                    navController.navigate(GroundWorkRoute.FieldNoteEditor(fieldNoteId = fieldNoteId.value))
                 },
                 onAddFieldNoteClick = {
-                    navController.navigate(GroundWorkRoute.fieldNoteEditor())
+                    navController.navigate(GroundWorkRoute.FieldNoteEditor())
                 },
             )
         }
 
-        composable(
-            route = GroundWorkRoute.FIELD_NOTE_EDITOR_ROUTE,
-            arguments = listOf(
-                navArgument(GroundWorkRoute.FIELD_NOTE_ID_ARG) {
-                    type = NavType.StringType
-                    nullable = true
-                    defaultValue = null
-                },
-                navArgument(GroundWorkRoute.SITE_ID_ARG) {
-                    type = NavType.StringType
-                    nullable = true
-                    defaultValue = null
-                },
-            ),
-        ) {
+        composable<GroundWorkRoute.FieldNoteEditor> { backStackEntry ->
             FieldNoteEditorRoute(
+                route = backStackEntry.toRoute(),
                 onEditorFinished = {
                     navController.popBackStack()
                 },
             )
         }
 
-        composable(route = GroundWorkRoute.SITES_LIST) {
+        composable<GroundWorkRoute.SitesList> {
             SitesListRoute(
                 onOpenSiteClick = { siteId ->
-                    navController.navigate(GroundWorkRoute.siteDetail(siteId))
+                    navController.navigate(GroundWorkRoute.SiteDetail(siteId = siteId.value))
                 },
                 onAddSiteClick = {
-                    navController.navigate(GroundWorkRoute.siteEditor())
+                    navController.navigate(GroundWorkRoute.SiteEditor())
                 },
             )
         }
 
-        composable(
-            route = GroundWorkRoute.SITE_DETAIL_ROUTE,
-            arguments = listOf(
-                navArgument(GroundWorkRoute.SITE_ID_ARG) {
-                    type = NavType.StringType
-                },
-            ),
-        ) {
+        composable<GroundWorkRoute.SiteDetail> { backStackEntry ->
             SiteDetailRoute(
+                route = backStackEntry.toRoute(),
                 onBackClick = { navController.popBackStack() },
                 onEditSiteClick = { siteId ->
-                    navController.navigate(GroundWorkRoute.siteEditor(siteId))
+                    navController.navigate(GroundWorkRoute.SiteEditor(siteId = siteId.value))
                 },
                 onFieldNoteClick = { fieldNoteId ->
-                    navController.navigate(GroundWorkRoute.fieldNoteEditor(fieldNoteId))
+                    navController.navigate(GroundWorkRoute.FieldNoteEditor(fieldNoteId = fieldNoteId.value))
                 },
                 onAddFieldNoteClick = { siteId ->
-                    navController.navigate(GroundWorkRoute.fieldNoteEditor(siteId = siteId))
+                    navController.navigate(GroundWorkRoute.FieldNoteEditor(siteId = siteId.value))
                 },
             )
         }
 
-        composable(
-            route = GroundWorkRoute.SITE_EDITOR_ROUTE,
-            arguments = listOf(
-                navArgument(GroundWorkRoute.SITE_ID_ARG) {
-                    type = NavType.StringType
-                    nullable = true
-                    defaultValue = null
-                },
-            ),
-        ) {
+        composable<GroundWorkRoute.SiteEditor> { backStackEntry ->
             SiteEditorRoute(
+                route = backStackEntry.toRoute(),
                 onEditorFinished = {
                     navController.popBackStack()
                 },

@@ -5,12 +5,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nabadi.groundwork.navigation.GroundWorkRoute
 
 @Composable
 fun FieldNoteEditorRoute(
+    route: GroundWorkRoute.FieldNoteEditor,
     onEditorFinished: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: FieldNoteEditorViewModel = hiltViewModel(),
+    viewModel: FieldNoteEditorViewModel = hiltViewModel<FieldNoteEditorViewModel, FieldNoteEditorViewModel.Factory>(
+        creationCallback = { factory -> factory.create(route) },
+    ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

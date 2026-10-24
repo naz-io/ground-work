@@ -6,6 +6,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -18,25 +19,25 @@ fun GroundWorkApp(
 ) {
     val navController = rememberNavController()
     val currentBackStack by navController.currentBackStackEntryAsState()
-    val currentRoute = currentBackStack?.destination?.route
-
-    val shouldShowBottomBar = currentRoute in setOf(
-        GroundWorkRoute.SITES_LIST,
-        GroundWorkRoute.FIELD_NOTES_LIST,
-    )
+    val currentDestination = currentBackStack?.destination
+    val selectedTopLevelRoute = when {
+        currentDestination?.hasRoute<GroundWorkRoute.SitesList>() == true -> GroundWorkRoute.SitesList
+        currentDestination?.hasRoute<GroundWorkRoute.FieldNotesList>() == true -> GroundWorkRoute.FieldNotesList
+        else -> null
+    }
 
     Scaffold(
         modifier = modifier,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
-            if (shouldShowBottomBar) {
+            if (selectedTopLevelRoute != null) {
                 GroundWorkBottomBar(
-                    selectedRoute = currentRoute,
+                    selectedRoute = selectedTopLevelRoute,
                     onSitesClick = {
-                        navController.navigateToTopLevelDestination(GroundWorkRoute.SITES_LIST)
+                        navController.navigateToTopLevelDestination(GroundWorkRoute.SitesList)
                     },
                     onFieldNotesClick = {
-                        navController.navigateToTopLevelDestination(GroundWorkRoute.FIELD_NOTES_LIST)
+                        navController.navigateToTopLevelDestination(GroundWorkRoute.FieldNotesList)
                     },
                 )
             }
@@ -49,7 +50,7 @@ fun GroundWorkApp(
     }
 }
 
-private fun NavHostController.navigateToTopLevelDestination(route: String) {
+private fun NavHostController.navigateToTopLevelDestination(route: GroundWorkRoute) {
     navigate(route) {
         launchSingleTop = true
         restoreState = true

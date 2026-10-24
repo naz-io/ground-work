@@ -1,6 +1,5 @@
 package com.nabadi.groundwork.feature.fieldnotes.editor
 
-import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.nabadi.groundwork.MainDispatcherRule
@@ -41,9 +40,7 @@ class FieldNoteEditorViewModelTest {
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(
-                initialState = mapOf(GroundWorkRoute.SITE_ID_ARG to siteId.value),
-            ),
+            route = GroundWorkRoute.FieldNoteEditor(siteId = siteId.value),
         )
 
         val state = viewModel.uiState.value
@@ -57,18 +54,14 @@ class FieldNoteEditorViewModelTest {
     fun `site detail creation route preselects site and saves assigned field note`() = runTest {
         val siteId = SiteId("site-001")
         val repository = FakeFieldNoteRepository()
-        val route = GroundWorkRoute.fieldNoteEditor(siteId = siteId)
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = repository,
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(
-                initialState = mapOf(GroundWorkRoute.SITE_ID_ARG to siteId.value),
-            ),
+            route = GroundWorkRoute.FieldNoteEditor(siteId = siteId.value),
         )
 
-        assertEquals("field_note_editor?siteId=site-001", route)
         assertEquals(siteId, viewModel.uiState.value.siteId)
 
         viewModel.onTitleChange("North gate issue")
@@ -88,7 +81,7 @@ class FieldNoteEditorViewModelTest {
             siteRepository = FakeSiteRepository().apply { setSites(sites) },
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.FieldNoteEditor(),
         )
 
         viewModel.uiState.test {
@@ -108,7 +101,7 @@ class FieldNoteEditorViewModelTest {
             siteRepository = FakeSiteRepository().apply { setShouldThrowError(true) },
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.FieldNoteEditor(),
         )
 
         viewModel.uiState.test {
@@ -139,9 +132,7 @@ class FieldNoteEditorViewModelTest {
             siteRepository = siteRepository,
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(
-                initialState = mapOf(GroundWorkRoute.FIELD_NOTE_ID_ARG to existingFieldNote.id.value),
-            ),
+            route = GroundWorkRoute.FieldNoteEditor(fieldNoteId = existingFieldNote.id.value),
         )
 
         viewModel.uiState.test {
@@ -168,9 +159,7 @@ class FieldNoteEditorViewModelTest {
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(
-                initialState = mapOf(GroundWorkRoute.FIELD_NOTE_ID_ARG to "missing-id"),
-            ),
+            route = GroundWorkRoute.FieldNoteEditor(fieldNoteId = "missing-id"),
         )
 
         viewModel.uiState.test {
@@ -192,7 +181,7 @@ class FieldNoteEditorViewModelTest {
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.FieldNoteEditor(),
         )
 
         viewModel.onTitleChange("North gate issue")
@@ -207,7 +196,7 @@ class FieldNoteEditorViewModelTest {
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.FieldNoteEditor(),
         )
 
         viewModel.onBodyChange("Loose fencing near the north access point.")
@@ -225,7 +214,7 @@ class FieldNoteEditorViewModelTest {
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.FieldNoteEditor(),
         )
         val siteId = SiteId("site-001")
 
@@ -244,7 +233,7 @@ class FieldNoteEditorViewModelTest {
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.FieldNoteEditor(),
         )
         var onSavedCalled = false
 
@@ -273,7 +262,7 @@ class FieldNoteEditorViewModelTest {
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.FieldNoteEditor(),
         )
 
         viewModel.onBodyChange("Observation without title.")
@@ -302,9 +291,7 @@ class FieldNoteEditorViewModelTest {
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(
-                mapOf(GroundWorkRoute.FIELD_NOTE_ID_ARG to existingFieldNote.id.value),
-            ),
+            route = GroundWorkRoute.FieldNoteEditor(fieldNoteId = existingFieldNote.id.value),
         )
         var onSavedCalled = false
 
@@ -341,9 +328,7 @@ class FieldNoteEditorViewModelTest {
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(
-                mapOf(GroundWorkRoute.FIELD_NOTE_ID_ARG to existingFieldNote.id.value),
-            ),
+            route = GroundWorkRoute.FieldNoteEditor(fieldNoteId = existingFieldNote.id.value),
         )
 
         viewModel.uiState.test {
@@ -374,9 +359,7 @@ class FieldNoteEditorViewModelTest {
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(
-                mapOf(GroundWorkRoute.FIELD_NOTE_ID_ARG to existingFieldNote.id.value),
-            ),
+            route = GroundWorkRoute.FieldNoteEditor(fieldNoteId = existingFieldNote.id.value),
         )
 
         viewModel.uiState.test {
@@ -401,9 +384,7 @@ class FieldNoteEditorViewModelTest {
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(
-                initialState = mapOf(GroundWorkRoute.FIELD_NOTE_ID_ARG to existingFieldNote.id.value),
-            ),
+            route = GroundWorkRoute.FieldNoteEditor(fieldNoteId = existingFieldNote.id.value),
         )
         var onDeletedCalled = false
 
@@ -427,7 +408,7 @@ class FieldNoteEditorViewModelTest {
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.FieldNoteEditor(),
         )
         var onDiscardedCalled = false
 
@@ -450,7 +431,7 @@ class FieldNoteEditorViewModelTest {
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.FieldNoteEditor(),
         )
         var onSavedCalled = false
 
@@ -473,7 +454,7 @@ class FieldNoteEditorViewModelTest {
             siteRepository = FakeSiteRepository(),
             clock = clock,
             idGenerator = idGenerator,
-            savedStateHandle = SavedStateHandle(),
+            route = GroundWorkRoute.FieldNoteEditor(),
         )
 
         viewModel.onBodyChange("Body")

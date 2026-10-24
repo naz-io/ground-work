@@ -17,7 +17,7 @@ import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
 
 @Composable
 fun GroundWorkBottomBar(
-    selectedRoute: String?,
+    selectedRoute: GroundWorkRoute?,
     onSitesClick: () -> Unit,
     onFieldNotesClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -26,7 +26,7 @@ fun GroundWorkBottomBar(
         modifier = modifier,
     ) {
         NavigationBarItem(
-            selected = selectedRoute == GroundWorkRoute.SITES_LIST,
+            selected = selectedRoute == GroundWorkRoute.SitesList,
             onClick = onSitesClick,
             icon = {
                 Icon(
@@ -40,7 +40,7 @@ fun GroundWorkBottomBar(
         )
 
         NavigationBarItem(
-            selected = selectedRoute == GroundWorkRoute.FIELD_NOTES_LIST,
+            selected = selectedRoute == GroundWorkRoute.FieldNotesList,
             onClick = onFieldNotesClick,
             icon = {
                 Icon(
@@ -63,7 +63,7 @@ fun GroundWorkBottomBar(
 private fun GroundWorkBottomBarPreview_SitesSelected() {
     GroundWorkPreviewSurface {
         GroundWorkBottomBar(
-            selectedRoute = GroundWorkRoute.SITES_LIST,
+            selectedRoute = GroundWorkRoute.SitesList,
             onSitesClick = {},
             onFieldNotesClick = {},
         )
@@ -78,7 +78,7 @@ private fun GroundWorkBottomBarPreview_SitesSelected() {
 private fun GroundWorkBottomBarPreview_FieldNotesSelected() {
     GroundWorkPreviewSurface {
         GroundWorkBottomBar(
-            selectedRoute = GroundWorkRoute.FIELD_NOTES_LIST,
+            selectedRoute = GroundWorkRoute.FieldNotesList,
             onSitesClick = {},
             onFieldNotesClick = {},
         )
@@ -94,7 +94,7 @@ private fun GroundWorkBottomBarPreview_FieldNotesSelected() {
 private fun GroundWorkBottomBarPreview_DarkMode_SitesSelected() {
     GroundWorkPreviewSurface {
         GroundWorkBottomBar(
-            selectedRoute = GroundWorkRoute.SITES_LIST,
+            selectedRoute = GroundWorkRoute.SitesList,
             onSitesClick = {},
             onFieldNotesClick = {},
         )
@@ -110,7 +110,7 @@ private fun GroundWorkBottomBarPreview_DarkMode_SitesSelected() {
 private fun GroundWorkBottomBarPreview_DarkMode_FieldNotesSelected() {
     GroundWorkPreviewSurface {
         GroundWorkBottomBar(
-            selectedRoute = GroundWorkRoute.FIELD_NOTES_LIST,
+            selectedRoute = GroundWorkRoute.FieldNotesList,
             onSitesClick = {},
             onFieldNotesClick = {},
         )
