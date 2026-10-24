@@ -24,6 +24,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneOffset
 
 @RunWith(AndroidJUnit4::class)
 class OfflineFirstSiteRepositoryTest {
@@ -41,6 +44,7 @@ class OfflineFirstSiteRepositoryTest {
             database = database,
             siteDao = database.siteDao(),
             fieldNoteDao = database.fieldNoteDao(),
+            clock = Clock.fixed(Instant.ofEpochMilli(NOW), ZoneOffset.UTC),
         )
     }
 
@@ -241,6 +245,7 @@ class OfflineFirstSiteRepositoryTest {
 
         val expectedNote = syncedNote.copy(
             siteId = null,
+            updatedAt = NOW,
             syncMetadata = SyncMetadata(state = SyncState.PENDING_UPDATE, lastSyncedAt = 100L),
         )
         assertEquals(
@@ -270,7 +275,7 @@ class OfflineFirstSiteRepositoryTest {
         repository.deleteSite(syncedSite.id)
 
         assertEquals(
-            pendingCreateNote.copy(siteId = null),
+            pendingCreateNote.copy(siteId = null, updatedAt = NOW),
             database.fieldNoteDao().getFieldNoteForSync(pendingCreateNote.id.value)?.toDomain(),
         )
     }
@@ -314,6 +319,7 @@ class OfflineFirstSiteRepositoryTest {
         assertEquals(
             syncedNote.copy(
                 siteId = null,
+                updatedAt = NOW,
                 syncMetadata = SyncMetadata(state = SyncState.PENDING_UPDATE),
             ),
             database.fieldNoteDao().getFieldNoteForSync(syncedNote.id.value)?.toDomain(),
@@ -344,3 +350,5 @@ class OfflineFirstSiteRepositoryTest {
         assertEquals(emptyList<Site>(), sites)
     }
 }
+
+private const val NOW = 1_750_000_000_000L

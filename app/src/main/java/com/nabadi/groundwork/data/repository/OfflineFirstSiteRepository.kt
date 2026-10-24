@@ -11,12 +11,14 @@ import com.nabadi.groundwork.domain.model.SyncState
 import com.nabadi.groundwork.domain.repository.SiteRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.time.Clock
 import javax.inject.Inject
 
 class OfflineFirstSiteRepository @Inject constructor(
     private val database: GroundWorkDatabase,
     private val siteDao: SiteDao,
     private val fieldNoteDao: FieldNoteDao,
+    private val clock: Clock,
 ) : SiteRepository {
     override fun observeSites(): Flow<List<Site>> =
         siteDao.observeSites().toDomainFlow()
@@ -43,6 +45,7 @@ class OfflineFirstSiteRepository @Inject constructor(
 
             // A pending delete keeps the site row, so ON DELETE SET NULL never fires.
             // Unassign the notes explicitly so they stay visible and sync their new site.
+            // Unassigning is a real change to each note, so it also moves updatedAt.
             unassignFieldNotes(id)
 
             if (
@@ -61,12 +64,14 @@ class OfflineFirstSiteRepository @Inject constructor(
     }
 
     private suspend fun unassignFieldNotes(siteId: SiteId) {
+        val now = clock.millis()
         fieldNoteDao.getFieldNotesForSite(siteId.value)
             .map { it.toDomain() }
             .forEach { fieldNote ->
                 fieldNoteDao.upsertFieldNote(
                     fieldNote.copy(
                         siteId = null,
+                        updatedAt = now,
                         syncMetadata = fieldNote.syncMetadata.markPendingUpdate(),
                     ).toEntity()
                 )
