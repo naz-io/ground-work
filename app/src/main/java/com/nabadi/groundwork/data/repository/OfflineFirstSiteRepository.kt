@@ -25,11 +25,13 @@ class OfflineFirstSiteRepository @Inject constructor(
         siteDao.getSite(id.value)?.toDomain()
 
     override suspend fun saveSite(site: Site) {
-        val existingSite = siteDao.getSiteForSync(site.id.value)?.toDomain()
-        val syncMetadata = existingSite?.syncMetadata?.markPendingUpdate()
-            ?: site.syncMetadata.markPendingCreate()
+        database.withTransaction {
+            val existingSite = siteDao.getSiteForSync(site.id.value)?.toDomain()
+            val syncMetadata = existingSite?.syncMetadata?.markPendingUpdate()
+                ?: site.syncMetadata.markPendingCreate()
 
-        siteDao.upsertSite(site.copy(syncMetadata = syncMetadata).toEntity())
+            siteDao.upsertSite(site.copy(syncMetadata = syncMetadata).toEntity())
+        }
     }
 
     override suspend fun deleteSite(id: SiteId) {
