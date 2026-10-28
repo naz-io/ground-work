@@ -51,6 +51,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    // Serialization
     // Aligns kotlinx-serialization versions. Test classpaths are pinned to the app's
     // versions, and room-testing's MigrationTestHelper needs a newer runtime.
     implementation(platform(libs.kotlinx.serialization.bom))
