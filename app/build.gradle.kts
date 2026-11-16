@@ -46,6 +46,9 @@ ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }
 
+// Compose BOM is declared in both implementation and androidTestImplementation to align version
+// constraints for unversioned test artifacts (e.g. ui-test-junit4) on the test classpath.
+@Suppress("GradleDuplicateDependencies", "RedundantDependency")
 dependencies {
     // AndroidX core
     implementation(libs.androidx.core.ktx)
