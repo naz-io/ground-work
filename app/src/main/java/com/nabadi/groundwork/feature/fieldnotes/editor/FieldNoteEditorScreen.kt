@@ -53,6 +53,7 @@ import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
 import com.nabadi.groundwork.ui.components.GroundWorkPrimaryButton
 import com.nabadi.groundwork.ui.components.TechnicalLabel
 import com.nabadi.groundwork.ui.format.absoluteDateTimeLabel
+import com.nabadi.groundwork.ui.format.rememberAbsoluteDateTimeFormatter
 
 internal const val FIELD_NOTE_SITE_SELECTOR_TAG = "field_note_site_selector"
 internal const val FIELD_NOTE_UNASSIGNED_SITE_OPTION_TAG = "field_note_site_option_unassigned"
@@ -103,7 +104,9 @@ fun FieldNoteEditorScreen(
         ) {
             if (uiState.isEditing && uiState.updatedAt != null) {
                 FieldNoteMetadataRow(
-                    lastUpdated = uiState.updatedAt.absoluteDateTimeLabel(),
+                    lastUpdated = uiState.updatedAt.absoluteDateTimeLabel(
+                        rememberAbsoluteDateTimeFormatter(),
+                    ),
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_divider_vertical)))
                 HorizontalDivider(

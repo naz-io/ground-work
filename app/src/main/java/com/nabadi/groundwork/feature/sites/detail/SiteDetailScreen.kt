@@ -58,6 +58,7 @@ import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
 import com.nabadi.groundwork.ui.components.GroundWorkShapes
 import com.nabadi.groundwork.ui.components.PREVIEW_API_LEVEL
 import com.nabadi.groundwork.ui.components.TechnicalLabel
+import com.nabadi.groundwork.ui.format.rememberAbsoluteDateTimeFormatter
 
 @Composable
 fun SiteDetailScreen(
@@ -142,6 +143,8 @@ private fun SiteDetailContent(
     onAddFieldNoteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val dateTimeFormatter = rememberAbsoluteDateTimeFormatter()
+
     LazyColumn(
         modifier = modifier,
         contentPadding = PaddingValues(
@@ -184,6 +187,7 @@ private fun SiteDetailContent(
             items(uiState.fieldNotes, key = { it.id.value }) { note ->
                 FieldNoteItemCard(
                     fieldNoteItem = FieldNoteListItemUiState(note, uiState.name),
+                    dateTimeFormatter = dateTimeFormatter,
                     onClick = { onFieldNoteClick(note.id) },
                 )
             }

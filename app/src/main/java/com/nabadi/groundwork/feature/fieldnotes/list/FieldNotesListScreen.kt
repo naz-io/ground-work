@@ -47,6 +47,7 @@ import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
 import com.nabadi.groundwork.ui.components.GroundWorkShapes
 import com.nabadi.groundwork.ui.components.GroundWorkPrimaryButton
 import com.nabadi.groundwork.ui.components.PREVIEW_API_LEVEL
+import com.nabadi.groundwork.ui.format.rememberAbsoluteDateTimeFormatter
 import com.nabadi.groundwork.ui.theme.GroundWorkTheme
 
 @Composable
@@ -112,6 +113,8 @@ private fun FieldNoteItemsContent(
     onFieldNoteClick: (FieldNoteId) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val dateTimeFormatter = rememberAbsoluteDateTimeFormatter()
+
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_form_section)),
@@ -157,6 +160,7 @@ private fun FieldNoteItemsContent(
             ) { fieldNoteItems ->
                 FieldNoteItemCard(
                     fieldNoteItem = fieldNoteItems,
+                    dateTimeFormatter = dateTimeFormatter,
                     onClick = { onFieldNoteClick(fieldNoteItems.note.id) },
                 )
             }

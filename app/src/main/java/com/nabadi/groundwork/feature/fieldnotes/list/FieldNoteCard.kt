@@ -40,11 +40,14 @@ import com.nabadi.groundwork.ui.components.GroundWorkShapes
 import com.nabadi.groundwork.ui.components.PREVIEW_API_LEVEL
 import com.nabadi.groundwork.ui.components.TechnicalLabel
 import com.nabadi.groundwork.ui.format.absoluteDateTimeLabel
+import com.nabadi.groundwork.ui.format.rememberAbsoluteDateTimeFormatter
 import androidx.compose.ui.platform.LocalLocale
+import java.time.format.DateTimeFormatter
 
 @Composable
 internal fun FieldNoteItemCard(
     fieldNoteItem: FieldNoteListItemUiState,
+    dateTimeFormatter: DateTimeFormatter,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -127,7 +130,7 @@ internal fun FieldNoteItemCard(
                     TechnicalLabel(
                         text = stringResource(
                             R.string.field_note_card_updated_label,
-                            note.updatedAt.absoluteDateTimeLabel().uppercase(locale),
+                            note.updatedAt.absoluteDateTimeLabel(dateTimeFormatter).uppercase(locale),
                         ),
                     )
                     Row(
@@ -189,6 +192,7 @@ private fun FieldNoteItemCardPreview() {
     GroundWorkPreviewSurface {
         FieldNoteItemCard(
             fieldNoteItem = previewFieldNoteItems.first(),
+            dateTimeFormatter = rememberAbsoluteDateTimeFormatter(),
             onClick = {},
         )
     }
@@ -204,6 +208,7 @@ private fun FieldNoteItemCardPreview_Dark() {
     GroundWorkPreviewSurface {
         FieldNoteItemCard(
             fieldNoteItem = previewFieldNoteItems.first(),
+            dateTimeFormatter = rememberAbsoluteDateTimeFormatter(),
             onClick = {},
         )
     }

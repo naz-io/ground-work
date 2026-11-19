@@ -316,13 +316,14 @@ Tests are split by what they need. Logic that runs on the JVM is covered by fast
 - **Editor ViewModels:** `FieldNoteEditorViewModelTest` and `SiteEditorViewModelTest` cover load, create, edit, delete, and discard flows, exact generated IDs and timestamps, site assignment and reassignment, site preselection from Site Detail, site name trimming and the required-name hint, and typed save, delete, and load errors
 - **Site Detail:** `SiteDetailViewModelTest` covers loading a site and its notes, live updates, the site being deleted while open, and site and note load errors
 - **UI state models:** list, editor, and detail UI state tests cover derived flags such as `canSave`, `isBusy`, empty and no-match states, active criteria, and the required-name hint
+- **Formatting:** `AbsoluteDateTimeLabelTest` covers the shared date pattern, formatting in the formatter's zone and locale, and empty labels for unset timestamps
 
 ### Instrumented tests (`app/src/androidTest`)
 
 - **Migrations:** `GroundWorkDatabaseMigrationTest` runs every migration from version 1 to 5 against real schemas, including converting orphaned site links to unassigned and adding sync columns to existing rows
 - **DAOs:** `FieldNoteDaoTest` and `SiteDaoTest` cover persistence, ordering, site-scoped and unassigned queries, upserts, deletes, and the foreign key that unassigns notes when a site row is removed
 - **Repositories:** `OfflineFirstFieldNoteRepositoryTest` and `OfflineFirstSiteRepositoryTest` use in-memory Room databases to cover pending create/update/delete tracking, soft deletes and their visibility, rejecting saves of deleted records, and unassigning a deleted site's notes while leaving already-deleted notes untouched
-- **Compose UI:** `FieldNoteEditorScreenTest` (associated-site selection and site-loading errors), `SiteEditorScreenTest` (required-name hint), `SiteCardTest` (card content and click), and `SitesSearchAndFiltersTest` (independent status and priority filters)
+- **Compose UI:** `FieldNoteEditorScreenTest` (associated-site selection and site-loading errors), `SiteEditorScreenTest` (required-name hint), `SiteCardTest` (card content and click), `FieldNoteItemCardTest` (updated time rendered with the screen's shared formatter), `AbsoluteDateTimeFormatterTest` (formatter follows the composition locale and system zone and is reused across recompositions), and `SitesSearchAndFiltersTest` (independent status and priority filters)
 
 ### Continuous integration
 
