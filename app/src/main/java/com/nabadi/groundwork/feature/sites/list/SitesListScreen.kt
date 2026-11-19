@@ -34,6 +34,7 @@ import com.nabadi.groundwork.domain.model.Site
 import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
+import com.nabadi.groundwork.feature.sites.previewNowMillis
 import com.nabadi.groundwork.feature.sites.previewSites
 import com.nabadi.groundwork.ui.components.GroundWorkFloatingActionButton
 import com.nabadi.groundwork.ui.components.GroundWorkLoadingState
@@ -100,6 +101,7 @@ fun SitesListScreen(
                     onPriorityFilterChange = onPriorityFilterChange,
                     sites = uiState.sites,
                     noteCountFor = uiState::noteCountFor,
+                    nowMillis = uiState.nowMillis,
                     onOpenSiteClick = onOpenSiteClick,
                     modifier = Modifier.fillMaxSize(),
                 )
@@ -164,6 +166,7 @@ private fun SitesContent(
     onPriorityFilterChange: (SitePriority?) -> Unit,
     sites: List<Site>,
     noteCountFor: (SiteId) -> Int,
+    nowMillis: Long,
     onOpenSiteClick: (SiteId) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -184,6 +187,7 @@ private fun SitesContent(
             SiteCard(
                 site = site,
                 noteCount = noteCountFor(site.id),
+                nowMillis = nowMillis,
                 onOpenSiteClick = { onOpenSiteClick(site.id) },
             )
         }
@@ -302,6 +306,7 @@ private fun SitesListScreenPreview_Content() {
                 isLoading = false,
                 sites = previewSites,
                 noteCountsBySiteId = previewNoteCountsBySiteId,
+                nowMillis = previewNowMillis,
             ),
             onSearchQueryChange = {},
             onStatusFilterChange = {},
@@ -327,6 +332,7 @@ private fun SitesListScreenPreview_Content_Dark() {
                 isLoading = false,
                 sites = previewSites,
                 noteCountsBySiteId = previewNoteCountsBySiteId,
+                nowMillis = previewNowMillis,
             ),
             onSearchQueryChange = {},
             onStatusFilterChange = {},
@@ -356,6 +362,7 @@ private fun SitesListScreenPreview_FilteredContent() {
                     it.status == SiteStatus.ACTIVE && it.priority == SitePriority.HIGH
                 },
                 noteCountsBySiteId = previewNoteCountsBySiteId,
+                nowMillis = previewNowMillis,
             ),
             onSearchQueryChange = {},
             onStatusFilterChange = {},
@@ -386,6 +393,7 @@ private fun SitesListScreenPreview_FilteredContent_Dark() {
                     it.status == SiteStatus.ACTIVE && it.priority == SitePriority.HIGH
                 },
                 noteCountsBySiteId = previewNoteCountsBySiteId,
+                nowMillis = previewNowMillis,
             ),
             onSearchQueryChange = {},
             onStatusFilterChange = {},

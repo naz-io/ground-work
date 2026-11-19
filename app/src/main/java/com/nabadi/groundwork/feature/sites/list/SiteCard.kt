@@ -35,6 +35,7 @@ import com.nabadi.groundwork.domain.model.Site
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
 import com.nabadi.groundwork.feature.sites.labelResId
+import com.nabadi.groundwork.feature.sites.previewNowMillis
 import com.nabadi.groundwork.feature.sites.previewSites
 import com.nabadi.groundwork.ui.components.GroundWorkPreviewSurface
 import com.nabadi.groundwork.ui.components.GroundWorkShapes
@@ -46,6 +47,7 @@ import com.nabadi.groundwork.ui.format.relativeTimeLabel
 fun SiteCard(
     site: Site,
     noteCount: Int,
+    nowMillis: Long,
     onOpenSiteClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -72,6 +74,7 @@ fun SiteCard(
             SiteCardMetadata(
                 site = site,
                 noteCount = noteCount,
+                nowMillis = nowMillis,
             )
         }
     }
@@ -219,6 +222,7 @@ private fun SiteLocationLabel(
 private fun SiteCardMetadata(
     site: Site,
     noteCount: Int,
+    nowMillis: Long,
     modifier: Modifier = Modifier,
 ) {
     HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
@@ -245,7 +249,7 @@ private fun SiteCardMetadata(
             icon = Icons.Filled.Schedule,
             text = stringResource(
                 R.string.sites_list_site_updated_label,
-                site.updatedAt.relativeTimeLabel(),
+                site.updatedAt.relativeTimeLabel(nowMillis),
             ),
         )
     }
@@ -296,6 +300,7 @@ private fun SiteCardPreview() {
         SiteCard(
             site = previewSites.first(),
             noteCount = 12,
+            nowMillis = previewNowMillis,
             onOpenSiteClick = {},
         )
     }
@@ -313,6 +318,7 @@ private fun SiteCardPreview_Dark() {
         SiteCard(
             site = previewSites.first(),
             noteCount = 12,
+            nowMillis = previewNowMillis,
             onOpenSiteClick = {},
         )
     }

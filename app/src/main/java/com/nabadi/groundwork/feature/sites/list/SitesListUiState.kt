@@ -14,6 +14,8 @@ data class SitesListUiState(
     val selectedPriority: SitePriority? = null,
     val sites: List<Site> = emptyList(),
     val noteCountsBySiteId: Map<SiteId, Int> = emptyMap(),
+    /** The time relative labels are measured from; refreshed every minute. */
+    val nowMillis: Long = 0L,
     val error: SitesListError? = null,
 ) {
     val isError: Boolean

@@ -6,8 +6,13 @@ import androidx.compose.ui.res.stringResource
 import com.nabadi.groundwork.R
 import kotlin.math.max
 
+/**
+ * [nowMillis] must come from the screen's state (see [minuteTicks]) rather than
+ * the system clock, so labels refresh as time passes and stay deterministic in
+ * tests and previews.
+ */
 @Composable
-internal fun Long.relativeTimeLabel(nowMillis: Long = System.currentTimeMillis()): String {
+internal fun Long.relativeTimeLabel(nowMillis: Long): String {
     if (this <= 0L) {
         return stringResource(R.string.relative_time_unknown)
     }

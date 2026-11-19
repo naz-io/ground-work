@@ -10,14 +10,19 @@ import com.nabadi.groundwork.feature.fieldnotes.TestFieldNote
 import com.nabadi.groundwork.feature.sites.TestSite
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
+import com.nabadi.groundwork.schedulerClock
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneOffset
 
 class SitesListViewModelTest {
 
@@ -26,11 +31,46 @@ class SitesListViewModelTest {
 
     private val repository = FakeSiteRepository()
     private val fieldNoteRepository = FakeFieldNoteRepository()
+    private val fixedClock = Clock.fixed(Instant.ofEpochMilli(NOW_MILLIS), ZoneOffset.UTC)
     private lateinit var viewModel: SitesListViewModel
 
     @Before
     fun setup() {
-        viewModel = SitesListViewModel(repository, fieldNoteRepository)
+        viewModel = SitesListViewModel(repository, fieldNoteRepository, fixedClock)
+    }
+
+    @Test
+    fun `uiState carries the clock time for relative labels`() = runTest {
+        repository.setSites(listOf(TestSite.site(id = "1")))
+
+        viewModel.uiState.test {
+            val state = skipItemsUntilLoaded()
+
+            assertEquals(NOW_MILLIS, state.nowMillis)
+        }
+    }
+
+    @Test
+    fun `uiState refreshes the time at the next minute boundary without refiltering`() = runTest {
+        val start = Instant.parse("2025-01-01T10:00:30Z").toEpochMilli()
+        repository.setSites(listOf(TestSite.site(id = "1")))
+        val tickingViewModel = SitesListViewModel(
+            repository,
+            fieldNoteRepository,
+            schedulerClock(start),
+        )
+
+        tickingViewModel.uiState.test {
+            val loadedState = skipItemsUntilLoaded()
+            assertEquals(start, loadedState.nowMillis)
+
+            // No input changes; the test scheduler skips ahead to the next minute.
+            val tickedState = awaitItem()
+
+            assertEquals(start + 30_000L, tickedState.nowMillis)
+            assertSame(loadedState.sites, tickedState.sites)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -470,7 +510,7 @@ class SitesListViewModelTest {
     fun `uiState emits error message when repository fails`() = runTest {
         repository.setShouldThrowError(true)
 
-        val errorViewModel = SitesListViewModel(repository, fieldNoteRepository)
+        val errorViewModel = SitesListViewModel(repository, fieldNoteRepository, fixedClock)
 
         errorViewModel.uiState.test {
             val state = awaitItem()
@@ -490,7 +530,7 @@ class SitesListViewModelTest {
         val failingFieldNoteRepository = FakeFieldNoteRepository().apply {
             setShouldThrowError(true)
         }
-        val errorViewModel = SitesListViewModel(repository, failingFieldNoteRepository)
+        val errorViewModel = SitesListViewModel(repository, failingFieldNoteRepository, fixedClock)
 
         errorViewModel.uiState.test {
             val state = awaitItem()
@@ -503,6 +543,10 @@ class SitesListViewModelTest {
                 assertEquals(SitesListError.LOAD_FAILED, state.error)
             }
         }
+    }
+
+    private companion object {
+        const val NOW_MILLIS = 1_735_689_600_000L
     }
 
     private suspend fun ReceiveTurbine<SitesListUiState>.skipItemsUntilLoaded(): SitesListUiState {

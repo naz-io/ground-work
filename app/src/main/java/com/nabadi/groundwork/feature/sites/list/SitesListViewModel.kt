@@ -6,6 +6,7 @@ import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
 import com.nabadi.groundwork.domain.repository.FieldNoteRepository
 import com.nabadi.groundwork.domain.repository.SiteRepository
+import com.nabadi.groundwork.ui.format.minuteTicks
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -13,12 +14,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import java.time.Clock
 import javax.inject.Inject
 
 @HiltViewModel
 class SitesListViewModel @Inject constructor(
     siteRepository: SiteRepository,
     fieldNoteRepository: FieldNoteRepository,
+    clock: Clock,
 ) : ViewModel() {
     private val searchQuery = MutableStateFlow("")
     private val selectedStatus = MutableStateFlow<SiteStatus?>(null)
@@ -56,6 +59,9 @@ class SitesListViewModel @Inject constructor(
                     .groupingBy { it }
                     .eachCount(),
             )
+        }.combine(clock.minuteTicks()) { state, nowMillis ->
+            // Combined after filtering so a minute tick only refreshes the time.
+            state.copy(nowMillis = nowMillis)
         }.catch {
             emit(
                 SitesListUiState(

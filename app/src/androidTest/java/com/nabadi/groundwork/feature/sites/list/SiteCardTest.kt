@@ -1,5 +1,8 @@
 package com.nabadi.groundwork.feature.sites.list
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
@@ -39,6 +42,7 @@ class SiteCardTest {
                 SiteCard(
                     site = site,
                     noteCount = 12,
+                    nowMillis = NOW_MILLIS,
                     onOpenSiteClick = { openClickCount++ },
                 )
             }
@@ -60,5 +64,36 @@ class SiteCardTest {
         composeTestRule.runOnIdle {
             assertEquals(1, openClickCount)
         }
+    }
+
+    @Test
+    fun siteCard_measuresUpdatedTimeFromTheGivenNow_andRefreshesWhenItChanges() {
+        val site = TestSites.site(
+            id = "GW-4901",
+            updatedAt = NOW_MILLIS - 5 * MINUTE_MILLIS,
+        )
+        var nowMillis by mutableLongStateOf(NOW_MILLIS)
+
+        composeTestRule.setContent {
+            GroundWorkTheme {
+                SiteCard(
+                    site = site,
+                    noteCount = 0,
+                    nowMillis = nowMillis,
+                    onOpenSiteClick = {},
+                )
+            }
+        }
+
+        composeTestRule.onNodeWithText("UPDATED: 5 min ago").assertIsDisplayed()
+
+        composeTestRule.runOnIdle { nowMillis = NOW_MILLIS + 55 * MINUTE_MILLIS }
+
+        composeTestRule.onNodeWithText("UPDATED: 1 hour ago").assertIsDisplayed()
+    }
+
+    private companion object {
+        const val NOW_MILLIS = 1_735_689_600_000L
+        const val MINUTE_MILLIS = 60_000L
     }
 }
