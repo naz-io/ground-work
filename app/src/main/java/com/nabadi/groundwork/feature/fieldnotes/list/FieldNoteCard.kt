@@ -74,9 +74,7 @@ internal fun FieldNoteItemCard(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
     ) {
-        Column(
-            modifier = Modifier.background(MaterialTheme.colorScheme.surface),
-        ) {
+        Column {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -103,7 +101,6 @@ internal fun FieldNoteItemCard(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface)
                     .padding(dimensionResource(R.dimen.padding_card_content)),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_card_content)),
             ) {
