@@ -625,7 +625,10 @@ private fun SiteDetailScreenPreview_Loading() {
 @Composable
 private fun SiteDetailScreenPreview_SiteError() {
     SiteDetailScreenPreview(
-        uiState = SiteDetailUiState(error = SiteDetailError.LOAD_FAILED),
+        uiState = SiteDetailUiState(
+            isLoading = false,
+            error = SiteDetailError.LOAD_FAILED,
+        ),
     )
 }
 
@@ -694,6 +697,7 @@ private fun Site.toDetailPreviewState(
     description = description,
     fieldNoteItems = fieldNotes.map { FieldNoteListItemUiState(note = it, siteName = name) },
     notesLoadFailed = notesLoadFailed,
+    isLoading = false,
 )
 
 private fun previewFieldNotesFor(

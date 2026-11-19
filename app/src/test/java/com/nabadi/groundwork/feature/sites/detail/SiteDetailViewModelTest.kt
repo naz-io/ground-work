@@ -23,7 +23,26 @@ class SiteDetailViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     @Test
-    fun `init loads site details when site id is provided`() = runTest {
+    fun `site is not loaded until ui state is collected`() = runTest {
+        val viewModel = createViewModel(
+            siteRepository = FakeSiteRepository().apply {
+                setSites(listOf(TestSite.site(id = "site-001", name = "North Warehouse")))
+            },
+            siteId = "site-001",
+        )
+
+        assertEquals(SiteDetailUiState(), viewModel.uiState.value)
+
+        viewModel.uiState.test {
+            val loadedState = skipItemsUntil { !it.isLoading }
+
+            assertEquals("North Warehouse", loadedState.name)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `loads site details for the route site id`() = runTest {
         val existingSite = TestSite.site(
             id = "site-001",
             name = "North Warehouse",
@@ -54,7 +73,7 @@ class SiteDetailViewModelTest {
     }
 
     @Test
-    fun `init observes only field notes assigned to the site`() = runTest {
+    fun `observes only field notes assigned to the site`() = runTest {
         val matchingNote = TestFieldNote.fieldNote(id = "matching", siteId = "site-001")
         val otherNote = TestFieldNote.fieldNote(id = "other", siteId = "site-002")
         val fieldNoteRepository = FakeFieldNoteRepository().apply {
@@ -230,7 +249,7 @@ class SiteDetailViewModelTest {
     }
 
     @Test
-    fun `init shows site not found when repository has no matching site`() = runTest {
+    fun `shows site not found when repository has no matching site`() = runTest {
         val viewModel = createViewModel(siteId = "missing-site")
 
         viewModel.uiState.test {
@@ -245,7 +264,7 @@ class SiteDetailViewModelTest {
     }
 
     @Test
-    fun `init shows load error when site repository fails`() = runTest {
+    fun `shows load error when site repository fails`() = runTest {
         val viewModel = createViewModel(
             siteRepository = FakeSiteRepository().apply {
                 setShouldThrowError(true)

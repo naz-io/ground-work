@@ -11,17 +11,17 @@ import org.junit.Test
 class SiteDetailUiStateTest {
 
     @Test
-    fun `isBusy is false by default`() {
+    fun `isBusy is true by default while loading`() {
         val state = SiteDetailUiState()
 
-        assertFalse(state.isBusy)
+        assertTrue(state.isBusy)
     }
 
     @Test
-    fun `isBusy is true while loading`() {
-        val state = SiteDetailUiState(isLoading = true)
+    fun `isBusy is false once loading finishes`() {
+        val state = SiteDetailUiState(isLoading = false)
 
-        assertTrue(state.isBusy)
+        assertFalse(state.isBusy)
     }
 
     @Test
@@ -47,7 +47,10 @@ class SiteDetailUiStateTest {
 
     @Test
     fun `canEdit is true when site is loaded without a fatal error`() {
-        val state = SiteDetailUiState(siteId = SiteId("site-001"))
+        val state = SiteDetailUiState(
+            siteId = SiteId("site-001"),
+            isLoading = false,
+        )
 
         assertTrue(state.canEdit)
     }
@@ -81,7 +84,10 @@ class SiteDetailUiStateTest {
 
     @Test
     fun `canAddFieldNote is true when site is loaded without a fatal error`() {
-        val state = SiteDetailUiState(siteId = SiteId("site-001"))
+        val state = SiteDetailUiState(
+            siteId = SiteId("site-001"),
+            isLoading = false,
+        )
 
         assertTrue(state.canAddFieldNote)
     }

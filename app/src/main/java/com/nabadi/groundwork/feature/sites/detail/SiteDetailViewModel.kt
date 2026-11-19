@@ -2,6 +2,8 @@ package com.nabadi.groundwork.feature.sites.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nabadi.groundwork.domain.model.FieldNote
+import com.nabadi.groundwork.domain.model.Site
 import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.repository.FieldNoteRepository
 import com.nabadi.groundwork.domain.repository.SiteRepository
@@ -11,116 +13,98 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.scan
+import kotlinx.coroutines.flow.stateIn
 
 @HiltViewModel(assistedFactory = SiteDetailViewModel.Factory::class)
 class SiteDetailViewModel @AssistedInject constructor(
     @Assisted route: GroundWorkRoute.SiteDetail,
-    private val siteRepository: SiteRepository,
-    private val fieldNoteRepository: FieldNoteRepository,
+    siteRepository: SiteRepository,
+    fieldNoteRepository: FieldNoteRepository,
 ) : ViewModel() {
 
     private val siteId: SiteId = SiteId(route.siteId)
 
-    private val _uiState: MutableStateFlow<SiteDetailUiState> =
-        MutableStateFlow(SiteDetailUiState())
-    val uiState = _uiState.asStateFlow()
+    private val site: Flow<Site?> = siteRepository.observeSites()
+        .map { sites -> sites.firstOrNull { it.id == siteId } }
+        .distinctUntilChanged()
 
-    init {
-        observeSite(siteId)
-        observeFieldNotes(siteId)
-    }
+    // Caught here rather than downstream so a notes failure keeps the site details on screen.
+    private val fieldNotes: Flow<Result<List<FieldNote>>> =
+        fieldNoteRepository.observeFieldNotesForSite(siteId)
+            .map { Result.success(it) }
+            .catch { emit(Result.failure(it)) }
 
-    private fun observeSite(id: SiteId) {
-        viewModelScope.launch {
-            updateLoadingState(isLoading = true)
-
-            siteRepository.observeSites()
-                .catch {
-                    updateLoadingState(
+    val uiState: StateFlow<SiteDetailUiState> =
+        combine(site, fieldNotes, ::Pair)
+            .scan(SiteDetailUiState()) { previous, (site, fieldNotes) ->
+                previous.next(site, fieldNotes)
+            }
+            .catch {
+                emit(
+                    SiteDetailUiState(
                         isLoading = false,
                         error = SiteDetailError.LOAD_FAILED,
                     )
-                }
-                .collect { sites ->
-                    val site = sites.firstOrNull { it.id == id }
-                    if (site == null) {
-                        _uiState.update {
-                            it.copy(
-                                siteId = null,
-                                isLoading = false,
-                                error = SiteDetailError.NOT_FOUND,
-                            )
-                        }
-                    } else {
-                        _uiState.update {
-                            it.copy(
-                                siteId = site.id,
-                                name = site.name,
-                                fieldNoteItems = it.fieldNoteItems.withSiteName(site.name),
-                                description = site.description,
-                                location = site.location,
-                                priority = site.priority,
-                                status = site.status,
-                                isLoading = false,
-                                error = null,
-                            )
-                        }
-                    }
-                }
-        }
-    }
+                )
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
+                initialValue = SiteDetailUiState(),
+            )
 
-    private fun observeFieldNotes(id: SiteId) {
-        viewModelScope.launch {
-            fieldNoteRepository.observeFieldNotesForSite(id)
-                .catch {
-                    _uiState.update { state ->
-                        state.copy(notesLoadFailed = true)
-                    }
-                }
-                .collect { fieldNotes ->
-                    _uiState.update { state ->
-                        state.copy(
-                            fieldNoteItems = fieldNotes.map { fieldNote ->
-                                FieldNoteListItemUiState(
-                                    note = fieldNote,
-                                    siteName = state.name,
-                                )
-                            },
-                            notesLoadFailed = false,
-                        )
-                    }
-                }
-        }
-    }
-
-    private fun updateLoadingState(
-        isLoading: Boolean,
-        error: SiteDetailError? = null,
-    ) {
-        _uiState.update {
-            it.copy(
-                isLoading = isLoading,
-                error = error,
+    private fun SiteDetailUiState.next(
+        site: Site?,
+        fieldNotes: Result<List<FieldNote>>,
+    ): SiteDetailUiState {
+        if (site == null) {
+            return SiteDetailUiState(
+                isLoading = false,
+                error = SiteDetailError.NOT_FOUND,
             )
         }
+
+        return SiteDetailUiState(
+            siteId = site.id,
+            name = site.name,
+            description = site.description,
+            location = site.location,
+            priority = site.priority,
+            status = site.status,
+            fieldNoteItems = fieldNotes.fold(
+                onSuccess = { notes -> fieldNoteItems.reuseOrBuild(notes, site.name) },
+                onFailure = { fieldNoteItems },
+            ),
+            notesLoadFailed = fieldNotes.isFailure,
+            isLoading = false,
+        )
     }
 
-    // Rebuild rows only when the label they show changed, so other site edits
+    // A site-only emission passes the same note instances again, so keep the existing
+    // rows unless a note or the site name they show changed. That way other site edits
     // keep the same row instances and the note cards skip by identity.
-    private fun List<FieldNoteListItemUiState>.withSiteName(
+    private fun List<FieldNoteListItemUiState>.reuseOrBuild(
+        notes: List<FieldNote>,
         siteName: String,
-    ): List<FieldNoteListItemUiState> =
-        if (all { it.siteName == siteName }) {
+    ): List<FieldNoteListItemUiState> {
+        val unchanged = size == notes.size &&
+                indices.all { index ->
+                    this[index].note === notes[index] && this[index].siteName == siteName
+                }
+        return if (unchanged) {
             this
         } else {
-            map { it.copy(siteName = siteName) }
+            notes.map { note -> FieldNoteListItemUiState(note = note, siteName = siteName) }
         }
+    }
 
     @AssistedFactory
     interface Factory {

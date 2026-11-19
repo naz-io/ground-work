@@ -15,7 +15,7 @@ data class SiteDetailUiState(
     val status: SiteStatus = SiteStatus.ACTIVE,
     val description: String = "",
     val fieldNoteItems: List<FieldNoteListItemUiState> = emptyList(),
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val error: SiteDetailError? = null,
     val notesLoadFailed: Boolean = false,
 ) {
