@@ -314,7 +314,7 @@ Tests are split by what they need. Logic that runs on the JVM is covered by fast
 - **Mappers:** `FieldNoteMapperTest`, `SiteMapperTest`, `SyncMetadataMapperTest`, and `PersistedEnumMapperTest` cover entity ↔ domain conversion, sync metadata round trips, nullable site links, and safe defaults for unknown persisted values
 - **List ViewModels:** `FieldNotesListViewModelTest` and `SitesListViewModelTest` cover repository updates, search by title, body, description, location, and site name, status and priority filters, combined and cleared criteria, per-site note counts, and load errors
 - **Editor ViewModels:** `FieldNoteEditorViewModelTest` and `SiteEditorViewModelTest` cover load, create, edit, delete, and discard flows, exact generated IDs and timestamps, site assignment and reassignment, site preselection from Site Detail, site name trimming and the required-name hint, and typed save, delete, and load errors
-- **Site Detail:** `SiteDetailViewModelTest` covers loading a site and its notes, live updates, the site being deleted while open, and site and note load errors
+- **Site Detail:** `SiteDetailViewModelTest` covers loading a site and its notes, the site name on note rows (including renames, with unchanged rows reused across other site edits), live updates, the site being deleted while open, and site and note load errors
 - **UI state models:** list, editor, and detail UI state tests cover derived flags such as `canSave`, `isBusy`, empty and no-match states, active criteria, and the required-name hint
 - **Formatting:** `AbsoluteDateTimeLabelTest` covers the shared date pattern, formatting in the formatter's zone and locale, and empty labels for unset timestamps
 

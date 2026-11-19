@@ -187,15 +187,15 @@ private fun SiteDetailContent(
             }
         } else {
             items(
-                items = uiState.fieldNotes,
-                key = { it.id.value },
+                items = uiState.fieldNoteItems,
+                key = { it.note.id.value },
                 contentType = { "FieldNote" },
-            ) { note ->
+            ) { fieldNoteItem ->
                 FieldNoteItemCard(
-                    fieldNoteItem = FieldNoteListItemUiState(note, uiState.name),
+                    fieldNoteItem = fieldNoteItem,
                     dateTimeFormatter = dateTimeFormatter,
                     locale = locale,
-                    onClick = { onFieldNoteClick(note.id) },
+                    onClick = { onFieldNoteClick(fieldNoteItem.note.id) },
                 )
             }
         }
@@ -692,7 +692,7 @@ private fun Site.toDetailPreviewState(
     priority = priority,
     status = status,
     description = description,
-    fieldNotes = fieldNotes,
+    fieldNoteItems = fieldNotes.map { FieldNoteListItemUiState(note = it, siteName = name) },
     notesLoadFailed = notesLoadFailed,
 )
 

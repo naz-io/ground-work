@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.repository.FieldNoteRepository
 import com.nabadi.groundwork.domain.repository.SiteRepository
+import com.nabadi.groundwork.feature.fieldnotes.list.FieldNoteListItemUiState
 import com.nabadi.groundwork.navigation.GroundWorkRoute
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -60,6 +61,7 @@ class SiteDetailViewModel @AssistedInject constructor(
                             it.copy(
                                 siteId = site.id,
                                 name = site.name,
+                                fieldNoteItems = it.fieldNoteItems.withSiteName(site.name),
                                 description = site.description,
                                 location = site.location,
                                 priority = site.priority,
@@ -84,7 +86,12 @@ class SiteDetailViewModel @AssistedInject constructor(
                 .collect { fieldNotes ->
                     _uiState.update { state ->
                         state.copy(
-                            fieldNotes = fieldNotes,
+                            fieldNoteItems = fieldNotes.map { fieldNote ->
+                                FieldNoteListItemUiState(
+                                    note = fieldNote,
+                                    siteName = state.name,
+                                )
+                            },
                             notesLoadFailed = false,
                         )
                     }
@@ -103,6 +110,17 @@ class SiteDetailViewModel @AssistedInject constructor(
             )
         }
     }
+
+    // Rebuild rows only when the label they show changed, so other site edits
+    // keep the same row instances and the note cards skip by identity.
+    private fun List<FieldNoteListItemUiState>.withSiteName(
+        siteName: String,
+    ): List<FieldNoteListItemUiState> =
+        if (all { it.siteName == siteName }) {
+            this
+        } else {
+            map { it.copy(siteName = siteName) }
+        }
 
     @AssistedFactory
     interface Factory {

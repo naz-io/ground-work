@@ -2,10 +2,10 @@ package com.nabadi.groundwork.feature.sites.detail
 
 import androidx.annotation.StringRes
 import com.nabadi.groundwork.R
-import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.domain.model.SitePriority
 import com.nabadi.groundwork.domain.model.SiteStatus
+import com.nabadi.groundwork.feature.fieldnotes.list.FieldNoteListItemUiState
 
 data class SiteDetailUiState(
     val siteId: SiteId? = null,
@@ -14,7 +14,7 @@ data class SiteDetailUiState(
     val priority: SitePriority = SitePriority.NORMAL,
     val status: SiteStatus = SiteStatus.ACTIVE,
     val description: String = "",
-    val fieldNotes: List<FieldNote> = emptyList(),
+    val fieldNoteItems: List<FieldNoteListItemUiState> = emptyList(),
     val isLoading: Boolean = false,
     val error: SiteDetailError? = null,
     val notesLoadFailed: Boolean = false,
@@ -32,10 +32,10 @@ data class SiteDetailUiState(
         get() = siteId != null && !isBusy && !isError
 
     val hasNotes: Boolean
-        get() = fieldNotes.isNotEmpty()
+        get() = fieldNoteItems.isNotEmpty()
 
     val noteCount: Int
-        get() = fieldNotes.size
+        get() = fieldNoteItems.size
 }
 
 enum class SiteDetailError(@StringRes val messageRes: Int) {

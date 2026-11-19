@@ -13,6 +13,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Rule
 import org.junit.Test
 
@@ -68,9 +69,85 @@ class SiteDetailViewModelTest {
         )
 
         viewModel.uiState.test {
-            val state = skipItemsUntil { it.fieldNotes.isNotEmpty() }
+            val state = skipItemsUntil { it.fieldNoteItems.isNotEmpty() }
 
-            assertEquals(listOf(matchingNote), state.fieldNotes)
+            assertEquals(listOf(matchingNote), state.fieldNoteItems.map { it.note })
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `field note rows show the site name`() = runTest {
+        val viewModel = createViewModel(
+            siteRepository = FakeSiteRepository().apply {
+                setSites(listOf(TestSite.site(id = "site-001", name = "North Warehouse")))
+            },
+            fieldNoteRepository = FakeFieldNoteRepository().apply {
+                setFieldNotes(listOf(TestFieldNote.fieldNote(id = "note-001", siteId = "site-001")))
+            },
+            siteId = "site-001",
+        )
+
+        viewModel.uiState.test {
+            val state = skipItemsUntil { state ->
+                state.fieldNoteItems.isNotEmpty() && state.name == "North Warehouse"
+            }
+
+            assertEquals(listOf("North Warehouse"), state.fieldNoteItems.map { it.siteName })
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `renaming the site updates the site name on its field note rows`() = runTest {
+        val originalSite = TestSite.site(id = "site-001", name = "Original site")
+        val siteRepository = FakeSiteRepository().apply {
+            setSites(listOf(originalSite))
+        }
+        val viewModel = createViewModel(
+            siteRepository = siteRepository,
+            fieldNoteRepository = FakeFieldNoteRepository().apply {
+                setFieldNotes(listOf(TestFieldNote.fieldNote(id = "note-001", siteId = "site-001")))
+            },
+            siteId = "site-001",
+        )
+
+        viewModel.uiState.test {
+            skipItemsUntil { state ->
+                state.fieldNoteItems.isNotEmpty() && state.name == originalSite.name
+            }
+
+            siteRepository.setSites(listOf(originalSite.copy(name = "Renamed site")))
+
+            val renamedState = skipItemsUntil { it.name == "Renamed site" }
+            assertEquals(listOf("Renamed site"), renamedState.fieldNoteItems.map { it.siteName })
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `site edits that keep the name reuse the same field note rows`() = runTest {
+        val originalSite = TestSite.site(id = "site-001", location = "Original location")
+        val siteRepository = FakeSiteRepository().apply {
+            setSites(listOf(originalSite))
+        }
+        val viewModel = createViewModel(
+            siteRepository = siteRepository,
+            fieldNoteRepository = FakeFieldNoteRepository().apply {
+                setFieldNotes(listOf(TestFieldNote.fieldNote(id = "note-001", siteId = "site-001")))
+            },
+            siteId = "site-001",
+        )
+
+        viewModel.uiState.test {
+            val loadedState = skipItemsUntil { state ->
+                state.fieldNoteItems.isNotEmpty() && state.name == originalSite.name
+            }
+
+            siteRepository.setSites(listOf(originalSite.copy(location = "Updated location")))
+
+            val updatedState = skipItemsUntil { it.location == "Updated location" }
+            assertSame(loadedState.fieldNoteItems, updatedState.fieldNoteItems)
             cancelAndIgnoreRemainingEvents()
         }
     }

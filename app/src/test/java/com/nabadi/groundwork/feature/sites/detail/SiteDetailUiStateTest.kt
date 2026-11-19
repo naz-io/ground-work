@@ -2,6 +2,7 @@ package com.nabadi.groundwork.feature.sites.detail
 
 import com.nabadi.groundwork.domain.model.SiteId
 import com.nabadi.groundwork.feature.fieldnotes.TestFieldNote
+import com.nabadi.groundwork.feature.fieldnotes.list.FieldNoteListItemUiState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -113,30 +114,35 @@ class SiteDetailUiStateTest {
     }
 
     @Test
-    fun `hasNotes is false when field note ids are empty`() {
-        val state = SiteDetailUiState(fieldNotes = emptyList())
+    fun `hasNotes is false when there are no field note rows`() {
+        val state = SiteDetailUiState(fieldNoteItems = emptyList())
 
         assertFalse(state.hasNotes)
     }
 
     @Test
-    fun `hasNotes is true when field note ids exist`() {
+    fun `hasNotes is true when field note rows exist`() {
         val state = SiteDetailUiState(
-            fieldNotes = listOf(TestFieldNote.fieldNote()),
+            fieldNoteItems = listOf(fieldNoteItem()),
         )
 
         assertTrue(state.hasNotes)
     }
 
     @Test
-    fun `noteCount matches the number of field notes`() {
+    fun `noteCount matches the number of field note rows`() {
         val state = SiteDetailUiState(
-            fieldNotes = listOf(
-                TestFieldNote.fieldNote(id = "note-001"),
-                TestFieldNote.fieldNote(id = "note-002"),
+            fieldNoteItems = listOf(
+                fieldNoteItem(id = "note-001"),
+                fieldNoteItem(id = "note-002"),
             ),
         )
 
         assertEquals(2, state.noteCount)
     }
+
+    private fun fieldNoteItem(id: String = "note-001") = FieldNoteListItemUiState(
+        note = TestFieldNote.fieldNote(id = id),
+        siteName = "North Warehouse",
+    )
 }
