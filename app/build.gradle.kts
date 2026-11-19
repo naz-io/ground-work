@@ -60,6 +60,8 @@ dependencies {
     // versions, and room-testing's MigrationTestHelper needs a newer runtime.
     implementation(platform(libs.kotlinx.serialization.bom))
     implementation(libs.kotlinx.serialization.core)
+    // JSON wire format for the (simulated) sync backend.
+    implementation(libs.kotlinx.serialization.json)
 
     // Compose
     implementation(platform(libs.androidx.compose.bom))
