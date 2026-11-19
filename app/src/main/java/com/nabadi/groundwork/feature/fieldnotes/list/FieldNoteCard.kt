@@ -43,16 +43,17 @@ import com.nabadi.groundwork.ui.format.absoluteDateTimeLabel
 import com.nabadi.groundwork.ui.format.rememberAbsoluteDateTimeFormatter
 import androidx.compose.ui.platform.LocalLocale
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 internal fun FieldNoteItemCard(
     fieldNoteItem: FieldNoteListItemUiState,
     dateTimeFormatter: DateTimeFormatter,
+    locale: Locale,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val note = fieldNoteItem.note
-    val locale = LocalLocale.current.platformLocale
     val statusColor = when (note.status) {
         FieldNoteStatus.ACTIVE -> MaterialTheme.colorScheme.primary
         FieldNoteStatus.DRAFT -> MaterialTheme.colorScheme.secondary
@@ -193,6 +194,7 @@ private fun FieldNoteItemCardPreview() {
         FieldNoteItemCard(
             fieldNoteItem = previewFieldNoteItems.first(),
             dateTimeFormatter = rememberAbsoluteDateTimeFormatter(),
+            locale = LocalLocale.current.platformLocale,
             onClick = {},
         )
     }
@@ -209,6 +211,7 @@ private fun FieldNoteItemCardPreview_Dark() {
         FieldNoteItemCard(
             fieldNoteItem = previewFieldNoteItems.first(),
             dateTimeFormatter = rememberAbsoluteDateTimeFormatter(),
+            locale = LocalLocale.current.platformLocale,
             onClick = {},
         )
     }

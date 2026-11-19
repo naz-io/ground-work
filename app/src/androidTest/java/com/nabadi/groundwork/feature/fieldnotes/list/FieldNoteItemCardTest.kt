@@ -33,11 +33,31 @@ class FieldNoteItemCardTest {
                 FieldNoteItemCard(
                     fieldNoteItem = FieldNoteListItemUiState(note = note, siteName = null),
                     dateTimeFormatter = tokyoFormatter,
+                    locale = Locale.US,
                     onClick = {},
                 )
             }
         }
 
         composeTestRule.onNodeWithText("UPDATED: NOV 15, 2023 07:13").assertIsDisplayed()
+    }
+
+    @Test
+    fun fieldNoteItemCard_uppercasesSiteNameWithTheProvidedLocale() {
+        val note = TestFieldNotes.fieldNote(id = "note-1", siteId = "site-1")
+
+        composeTestRule.setContent {
+            GroundWorkTheme {
+                FieldNoteItemCard(
+                    fieldNoteItem = FieldNoteListItemUiState(note = note, siteName = "istanbul depot"),
+                    dateTimeFormatter = absoluteDateTimeFormatter(Locale.US, ZoneId.of("UTC")),
+                    // Turkish uppercases "i" to a dotted "İ", unlike the device's default locale.
+                    locale = Locale.forLanguageTag("tr-TR"),
+                    onClick = {},
+                )
+            }
+        }
+
+        composeTestRule.onNodeWithText("SITE: İSTANBUL DEPOT").assertIsDisplayed()
     }
 }

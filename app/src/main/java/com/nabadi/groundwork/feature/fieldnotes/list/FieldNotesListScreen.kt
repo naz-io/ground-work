@@ -30,6 +30,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -116,6 +117,7 @@ private fun FieldNoteItemsContent(
     modifier: Modifier = Modifier,
 ) {
     val dateTimeFormatter = rememberAbsoluteDateTimeFormatter()
+    val locale = LocalLocale.current.platformLocale
 
     LazyColumn(
         modifier = modifier,
@@ -163,6 +165,7 @@ private fun FieldNoteItemsContent(
                 FieldNoteItemCard(
                     fieldNoteItem = fieldNoteItems,
                     dateTimeFormatter = dateTimeFormatter,
+                    locale = locale,
                     onClick = { onFieldNoteClick(fieldNoteItems.note.id) },
                 )
             }
