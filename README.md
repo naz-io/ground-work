@@ -15,6 +15,7 @@ The sync groundwork is in place: records carry pending/failed/synced state, dele
 ## Tech Stack
 
 - Kotlin 2.4, Jetpack Compose with Material 3
+- kotlinx.serialization for type-safe routes and the sync backend's JSON wire format
 - Room 2.8 with exported schemas and tested migrations
 - Hilt for dependency injection, including assisted injection for route-scoped ViewModels
 - Navigation Compose 2.10 with type-safe `@Serializable` routes
@@ -150,6 +151,12 @@ Sync groundwork:
 - Decoded unknown persisted enum values to safe defaults in the data layer
 - Added Room migrations 2→3, 3→4, and 4→5 for sync columns, with migration tests
 
+Simulated backend:
+- Defined the backend's own JSON wire format (snake_case fields, ISO-8601 UTC timestamps, lowercase enums, no local sync metadata) with separate remote models, mapped from the domain
+- Put the backend behind an HTTP-shaped `RemoteTransport` (method, path, JSON body in; status, JSON body out; `IOException` for network failures) so a real HTTP client can replace the fake later
+- Added an in-memory `FakeGroundWorkServer` that stores records as JSON, numbers revisions per record, makes retries and deletes idempotent, enforces server-side rules (required fields, notes only for known sites, no deleting a site in use), and can simulate latency, network errors, server errors, and rejections
+- Added `RemoteSyncDataSource`, which reports every call as success, transient failure (retry later), or rejection (give up), so the sync engine never handles JSON or status codes
+
 Architecture and quality:
 - Moved navigation to type-safe `@Serializable` routes; Site Detail now always has a site ID
 - Passed typed routes into editor and detail ViewModels through Hilt assisted injection instead of `SavedStateHandle` lookups
@@ -165,7 +172,6 @@ Build and CI:
 - Cancelled superseded CI runs for the same branch or pull request
 
 Remaining for v0.9.0:
-- Fake remote data source with controllable failures
 - Sync worker that processes pending changes and records success or failure
 - Guard against losing a local edit made while an upload is in flight
 - Manual retry and a sync status indicator in the UI
@@ -233,6 +239,10 @@ Deleting a record that has already synced marks it `PENDING_DELETE` instead of r
 
 Saves and deletes read the current sync state and then write. Each of these paths runs inside a Room transaction so a future sync worker cannot change the row between the read and the write. Transactions do not cover network calls, so the sync worker will still need its own check before marking a record synced.
 
+### A simulated backend with its own wire format
+
+The sync backend is simulated, but it is treated as a separate system. Remote models use the backend's conventions rather than the domain's or Room's, so the API does not change when a domain field is renamed. Requests go through an HTTP-shaped `RemoteTransport`; the app binds it to `FakeGroundWorkServer` in `RemoteModule`, and a real backend would replace only that binding. The fake parses and stores JSON and enforces the rules a real server would, so wire-format mistakes and wrong sync ordering fail in tests instead of being hidden. `RemoteSyncDataSource` reduces every outcome to success, transient failure, or rejection: network errors, timeouts, rate limits, and server errors are retried, other 4xx responses are not, and an unreadable success response is treated as a server problem rather than a reason to mark local data failed. The fake keeps its data in memory, so it resets when the process dies.
+
 ### Type-safe navigation and route-scoped ViewModels
 
 Destinations are `@Serializable` classes under `GroundWorkRoute`, so arguments are checked at compile time and required arguments, such as Site Detail's site ID, cannot be missing. Route composables read their typed route from the back stack and pass it to the ViewModel through a Hilt assisted factory. ViewModels therefore take a plain route object, which keeps them free of `SavedStateHandle` key lookups and lets local unit tests construct them directly.
@@ -296,7 +306,7 @@ Site priority represents long-term operational importance. Urgency is intentiona
 
 ## What Is Intentionally Not Built Yet
 
-- Sync worker and fake remote data source (sync metadata is tracked, but nothing is sent yet)
+- Sync worker (sync metadata is tracked and a simulated backend exists, but nothing is sent yet)
 - Sync status UI and manual retry
 - Conflict resolution
 - Attachments and evidence capture
@@ -317,6 +327,7 @@ Tests are split by what they need. Logic that runs on the JVM is covered by fast
 - **Site Detail:** `SiteDetailViewModelTest` covers loading a site and its notes, the site name on note rows (including renames, with unchanged rows reused across other site edits), live updates, the site being deleted while open, and site and note load errors
 - **UI state models:** list, editor, and detail UI state tests cover derived flags such as `canSave`, `isBusy`, empty and no-match states, active criteria, and the required-name hint
 - **Formatting:** `AbsoluteDateTimeLabelTest` covers the shared date pattern, formatting in the formatter's zone and locale, and empty labels for unset timestamps; `MinuteTicksTest` covers emitting the clock time immediately and then on each minute boundary
+- **Simulated backend:** `RemoteWireFormatTest` pins the JSON format with literal JSON (field names, ISO timestamps, lowercase enums, explicit null site links, ignored unknown fields, rejected malformed values); `RemoteMappersTest` covers domain → remote mapping; `FakeGroundWorkServerTest` covers revisions, idempotent retries and deletes, server-side validation and ordering rules, and simulated failures; `RemoteSyncDataSourceTest` covers mapping every outcome to success, transient failure, or rejection, and that cancellation is not swallowed
 
 ### Instrumented tests (`app/src/androidTest`)
 
@@ -351,7 +362,7 @@ Future performance work may include:
 ### v0.9.0 — Offline sync simulation
 - Pending/failed/synced states (done)
 - Soft deletes and transactional repository writes (done)
-- Fake remote source
+- Fake remote source (done)
 - Sync worker that processes pending changes
 - Manual retry and sync status indicator
 

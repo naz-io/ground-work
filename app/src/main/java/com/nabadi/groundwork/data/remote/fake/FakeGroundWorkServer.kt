@@ -18,6 +18,8 @@ import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 import java.io.IOException
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.time.Duration
 
 /**
@@ -32,7 +34,8 @@ import kotlin.time.Duration
  * State lives in memory and is lost when the process dies; this is a
  * simulation, not a backend.
  */
-internal class FakeGroundWorkServer : RemoteTransport {
+@Singleton
+internal class FakeGroundWorkServer @Inject constructor() : RemoteTransport {
 
     private val mutex = Mutex()
     private val sites = mutableMapOf<String, StoredRecord>()
