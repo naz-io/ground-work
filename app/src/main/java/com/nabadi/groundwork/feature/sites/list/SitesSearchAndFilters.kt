@@ -1,11 +1,12 @@
 package com.nabadi.groundwork.feature.sites.list
 
 import android.content.res.Configuration
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
@@ -132,23 +133,19 @@ private fun SiteStatusFilters(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_card_content)),
     ) {
         TechnicalLabel(text = stringResource(R.string.sites_list_filter_status_title))
-        LazyRow(
-            modifier = Modifier.fillMaxWidth(),
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
         ) {
-            item {
-                SitesFilterChip(
-                    selected = selectedStatus == null,
-                    onClick = { onStatusFilterChange(null) },
-                    label = stringResource(R.string.sites_list_filter_all),
-                )
-            }
+            SitesFilterChip(
+                selected = selectedStatus == null,
+                onClick = { onStatusFilterChange(null) },
+                label = stringResource(R.string.sites_list_filter_all),
+            )
 
-            items(
-                items = SiteStatus.entries,
-                key = { it },
-                contentType = { "SiteStatusFilterOption" },
-            ) { statusFilter ->
+            SiteStatus.entries.forEach { statusFilter ->
                 SitesFilterChip(
                     selected = selectedStatus == statusFilter,
                     onClick = {
@@ -178,23 +175,19 @@ private fun SitePriorityFilters(
         verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_card_content)),
     ) {
         TechnicalLabel(text = stringResource(R.string.sites_list_filter_priority_title))
-        LazyRow(
-            modifier = Modifier.fillMaxWidth(),
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
         ) {
-            item {
-                SitesFilterChip(
-                    selected = selectedPriority == null,
-                    onClick = { onPriorityFilterChange(null) },
-                    label = stringResource(R.string.sites_list_filter_all),
-                )
-            }
+            SitesFilterChip(
+                selected = selectedPriority == null,
+                onClick = { onPriorityFilterChange(null) },
+                label = stringResource(R.string.sites_list_filter_all),
+            )
 
-            items(
-                items = sitePriorityFilterOrder,
-                key = { it },
-                contentType = { "SitePriorityFilterOption" },
-            ) { priorityFilter ->
+            sitePriorityFilterOrder.forEach { priorityFilter ->
                 SitesFilterChip(
                     selected = selectedPriority == priorityFilter,
                     onClick = {

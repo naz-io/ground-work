@@ -8,8 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Save
@@ -381,15 +382,13 @@ private fun FieldNoteStatusChips(
         label = stringResource(R.string.field_note_editor_status_label),
         modifier = modifier,
     ) {
-        LazyRow(
-            modifier = modifier.fillMaxWidth(),
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_list_item)),
         ) {
-            items(
-                items = FieldNoteStatus.entries,
-                key = { it },
-                contentType = { "StatusOption" },
-            ) { noteStatus ->
+            FieldNoteStatus.entries.forEach { noteStatus ->
                 GroundWorkFilterChip(
                     selected = selectedStatus == noteStatus,
                     onClick = { onStatusChange(noteStatus) },
