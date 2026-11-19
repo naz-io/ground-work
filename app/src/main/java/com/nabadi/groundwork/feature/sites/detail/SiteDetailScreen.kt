@@ -184,7 +184,11 @@ private fun SiteDetailContent(
                 )
             }
         } else {
-            items(uiState.fieldNotes, key = { it.id.value }) { note ->
+            items(
+                items = uiState.fieldNotes,
+                key = { it.id.value },
+                contentType = { "FieldNote" },
+            ) { note ->
                 FieldNoteItemCard(
                     fieldNoteItem = FieldNoteListItemUiState(note, uiState.name),
                     dateTimeFormatter = dateTimeFormatter,

@@ -176,7 +176,11 @@ private fun SitesContent(
         onPriorityFilterChange = onPriorityFilterChange,
         modifier = modifier,
     ) {
-        items(sites, key = { it.id.value }) { site ->
+        items(
+            items = sites,
+            key = { it.id.value },
+            contentType = { "Site" },
+        ) { site ->
             SiteCard(
                 site = site,
                 noteCount = noteCountFor(site.id),
