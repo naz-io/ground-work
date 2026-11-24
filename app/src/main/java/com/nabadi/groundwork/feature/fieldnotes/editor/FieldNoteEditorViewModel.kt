@@ -14,10 +14,15 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Clock
@@ -26,7 +31,7 @@ import java.time.Clock
 class FieldNoteEditorViewModel @AssistedInject constructor(
     @Assisted route: GroundWorkRoute.FieldNoteEditor,
     private val fieldNoteRepository: FieldNoteRepository,
-    private val siteRepository: SiteRepository,
+    siteRepository: SiteRepository,
     private val clock: Clock,
     private val idGenerator: IdGenerator,
 ) : ViewModel() {
@@ -35,20 +40,39 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
     private val fieldNoteId: FieldNoteId? = route.fieldNoteId?.let(::FieldNoteId)
     private var existingFieldNote: FieldNote? = null
 
-    private val _uiState = MutableStateFlow(FieldNoteEditorUiState(siteId = initialSiteId))
-    val uiState: StateFlow<FieldNoteEditorUiState> = _uiState.asStateFlow()
+    // The form is state this ViewModel writes itself. The site options are a repository
+    // stream, collected only while the screen is subscribed.
+    private val formState = MutableStateFlow(
+        FieldNoteEditorUiState(siteId = initialSiteId, isEditing = fieldNoteId != null),
+    )
+
+    private val siteOptions: Flow<SiteOptions> = siteRepository.getSitesStream()
+        .map { sites ->
+            SiteOptions(sites = sites.map { site -> SiteOptionUiState(id = site.id, name = site.name) })
+        }
+        .catch { emit(SiteOptions(loadFailed = true)) }
+        // combine waits for every source, so start empty: the form never waits for the sites.
+        .onStart { emit(SiteOptions()) }
+
+    val uiState: StateFlow<FieldNoteEditorUiState> =
+        combine(formState, siteOptions) { form, options ->
+            form.copy(
+                availableSites = options.sites,
+                siteOptionsLoadFailed = options.loadFailed,
+            )
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
+            initialValue = formState.value,
+        )
 
     init {
-        observeAvailableSites()
-
-        if (fieldNoteId != null) {
-            _uiState.update { it.copy(isEditing = true) }
-            loadFieldNote(fieldNoteId)
-        }
+        // A one-shot read, not a stream: later database changes must not overwrite the form.
+        if (fieldNoteId != null) loadFieldNote(fieldNoteId)
     }
 
     fun updateTitle(title: String) {
-        _uiState.update { currentState ->
+        formState.update { currentState ->
             currentState.copy(
                 title = title,
                 error = null,
@@ -57,7 +81,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
     }
 
     fun updateAssociatedSite(siteId: SiteId?) {
-        _uiState.update { currentState ->
+        formState.update { currentState ->
             currentState.copy(
                 siteId = siteId,
                 error = null,
@@ -66,7 +90,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
     }
 
     fun updateBody(body: String) {
-        _uiState.update { currentState ->
+        formState.update { currentState ->
             currentState.copy(
                 body = body,
                 error = null,
@@ -75,7 +99,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
     }
 
     fun updateStatus(status: FieldNoteStatus) {
-        _uiState.update {
+        formState.update {
             it.copy(
                 status = status,
                 error = null,
@@ -84,8 +108,8 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
     }
 
     fun saveFieldNote() {
-        if (_uiState.value.isBusy) return
-        val currentState = _uiState.value
+        if (formState.value.isBusy) return
+        val currentState = formState.value
 
         viewModelScope.launch {
             updateSavingState(isSaving = true)
@@ -117,7 +141,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
     }
 
     fun deleteFieldNote() {
-        if (_uiState.value.isBusy) return
+        if (formState.value.isBusy) return
 
         viewModelScope.launch {
             updateDeletingState(isDeleting = true)
@@ -138,45 +162,18 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
     }
 
     fun discardChanges() {
-        if (_uiState.value.isBusy) return
+        if (formState.value.isBusy) return
         complete(FieldNoteEditorCompletion.DISCARDED)
     }
 
     // The form keeps its values while the screen leaves, so it doesn't flash empty.
     private fun complete(completion: FieldNoteEditorCompletion) {
-        _uiState.update {
+        formState.update {
             it.copy(
                 isSaving = false,
                 isDeleting = false,
                 completion = completion,
             )
-        }
-    }
-
-    private fun observeAvailableSites() {
-        viewModelScope.launch {
-            siteRepository.getSitesStream()
-                .catch {
-                    _uiState.update { currentState ->
-                        currentState.copy(
-                            availableSites = emptyList(),
-                            siteOptionsLoadFailed = true,
-                        )
-                    }
-                }
-                .collect { sites ->
-                    _uiState.update { currentState ->
-                        currentState.copy(
-                            availableSites = sites.map { site ->
-                                SiteOptionUiState(
-                                    id = site.id,
-                                    name = site.name,
-                                )
-                            },
-                            siteOptionsLoadFailed = false,
-                        )
-                    }
-                }
         }
     }
 
@@ -188,7 +185,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
                 fieldNoteRepository.getFieldNote(id)
             }.onSuccess { fieldNote ->
                 if (fieldNote == null) {
-                    _uiState.update {
+                    formState.update {
                         it.copy(
                             isLoading = false,
                             error = FieldNoteEditorError.NOT_FOUND,
@@ -197,7 +194,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
                     }
                 } else {
                     existingFieldNote = fieldNote
-                    _uiState.update {
+                    formState.update {
                         it.copy(
                             title = fieldNote.title,
                             siteId = fieldNote.siteId,
@@ -223,7 +220,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
         isLoading: Boolean,
         error: FieldNoteEditorError? = null,
     ) {
-        _uiState.update {
+        formState.update {
             it.copy(
                 isLoading = isLoading,
                 error = error,
@@ -235,7 +232,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
         isSaving: Boolean,
         error: FieldNoteEditorError? = null,
     ) {
-        _uiState.update {
+        formState.update {
             it.copy(
                 isSaving = isSaving,
                 error = error,
@@ -247,13 +244,18 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
         isDeleting: Boolean,
         error: FieldNoteEditorError? = null,
     ) {
-        _uiState.update {
+        formState.update {
             it.copy(
                 isDeleting = isDeleting,
                 error = error,
             )
         }
     }
+
+    private data class SiteOptions(
+        val sites: List<SiteOptionUiState> = emptyList(),
+        val loadFailed: Boolean = false,
+    )
 
     @AssistedFactory
     interface Factory {

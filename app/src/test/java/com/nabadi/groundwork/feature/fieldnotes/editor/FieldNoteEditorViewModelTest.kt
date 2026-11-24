@@ -71,6 +71,28 @@ class FieldNoteEditorViewModelTest {
     }
 
     @Test
+    fun `site options load only while ui state is collected`() = runTest {
+        val viewModel = FieldNoteEditorViewModel(
+            fieldNoteRepository = FakeFieldNoteRepository(),
+            siteRepository = FakeSiteRepository().apply {
+                setSites(listOf(TestSite.site(id = "site-001", name = "North Warehouse")))
+            },
+            clock = clock,
+            idGenerator = idGenerator,
+            route = GroundWorkRoute.FieldNoteEditor(),
+        )
+
+        assertTrue(viewModel.uiState.value.availableSites.isEmpty())
+
+        viewModel.uiState.test {
+            val state = skipItemsUntil { it.availableSites.isNotEmpty() }
+
+            assertEquals(listOf("North Warehouse"), state.availableSites.map { it.name })
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `available sites are exposed as editor options`() = runTest {
         val sites = listOf(
             TestSite.site(id = "site-001", name = "North Warehouse"),
@@ -184,9 +206,12 @@ class FieldNoteEditorViewModelTest {
             route = GroundWorkRoute.FieldNoteEditor(),
         )
 
-        viewModel.updateTitle("North gate issue")
+        viewModel.uiState.test {
+            viewModel.updateTitle("North gate issue")
 
-        assertEquals("North gate issue", viewModel.uiState.value.title)
+            assertEquals("North gate issue", viewModel.uiState.value.title)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -199,12 +224,15 @@ class FieldNoteEditorViewModelTest {
             route = GroundWorkRoute.FieldNoteEditor(),
         )
 
-        viewModel.updateBody("Loose fencing near the north access point.")
+        viewModel.uiState.test {
+            viewModel.updateBody("Loose fencing near the north access point.")
 
-        assertEquals(
-            "Loose fencing near the north access point.",
-            viewModel.uiState.value.body
-        )
+            assertEquals(
+                "Loose fencing near the north access point.",
+                viewModel.uiState.value.body
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -218,11 +246,14 @@ class FieldNoteEditorViewModelTest {
         )
         val siteId = SiteId("site-001")
 
-        viewModel.updateAssociatedSite(siteId)
-        assertEquals(siteId, viewModel.uiState.value.siteId)
+        viewModel.uiState.test {
+            viewModel.updateAssociatedSite(siteId)
+            assertEquals(siteId, viewModel.uiState.value.siteId)
 
-        viewModel.updateAssociatedSite(null)
-        assertNull(viewModel.uiState.value.siteId)
+            viewModel.updateAssociatedSite(null)
+            assertNull(viewModel.uiState.value.siteId)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -236,20 +267,23 @@ class FieldNoteEditorViewModelTest {
             route = GroundWorkRoute.FieldNoteEditor(),
         )
 
-        viewModel.updateTitle("North gate issue")
-        viewModel.updateBody("Loose fencing near the north access point.")
-        viewModel.updateStatus(FieldNoteStatus.ACTIVE)
-        viewModel.saveFieldNote()
+        viewModel.uiState.test {
+            viewModel.updateTitle("North gate issue")
+            viewModel.updateBody("Loose fencing near the north access point.")
+            viewModel.updateStatus(FieldNoteStatus.ACTIVE)
+            viewModel.saveFieldNote()
 
-        val savedFieldNote = repository.getFieldNotesStream().first().single()
-        assertEquals("North gate issue", savedFieldNote.title)
-        assertEquals("Loose fencing near the north access point.", savedFieldNote.body)
-        assertEquals(FieldNoteStatus.ACTIVE, savedFieldNote.status)
-        assertNull(savedFieldNote.siteId)
-        assertEquals(FieldNoteId(GENERATED_ID), savedFieldNote.id)
-        assertEquals(NOW, savedFieldNote.createdAt)
-        assertEquals(NOW, savedFieldNote.updatedAt)
-        assertEquals(FieldNoteEditorCompletion.SAVED, viewModel.uiState.value.completion)
+            val savedFieldNote = repository.getFieldNotesStream().first().single()
+            assertEquals("North gate issue", savedFieldNote.title)
+            assertEquals("Loose fencing near the north access point.", savedFieldNote.body)
+            assertEquals(FieldNoteStatus.ACTIVE, savedFieldNote.status)
+            assertNull(savedFieldNote.siteId)
+            assertEquals(FieldNoteId(GENERATED_ID), savedFieldNote.id)
+            assertEquals(NOW, savedFieldNote.createdAt)
+            assertEquals(NOW, savedFieldNote.updatedAt)
+            assertEquals(FieldNoteEditorCompletion.SAVED, viewModel.uiState.value.completion)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -425,12 +459,16 @@ class FieldNoteEditorViewModelTest {
             idGenerator = idGenerator,
             route = GroundWorkRoute.FieldNoteEditor(),
         )
-        viewModel.updateTitle("Draft title")
-        viewModel.updateBody("Draft body")
-        viewModel.discardChanges()
 
-        assertEquals(FieldNoteEditorCompletion.DISCARDED, viewModel.uiState.value.completion)
-        assertTrue(repository.getFieldNotesStream().first().isEmpty())
+        viewModel.uiState.test {
+            viewModel.updateTitle("Draft title")
+            viewModel.updateBody("Draft body")
+            viewModel.discardChanges()
+
+            assertEquals(FieldNoteEditorCompletion.DISCARDED, viewModel.uiState.value.completion)
+            assertTrue(repository.getFieldNotesStream().first().isEmpty())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -446,13 +484,16 @@ class FieldNoteEditorViewModelTest {
             route = GroundWorkRoute.FieldNoteEditor(),
         )
 
-        viewModel.updateTitle("Title")
-        viewModel.saveFieldNote()
+        viewModel.uiState.test {
+            viewModel.updateTitle("Title")
+            viewModel.saveFieldNote()
 
-        val state = viewModel.uiState.value
-        assertFalse(state.isSaving)
-        assertEquals(FieldNoteEditorError.SAVE_FAILED, state.error)
-        assertNull(viewModel.uiState.value.completion)
+            val state = viewModel.uiState.value
+            assertFalse(state.isSaving)
+            assertEquals(FieldNoteEditorError.SAVE_FAILED, state.error)
+            assertNull(state.completion)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -468,13 +509,16 @@ class FieldNoteEditorViewModelTest {
             route = GroundWorkRoute.FieldNoteEditor(),
         )
 
-        viewModel.updateBody("Loose fencing near the north access point.")
-        viewModel.saveFieldNote()
-        viewModel.discardChanges()
-        viewModel.saveFieldNote()
+        viewModel.uiState.test {
+            viewModel.updateBody("Loose fencing near the north access point.")
+            viewModel.saveFieldNote()
+            viewModel.discardChanges()
+            viewModel.saveFieldNote()
 
-        assertEquals(FieldNoteEditorCompletion.SAVED, viewModel.uiState.value.completion)
-        assertEquals(1, repository.getFieldNotesStream().first().size)
+            assertEquals(FieldNoteEditorCompletion.SAVED, viewModel.uiState.value.completion)
+            assertEquals(1, repository.getFieldNotesStream().first().size)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -490,12 +534,15 @@ class FieldNoteEditorViewModelTest {
             route = GroundWorkRoute.FieldNoteEditor(),
         )
 
-        viewModel.updateBody("Body")
-        viewModel.saveFieldNote()
-        viewModel.updateTitle("Updated title")
+        viewModel.uiState.test {
+            viewModel.updateBody("Body")
+            viewModel.saveFieldNote()
+            viewModel.updateTitle("Updated title")
 
-        assertEquals("Updated title", viewModel.uiState.value.title)
-        assertNull(viewModel.uiState.value.error)
+            assertEquals("Updated title", viewModel.uiState.value.title)
+            assertNull(viewModel.uiState.value.error)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private suspend fun ReceiveTurbine<FieldNoteEditorUiState>.skipItemsUntilLoaded(): FieldNoteEditorUiState =
