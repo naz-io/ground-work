@@ -39,11 +39,11 @@ fun SiteEditorRoute(
 
     SiteEditorScreen(
         uiState = uiState,
-        onNameChange = viewModel::onNameChange,
-        onDescriptionChange = viewModel::onDescriptionChange,
-        onLocationChange = viewModel::onLocationChange,
-        onStatusChange = viewModel::onStatusChange,
-        onPriorityChange = viewModel::onPriorityChange,
+        onNameChange = viewModel::updateName,
+        onDescriptionChange = viewModel::updateDescription,
+        onLocationChange = viewModel::updateLocation,
+        onStatusChange = viewModel::updateStatus,
+        onPriorityChange = viewModel::updatePriority,
         onSaveClick = viewModel::saveSite,
         onDestructiveActionClick = {
             if (uiState.isEditing) {

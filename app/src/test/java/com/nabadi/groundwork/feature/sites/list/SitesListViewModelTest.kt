@@ -142,7 +142,7 @@ class SitesListViewModelTest {
     }
 
     @Test
-    fun `onSearchQueryChange updates searchQuery and filters sites`() = runTest {
+    fun `updateSearchQuery updates searchQuery and filters sites`() = runTest {
         val sites = listOf(
             TestSite.site(id = "1", name = "North Warehouse"),
             TestSite.site(id = "2", name = "South Yard"),
@@ -152,7 +152,7 @@ class SitesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onSearchQueryChange(query = "North")
+            viewModel.updateSearchQuery(query = "North")
 
             val filteredState = awaitItem()
             assertEquals("North", filteredState.searchQuery)
@@ -162,7 +162,7 @@ class SitesListViewModelTest {
     }
 
     @Test
-    fun `onStatusFilterChange updates selectedStatus and filters sites`() = runTest {
+    fun `updateStatusFilter updates selectedStatus and filters sites`() = runTest {
         val sites = listOf(
             TestSite.site(
                 id = "1",
@@ -180,7 +180,7 @@ class SitesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onStatusFilterChange(status = SiteStatus.ARCHIVED)
+            viewModel.updateStatusFilter(status = SiteStatus.ARCHIVED)
 
             val filteredState = awaitItem()
             assertEquals(SiteStatus.ARCHIVED, filteredState.selectedStatus)
@@ -190,7 +190,7 @@ class SitesListViewModelTest {
     }
 
     @Test
-    fun `onPriorityFilterChange updates selectedPriority and filters sites`() = runTest {
+    fun `updatePriorityFilter updates selectedPriority and filters sites`() = runTest {
         val sites = listOf(
             TestSite.site(
                 id = "1",
@@ -208,7 +208,7 @@ class SitesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onPriorityFilterChange(priority = SitePriority.HIGH)
+            viewModel.updatePriorityFilter(priority = SitePriority.HIGH)
 
             val filteredState = awaitItem()
             assertEquals(SitePriority.HIGH, filteredState.selectedPriority)
@@ -244,13 +244,13 @@ class SitesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onSearchQueryChange(query = "North")
+            viewModel.updateSearchQuery(query = "North")
             awaitItem()
 
-            viewModel.onStatusFilterChange(status = SiteStatus.ACTIVE)
+            viewModel.updateStatusFilter(status = SiteStatus.ACTIVE)
             awaitItem()
 
-            viewModel.onPriorityFilterChange(priority = SitePriority.HIGH)
+            viewModel.updatePriorityFilter(priority = SitePriority.HIGH)
             val finalState = awaitItem()
 
             assertEquals(1, finalState.sites.size)
@@ -280,7 +280,7 @@ class SitesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onSearchQueryChange(query = "fencing")
+            viewModel.updateSearchQuery(query = "fencing")
 
             val filteredState = awaitItem()
             assertEquals(1, filteredState.sites.size)
@@ -308,7 +308,7 @@ class SitesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onSearchQueryChange(query = "Riverbend")
+            viewModel.updateSearchQuery(query = "Riverbend")
 
             val filteredState = awaitItem()
             assertEquals(1, filteredState.sites.size)
@@ -328,7 +328,7 @@ class SitesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onSearchQueryChange(query = "gate")
+            viewModel.updateSearchQuery(query = "gate")
 
             val filteredState = awaitItem()
             assertEquals(1, filteredState.sites.size)
@@ -347,7 +347,7 @@ class SitesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onSearchQueryChange(query = "   ")
+            viewModel.updateSearchQuery(query = "   ")
 
             val state = awaitItem()
             assertEquals("   ", state.searchQuery)
@@ -366,7 +366,7 @@ class SitesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onSearchQueryChange(query = "Bridge")
+            viewModel.updateSearchQuery(query = "Bridge")
 
             val state = awaitItem()
             assertEquals("Bridge", state.searchQuery)
@@ -389,7 +389,7 @@ class SitesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onSearchQueryChange(query = "Bridge")
+            viewModel.updateSearchQuery(query = "Bridge")
             awaitItem()
 
             repository.setSites(
@@ -407,7 +407,7 @@ class SitesListViewModelTest {
     }
 
     @Test
-    fun `onClearCriteriaClick clears search status and priority filters`() = runTest {
+    fun `clearCriteria clears search status and priority filters`() = runTest {
         val sites = listOf(
             TestSite.site(
                 id = "1",
@@ -427,16 +427,16 @@ class SitesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onSearchQueryChange(query = "North")
+            viewModel.updateSearchQuery(query = "North")
             awaitItem()
 
-            viewModel.onStatusFilterChange(status = SiteStatus.ACTIVE)
+            viewModel.updateStatusFilter(status = SiteStatus.ACTIVE)
             awaitItem()
 
-            viewModel.onPriorityFilterChange(priority = SitePriority.HIGH)
+            viewModel.updatePriorityFilter(priority = SitePriority.HIGH)
             awaitItem()
 
-            viewModel.onClearCriteriaClick()
+            viewModel.clearCriteria()
 
             val clearedState = skipItemsUntilCriteriaCleared()
             assertEquals("", clearedState.searchQuery)
@@ -465,10 +465,10 @@ class SitesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onStatusFilterChange(status = SiteStatus.ARCHIVED)
+            viewModel.updateStatusFilter(status = SiteStatus.ARCHIVED)
             awaitItem()
 
-            viewModel.onStatusFilterChange(status = null)
+            viewModel.updateStatusFilter(status = null)
 
             val clearedState = awaitItem()
             assertNull(clearedState.selectedStatus)
@@ -495,10 +495,10 @@ class SitesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onPriorityFilterChange(priority = SitePriority.HIGH)
+            viewModel.updatePriorityFilter(priority = SitePriority.HIGH)
             awaitItem()
 
-            viewModel.onPriorityFilterChange(priority = null)
+            viewModel.updatePriorityFilter(priority = null)
 
             val clearedState = awaitItem()
             assertNull(clearedState.selectedPriority)

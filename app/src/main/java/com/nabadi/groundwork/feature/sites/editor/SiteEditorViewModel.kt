@@ -41,7 +41,7 @@ class SiteEditorViewModel @AssistedInject constructor(
         }
     }
 
-    fun onNameChange(name: String) {
+    fun updateName(name: String) {
         _uiState.update { currentState ->
             currentState.copy(
                 name = name,
@@ -51,7 +51,7 @@ class SiteEditorViewModel @AssistedInject constructor(
         }
     }
 
-    fun onDescriptionChange(description: String) {
+    fun updateDescription(description: String) {
         _uiState.update { currentState ->
             currentState.copy(
                 description = description,
@@ -60,7 +60,7 @@ class SiteEditorViewModel @AssistedInject constructor(
         }
     }
 
-    fun onLocationChange(location: String) {
+    fun updateLocation(location: String) {
         _uiState.update { currentState ->
             currentState.copy(
                 location = location,
@@ -69,7 +69,7 @@ class SiteEditorViewModel @AssistedInject constructor(
         }
     }
 
-    fun onStatusChange(status: SiteStatus) {
+    fun updateStatus(status: SiteStatus) {
         _uiState.update { currentState ->
             currentState.copy(
                 status = status,
@@ -78,7 +78,7 @@ class SiteEditorViewModel @AssistedInject constructor(
         }
     }
 
-    fun onPriorityChange(priority: SitePriority) {
+    fun updatePriority(priority: SitePriority) {
         _uiState.update { currentState ->
             currentState.copy(
                 priority = priority,

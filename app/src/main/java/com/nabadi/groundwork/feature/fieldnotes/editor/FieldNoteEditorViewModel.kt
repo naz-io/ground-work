@@ -47,7 +47,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
         }
     }
 
-    fun onTitleChange(title: String) {
+    fun updateTitle(title: String) {
         _uiState.update { currentState ->
             currentState.copy(
                 title = title,
@@ -56,7 +56,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
         }
     }
 
-    fun onAssociatedSiteChange(siteId: SiteId?) {
+    fun updateAssociatedSite(siteId: SiteId?) {
         _uiState.update { currentState ->
             currentState.copy(
                 siteId = siteId,
@@ -65,7 +65,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
         }
     }
 
-    fun onBodyChange(body: String) {
+    fun updateBody(body: String) {
         _uiState.update { currentState ->
             currentState.copy(
                 body = body,
@@ -74,7 +74,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
         }
     }
 
-    fun onStatusChange(status: FieldNoteStatus) {
+    fun updateStatus(status: FieldNoteStatus) {
         _uiState.update {
             it.copy(
                 status = status,

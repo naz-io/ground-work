@@ -117,7 +117,7 @@ class SiteEditorViewModelTest {
     }
 
     @Test
-    fun `onNameChange updates name`() = runTest {
+    fun `updateName updates name`() = runTest {
         val viewModel = SiteEditorViewModel(
             siteRepository = FakeSiteRepository(),
             clock = clock,
@@ -125,7 +125,7 @@ class SiteEditorViewModelTest {
             route = GroundWorkRoute.SiteEditor(),
         )
 
-        viewModel.onNameChange("North Warehouse")
+        viewModel.updateName("North Warehouse")
 
         assertEquals("North Warehouse", viewModel.uiState.value.name)
     }
@@ -140,10 +140,10 @@ class SiteEditorViewModelTest {
         )
         assertFalse(viewModel.uiState.value.showNameRequiredError)
 
-        viewModel.onNameChange("North Warehouse")
+        viewModel.updateName("North Warehouse")
         assertFalse(viewModel.uiState.value.showNameRequiredError)
 
-        viewModel.onNameChange("")
+        viewModel.updateName("")
         assertTrue(viewModel.uiState.value.showNameRequiredError)
     }
 
@@ -157,9 +157,9 @@ class SiteEditorViewModelTest {
             route = GroundWorkRoute.SiteEditor(),
         )
 
-        viewModel.onNameChange("  North Warehouse  ")
-        viewModel.onLocationChange(" Sector A ")
-        viewModel.onDescriptionChange("Main storage facility.\n")
+        viewModel.updateName("  North Warehouse  ")
+        viewModel.updateLocation(" Sector A ")
+        viewModel.updateDescription("Main storage facility.\n")
         viewModel.saveSite()
 
         val savedSite = repository.getSitesStream().first().single()
@@ -169,7 +169,7 @@ class SiteEditorViewModelTest {
     }
 
     @Test
-    fun `onLocationChange updates location`() = runTest {
+    fun `updateLocation updates location`() = runTest {
         val viewModel = SiteEditorViewModel(
             siteRepository = FakeSiteRepository(),
             clock = clock,
@@ -177,13 +177,13 @@ class SiteEditorViewModelTest {
             route = GroundWorkRoute.SiteEditor(),
         )
 
-        viewModel.onLocationChange("Sector A")
+        viewModel.updateLocation("Sector A")
 
         assertEquals("Sector A", viewModel.uiState.value.location)
     }
 
     @Test
-    fun `onDescriptionChange updates description`() = runTest {
+    fun `updateDescription updates description`() = runTest {
         val viewModel = SiteEditorViewModel(
             siteRepository = FakeSiteRepository(),
             clock = clock,
@@ -191,7 +191,7 @@ class SiteEditorViewModelTest {
             route = GroundWorkRoute.SiteEditor(),
         )
 
-        viewModel.onDescriptionChange("Recurring loading-bay access issue.")
+        viewModel.updateDescription("Recurring loading-bay access issue.")
 
         assertEquals(
             "Recurring loading-bay access issue.",
@@ -200,7 +200,7 @@ class SiteEditorViewModelTest {
     }
 
     @Test
-    fun `onPriorityChange updates priority`() = runTest {
+    fun `updatePriority updates priority`() = runTest {
         val viewModel = SiteEditorViewModel(
             siteRepository = FakeSiteRepository(),
             clock = clock,
@@ -208,13 +208,13 @@ class SiteEditorViewModelTest {
             route = GroundWorkRoute.SiteEditor(),
         )
 
-        viewModel.onPriorityChange(SitePriority.HIGH)
+        viewModel.updatePriority(SitePriority.HIGH)
 
         assertEquals(SitePriority.HIGH, viewModel.uiState.value.priority)
     }
 
     @Test
-    fun `onStatusChange updates status`() = runTest {
+    fun `updateStatus updates status`() = runTest {
         val viewModel = SiteEditorViewModel(
             siteRepository = FakeSiteRepository(),
             clock = clock,
@@ -222,7 +222,7 @@ class SiteEditorViewModelTest {
             route = GroundWorkRoute.SiteEditor(),
         )
 
-        viewModel.onStatusChange(SiteStatus.ARCHIVED)
+        viewModel.updateStatus(SiteStatus.ARCHIVED)
 
         assertEquals(SiteStatus.ARCHIVED, viewModel.uiState.value.status)
     }
@@ -237,11 +237,11 @@ class SiteEditorViewModelTest {
             route = GroundWorkRoute.SiteEditor(),
         )
 
-        viewModel.onNameChange("North Warehouse")
-        viewModel.onLocationChange("Sector A")
-        viewModel.onDescriptionChange("Main storage facility.")
-        viewModel.onPriorityChange(SitePriority.HIGH)
-        viewModel.onStatusChange(SiteStatus.ACTIVE)
+        viewModel.updateName("North Warehouse")
+        viewModel.updateLocation("Sector A")
+        viewModel.updateDescription("Main storage facility.")
+        viewModel.updatePriority(SitePriority.HIGH)
+        viewModel.updateStatus(SiteStatus.ACTIVE)
         viewModel.saveSite()
 
         val savedSite = repository.getSitesStream().first().single()
@@ -266,8 +266,8 @@ class SiteEditorViewModelTest {
             route = GroundWorkRoute.SiteEditor(),
         )
 
-        viewModel.onLocationChange("Sector A")
-        viewModel.onDescriptionChange("Description without a site name.")
+        viewModel.updateLocation("Sector A")
+        viewModel.updateDescription("Description without a site name.")
         viewModel.saveSite()
 
         assertTrue(repository.getSitesStream().first().isEmpty())
@@ -299,11 +299,11 @@ class SiteEditorViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onNameChange("Updated site")
-            viewModel.onLocationChange("Updated location")
-            viewModel.onDescriptionChange("Updated description")
-            viewModel.onPriorityChange(SitePriority.HIGH)
-            viewModel.onStatusChange(SiteStatus.ARCHIVED)
+            viewModel.updateName("Updated site")
+            viewModel.updateLocation("Updated location")
+            viewModel.updateDescription("Updated description")
+            viewModel.updatePriority(SitePriority.HIGH)
+            viewModel.updateStatus(SiteStatus.ARCHIVED)
             viewModel.saveSite()
 
             val savedSite = repository.getSitesStream().first().single()
@@ -370,9 +370,9 @@ class SiteEditorViewModelTest {
             idGenerator = idGenerator,
             route = GroundWorkRoute.SiteEditor(),
         )
-        viewModel.onNameChange("Draft site")
-        viewModel.onLocationChange("Draft location")
-        viewModel.onDescriptionChange("Draft description")
+        viewModel.updateName("Draft site")
+        viewModel.updateLocation("Draft location")
+        viewModel.updateDescription("Draft description")
         viewModel.discardSite()
 
         assertEquals(SiteEditorCompletion.DISCARDED, viewModel.uiState.value.completion)
@@ -391,7 +391,7 @@ class SiteEditorViewModelTest {
             route = GroundWorkRoute.SiteEditor(),
         )
 
-        viewModel.onNameChange("North Warehouse")
+        viewModel.updateName("North Warehouse")
         viewModel.saveSite()
 
         val state = viewModel.uiState.value
@@ -439,7 +439,7 @@ class SiteEditorViewModelTest {
             route = GroundWorkRoute.SiteEditor(),
         )
 
-        viewModel.onNameChange("North Warehouse")
+        viewModel.updateName("North Warehouse")
         viewModel.saveSite()
         viewModel.discardSite()
         viewModel.saveSite()
@@ -449,7 +449,7 @@ class SiteEditorViewModelTest {
     }
 
     @Test
-    fun `onNameChange clears error message`() = runTest {
+    fun `updateName clears error message`() = runTest {
         val repository = FakeSiteRepository().apply {
             setShouldThrowError(true)
         }
@@ -460,9 +460,9 @@ class SiteEditorViewModelTest {
             route = GroundWorkRoute.SiteEditor(),
         )
 
-        viewModel.onNameChange("North Warehouse")
+        viewModel.updateName("North Warehouse")
         viewModel.saveSite()
-        viewModel.onNameChange("Updated site")
+        viewModel.updateName("Updated site")
 
         assertEquals("Updated site", viewModel.uiState.value.name)
         assertNull(viewModel.uiState.value.error)

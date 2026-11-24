@@ -78,19 +78,19 @@ class SitesListViewModel @Inject constructor(
             initialValue = SitesListUiState(),
         )
 
-    fun onSearchQueryChange(query: String) {
+    fun updateSearchQuery(query: String) {
         searchQuery.value = query
     }
 
-    fun onStatusFilterChange(status: SiteStatus?) {
+    fun updateStatusFilter(status: SiteStatus?) {
         selectedStatus.value = status
     }
 
-    fun onPriorityFilterChange(priority: SitePriority?) {
+    fun updatePriorityFilter(priority: SitePriority?) {
         selectedPriority.value = priority
     }
 
-    fun onClearCriteriaClick() {
+    fun clearCriteria() {
         searchQuery.value = ""
         selectedStatus.value = null
         selectedPriority.value = null

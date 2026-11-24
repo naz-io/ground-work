@@ -20,10 +20,10 @@ fun SitesListRoute(
 
     SitesListScreen(
         uiState = uiState,
-        onSearchQueryChange = viewModel::onSearchQueryChange,
-        onStatusFilterChange = viewModel::onStatusFilterChange,
-        onPriorityFilterChange = viewModel::onPriorityFilterChange,
-        onClearCriteriaClick = viewModel::onClearCriteriaClick,
+        onSearchQueryChange = viewModel::updateSearchQuery,
+        onStatusFilterChange = viewModel::updateStatusFilter,
+        onPriorityFilterChange = viewModel::updatePriorityFilter,
+        onClearCriteriaClick = viewModel::clearCriteria,
         onOpenSiteClick = onOpenSiteClick.dropUnlessResumed(),
         onAddSiteClick = dropUnlessResumed { onAddSiteClick() },
         modifier = modifier,

@@ -64,7 +64,7 @@ class FieldNoteEditorViewModelTest {
 
         assertEquals(siteId, viewModel.uiState.value.siteId)
 
-        viewModel.onTitleChange("North gate issue")
+        viewModel.updateTitle("North gate issue")
         viewModel.saveFieldNote()
 
         assertEquals(siteId, repository.getFieldNotesStream().first().single().siteId)
@@ -175,7 +175,7 @@ class FieldNoteEditorViewModelTest {
     }
 
     @Test
-    fun `onTitleChange updates title`() = runTest {
+    fun `updateTitle updates title`() = runTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = FakeFieldNoteRepository(),
             siteRepository = FakeSiteRepository(),
@@ -184,13 +184,13 @@ class FieldNoteEditorViewModelTest {
             route = GroundWorkRoute.FieldNoteEditor(),
         )
 
-        viewModel.onTitleChange("North gate issue")
+        viewModel.updateTitle("North gate issue")
 
         assertEquals("North gate issue", viewModel.uiState.value.title)
     }
 
     @Test
-    fun `onBodyChange updates body`() = runTest {
+    fun `updateBody updates body`() = runTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = FakeFieldNoteRepository(),
             siteRepository = FakeSiteRepository(),
@@ -199,7 +199,7 @@ class FieldNoteEditorViewModelTest {
             route = GroundWorkRoute.FieldNoteEditor(),
         )
 
-        viewModel.onBodyChange("Loose fencing near the north access point.")
+        viewModel.updateBody("Loose fencing near the north access point.")
 
         assertEquals(
             "Loose fencing near the north access point.",
@@ -208,7 +208,7 @@ class FieldNoteEditorViewModelTest {
     }
 
     @Test
-    fun `onAssociatedSiteChange assigns and clears site`() = runTest {
+    fun `updateAssociatedSite assigns and clears site`() = runTest {
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = FakeFieldNoteRepository(),
             siteRepository = FakeSiteRepository(),
@@ -218,10 +218,10 @@ class FieldNoteEditorViewModelTest {
         )
         val siteId = SiteId("site-001")
 
-        viewModel.onAssociatedSiteChange(siteId)
+        viewModel.updateAssociatedSite(siteId)
         assertEquals(siteId, viewModel.uiState.value.siteId)
 
-        viewModel.onAssociatedSiteChange(null)
+        viewModel.updateAssociatedSite(null)
         assertNull(viewModel.uiState.value.siteId)
     }
 
@@ -236,9 +236,9 @@ class FieldNoteEditorViewModelTest {
             route = GroundWorkRoute.FieldNoteEditor(),
         )
 
-        viewModel.onTitleChange("North gate issue")
-        viewModel.onBodyChange("Loose fencing near the north access point.")
-        viewModel.onStatusChange(FieldNoteStatus.ACTIVE)
+        viewModel.updateTitle("North gate issue")
+        viewModel.updateBody("Loose fencing near the north access point.")
+        viewModel.updateStatus(FieldNoteStatus.ACTIVE)
         viewModel.saveFieldNote()
 
         val savedFieldNote = repository.getFieldNotesStream().first().single()
@@ -263,7 +263,7 @@ class FieldNoteEditorViewModelTest {
             route = GroundWorkRoute.FieldNoteEditor(),
         )
 
-        viewModel.onBodyChange("Observation without title.")
+        viewModel.updateBody("Observation without title.")
         viewModel.saveFieldNote()
 
         val savedFieldNote = repository.getFieldNotesStream().first().single()
@@ -282,8 +282,8 @@ class FieldNoteEditorViewModelTest {
             route = GroundWorkRoute.FieldNoteEditor(),
         )
 
-        viewModel.onTitleChange("  North gate issue ")
-        viewModel.onBodyChange("\nLoose fencing near the north access point.  \n")
+        viewModel.updateTitle("  North gate issue ")
+        viewModel.updateBody("\nLoose fencing near the north access point.  \n")
         viewModel.saveFieldNote()
 
         val savedFieldNote = repository.getFieldNotesStream().first().single()
@@ -315,8 +315,8 @@ class FieldNoteEditorViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onTitleChange("Updated title")
-            viewModel.onBodyChange("Updated body")
+            viewModel.updateTitle("Updated title")
+            viewModel.updateBody("Updated body")
             viewModel.saveFieldNote()
 
             val savedFieldNote = repository.getFieldNotesStream().first().single()
@@ -351,7 +351,7 @@ class FieldNoteEditorViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onAssociatedSiteChange(SiteId("site-002"))
+            viewModel.updateAssociatedSite(SiteId("site-002"))
             viewModel.saveFieldNote()
 
             assertEquals(
@@ -382,7 +382,7 @@ class FieldNoteEditorViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onAssociatedSiteChange(null)
+            viewModel.updateAssociatedSite(null)
             viewModel.saveFieldNote()
 
             assertNull(repository.getFieldNotesStream().first().single().siteId)
@@ -425,8 +425,8 @@ class FieldNoteEditorViewModelTest {
             idGenerator = idGenerator,
             route = GroundWorkRoute.FieldNoteEditor(),
         )
-        viewModel.onTitleChange("Draft title")
-        viewModel.onBodyChange("Draft body")
+        viewModel.updateTitle("Draft title")
+        viewModel.updateBody("Draft body")
         viewModel.discardChanges()
 
         assertEquals(FieldNoteEditorCompletion.DISCARDED, viewModel.uiState.value.completion)
@@ -446,7 +446,7 @@ class FieldNoteEditorViewModelTest {
             route = GroundWorkRoute.FieldNoteEditor(),
         )
 
-        viewModel.onTitleChange("Title")
+        viewModel.updateTitle("Title")
         viewModel.saveFieldNote()
 
         val state = viewModel.uiState.value
@@ -468,7 +468,7 @@ class FieldNoteEditorViewModelTest {
             route = GroundWorkRoute.FieldNoteEditor(),
         )
 
-        viewModel.onBodyChange("Loose fencing near the north access point.")
+        viewModel.updateBody("Loose fencing near the north access point.")
         viewModel.saveFieldNote()
         viewModel.discardChanges()
         viewModel.saveFieldNote()
@@ -478,7 +478,7 @@ class FieldNoteEditorViewModelTest {
     }
 
     @Test
-    fun `onTitleChange clears error message`() = runTest {
+    fun `updateTitle clears error message`() = runTest {
         val repository = FakeFieldNoteRepository().apply {
             setShouldThrowError(true)
         }
@@ -490,9 +490,9 @@ class FieldNoteEditorViewModelTest {
             route = GroundWorkRoute.FieldNoteEditor(),
         )
 
-        viewModel.onBodyChange("Body")
+        viewModel.updateBody("Body")
         viewModel.saveFieldNote()
-        viewModel.onTitleChange("Updated title")
+        viewModel.updateTitle("Updated title")
 
         assertEquals("Updated title", viewModel.uiState.value.title)
         assertNull(viewModel.uiState.value.error)

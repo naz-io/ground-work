@@ -68,11 +68,11 @@ class FieldNotesListViewModel @Inject constructor(
         initialValue = FieldNotesListUiState(),
     )
 
-    fun onSearchQueryChange(query: String) {
+    fun updateSearchQuery(query: String) {
         searchQuery.value = query
     }
 
-    fun onStatusFilterChange(status: FieldNoteStatus?) {
+    fun updateStatusFilter(status: FieldNoteStatus?) {
         selectedStatus.value = status
     }
 }

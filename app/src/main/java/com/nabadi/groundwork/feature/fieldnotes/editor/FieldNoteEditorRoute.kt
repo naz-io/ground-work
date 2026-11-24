@@ -32,10 +32,10 @@ fun FieldNoteEditorRoute(
 
     FieldNoteEditorScreen(
         uiState = uiState,
-        onTitleChange = viewModel::onTitleChange,
-        onAssociatedSiteChange = viewModel::onAssociatedSiteChange,
-        onStatusChange = viewModel::onStatusChange,
-        onBodyChange = viewModel::onBodyChange,
+        onTitleChange = viewModel::updateTitle,
+        onAssociatedSiteChange = viewModel::updateAssociatedSite,
+        onStatusChange = viewModel::updateStatus,
+        onBodyChange = viewModel::updateBody,
         onSaveClick = viewModel::saveFieldNote,
         onDeleteClick = viewModel::deleteFieldNote,
         onDiscardClick = viewModel::discardChanges,

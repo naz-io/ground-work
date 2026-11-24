@@ -100,7 +100,7 @@ class FieldNotesListViewModelTest {
     }
 
     @Test
-    fun `onSearchQueryChange updates searchQuery and filters field note items`() = runTest {
+    fun `updateSearchQuery updates searchQuery and filters field note items`() = runTest {
         val fieldNotes = listOf(
             fieldNote(
                 id = "1",
@@ -120,7 +120,7 @@ class FieldNotesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onSearchQueryChange(query = "App")
+            viewModel.updateSearchQuery(query = "App")
 
             val filteredState = awaitItem()
             assertEquals("App", filteredState.searchQuery)
@@ -130,7 +130,7 @@ class FieldNotesListViewModelTest {
     }
 
     @Test
-    fun `onStatusFilterChange updates selectedStatus and filters field note items`() = runTest {
+    fun `updateStatusFilter updates selectedStatus and filters field note items`() = runTest {
         val fieldNotes = listOf(
             fieldNote(
                 id = "1",
@@ -150,7 +150,7 @@ class FieldNotesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onStatusFilterChange(status = FieldNoteStatus.DRAFT)
+            viewModel.updateStatusFilter(status = FieldNoteStatus.DRAFT)
 
             val filteredState = awaitItem()
             assertEquals(FieldNoteStatus.DRAFT, filteredState.selectedStatus)
@@ -186,10 +186,10 @@ class FieldNotesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onSearchQueryChange(query = "Apple")
+            viewModel.updateSearchQuery(query = "Apple")
             awaitItem()
 
-            viewModel.onStatusFilterChange(status = FieldNoteStatus.DRAFT)
+            viewModel.updateStatusFilter(status = FieldNoteStatus.DRAFT)
             val finalState = awaitItem()
 
             assertEquals(1, finalState.fieldNoteItems.size)
@@ -222,7 +222,7 @@ class FieldNotesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onSearchQueryChange(query = "fencing")
+            viewModel.updateSearchQuery(query = "fencing")
 
             val finalState = awaitItem()
 
@@ -270,7 +270,7 @@ class FieldNotesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onSearchQueryChange(query = "generator")
+            viewModel.updateSearchQuery(query = "generator")
 
             val filteredState = awaitItem()
             assertEquals("generator", filteredState.searchQuery)
@@ -325,7 +325,7 @@ class FieldNotesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onSearchQueryChange(query = "gate")
+            viewModel.updateSearchQuery(query = "gate")
 
             val filteredState = awaitItem()
             assertEquals(1, filteredState.fieldNoteItems.size)
@@ -354,7 +354,7 @@ class FieldNotesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onSearchQueryChange(query = "   ")
+            viewModel.updateSearchQuery(query = "   ")
 
             val state = awaitItem()
             assertEquals("   ", state.searchQuery)
@@ -383,10 +383,10 @@ class FieldNotesListViewModelTest {
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.onStatusFilterChange(status = FieldNoteStatus.DRAFT)
+            viewModel.updateStatusFilter(status = FieldNoteStatus.DRAFT)
             awaitItem()
 
-            viewModel.onStatusFilterChange(status = null)
+            viewModel.updateStatusFilter(status = null)
 
             val clearedState = awaitItem()
             assertNull(clearedState.selectedStatus)
