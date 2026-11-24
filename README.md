@@ -21,7 +21,7 @@ The sync groundwork is in place: records carry pending/failed/synced state, dele
 - Navigation 3 with typed `@Serializable` routes and one back stack per bottom-bar tab
 - Coroutines and Flow for observable local data
 - JUnit 4, Turbine, kotlinx-coroutines-test, Room testing, and Compose UI tests
-- AGP 9.4, Gradle 9.8, minSdk 30, targetSdk 37, R8 shrinking for release builds
+- AGP 9.5, Gradle 9.9, compileSdk 37.2, minSdk 30, targetSdk 37, R8 shrinking for release builds
 - GitHub Actions for unit tests, debug builds, and emulator-based instrumented tests
 
 ## Seniority Signals
