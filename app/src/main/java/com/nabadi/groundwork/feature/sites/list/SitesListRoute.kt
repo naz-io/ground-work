@@ -5,7 +5,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.dropUnlessResumed
 import com.nabadi.groundwork.domain.model.SiteId
+import com.nabadi.groundwork.ui.lifecycle.dropUnlessResumed
 
 @Composable
 fun SitesListRoute(
@@ -22,8 +24,8 @@ fun SitesListRoute(
         onStatusFilterChange = viewModel::onStatusFilterChange,
         onPriorityFilterChange = viewModel::onPriorityFilterChange,
         onClearCriteriaClick = viewModel::onClearCriteriaClick,
-        onOpenSiteClick = onOpenSiteClick,
-        onAddSiteClick = onAddSiteClick,
+        onOpenSiteClick = onOpenSiteClick.dropUnlessResumed(),
+        onAddSiteClick = dropUnlessResumed { onAddSiteClick() },
         modifier = modifier,
     )
 }

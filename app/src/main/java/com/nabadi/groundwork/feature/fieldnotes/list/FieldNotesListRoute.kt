@@ -5,7 +5,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.dropUnlessResumed
 import com.nabadi.groundwork.domain.model.FieldNoteId
+import com.nabadi.groundwork.ui.lifecycle.dropUnlessResumed
 
 @Composable
 fun FieldNotesListRoute(
@@ -20,8 +22,8 @@ fun FieldNotesListRoute(
         uiState = uiState,
         onSearchQueryChange = viewModel::onSearchQueryChange,
         onStatusFilterChange = viewModel::onStatusFilterChange,
-        onAddFieldNoteClick = onAddFieldNoteClick,
-        onFieldNoteClick = onFieldNoteClick,
+        onAddFieldNoteClick = dropUnlessResumed { onAddFieldNoteClick() },
+        onFieldNoteClick = onFieldNoteClick.dropUnlessResumed(),
         modifier = modifier,
     )
 }
