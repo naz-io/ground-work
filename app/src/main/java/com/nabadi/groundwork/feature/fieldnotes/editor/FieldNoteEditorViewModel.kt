@@ -3,6 +3,7 @@ package com.nabadi.groundwork.feature.fieldnotes.editor
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nabadi.groundwork.core.common.suspendRunCatching
 import com.nabadi.groundwork.domain.IdGenerator
 import com.nabadi.groundwork.domain.model.FieldNote
 import com.nabadi.groundwork.domain.model.FieldNoteId
@@ -124,7 +125,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
         viewModelScope.launch {
             updateSavingState(isSaving = true)
 
-            runCatching {
+            suspendRunCatching {
                 val existingNote = existingFieldNote
                 val now = clock.millis()
 
@@ -156,7 +157,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
         viewModelScope.launch {
             updateDeletingState(isDeleting = true)
 
-            runCatching {
+            suspendRunCatching {
                 val existingNote = existingFieldNote
                     ?: error("Cannot delete a field note that has not been saved.")
                 fieldNoteRepository.deleteFieldNote(id = existingNote.id)
@@ -191,7 +192,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
         viewModelScope.launch {
             updateLoadingState(isLoading = true)
 
-            runCatching {
+            suspendRunCatching {
                 fieldNoteRepository.getFieldNote(id)
             }.onSuccess { fieldNote ->
                 if (fieldNote == null) {

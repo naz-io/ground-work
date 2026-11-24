@@ -160,6 +160,7 @@ Simulated backend:
 Architecture and quality:
 - Moved navigation to type-safe `@Serializable` routes; Site Detail now always has a site ID
 - Migrated from Navigation Compose to Navigation 3: each bottom-bar tab keeps its own back stack in `NavigationState`, changed only through `Navigator`, and the stacks survive process death
+- Stopped editor ViewModels from reporting coroutine cancellation as a failed save, delete, or load: failable work goes through `suspendRunCatching` in `core/common`, which rethrows `CancellationException` and doesn't catch `Error`s
 - Kept unsaved editor input across process death through each editor's `SavedStateHandle`; when editing an existing record, a restored draft wins over the record reloaded from the database
 - Passed typed routes into editor and detail ViewModels through Hilt assisted injection instead of `SavedStateHandle` lookups
 - Replaced hard-coded ViewModel error strings with per-screen error types resolved from string resources
@@ -253,6 +254,12 @@ Destinations are `@Serializable` `NavKey` classes under `GroundWorkRoute`, so ar
 
 ViewModels expose per-screen error enums (for example `SiteEditorError.SAVE_FAILED`) instead of display strings. Each error carries its string resource, and screens resolve the text with `stringResource`. This keeps user-facing text in string resources, ready for translation, and lets tests assert on error values rather than English sentences.
 
+### Coroutine failures without swallowing cancellation
+
+Editor ViewModels run saves, deletes, and loads in `viewModelScope` and turn any failure into a typed UI error. They used `runCatching` for this, but `runCatching` catches every `Throwable`, including the `CancellationException` that coroutines use to cancel work. A cancelled save, for example when the ViewModel is cleared, was then reported as a failed save, and cancellation stopped propagating, breaking [structured concurrency](https://kotlinlang.org/docs/cancellation-and-timeouts.html). Android's [coroutines best practices](https://developer.android.com/kotlin/coroutines/coroutines-best-practices) say not to consume `CancellationException` and to prefer catching specific exception types.
+
+Catching only specific types was considered and rejected for now: repositories fail in several ways (SQLite errors from Room, the `IllegalStateException` for saving a deleted record, and soon sync failures), and any type left off the list would crash the app instead of showing the typed error. Instead, failable work goes through `suspendRunCatching`, which rethrows `CancellationException`, catches `Exception` rather than `Throwable` so errors such as `OutOfMemoryError` aren't swallowed, and otherwise behaves like `runCatching`. It is the same helper Google's Now in Android sample uses for sync ([`SyncUtilities.kt`](https://github.com/android/nowinandroid/blob/main/core/data/src/main/kotlin/com/google/samples/apps/nowinandroid/core/data/SyncUtilities.kt)). Now in Android keeps it private next to its only caller; here two features already use it and the sync layer will too, so it lives in `core/common`, the single-module counterpart of the [common (core) module](https://developer.android.com/topic/modularization/patterns#common-modules) in Android's modularization guidance. `SuspendRunCatchingTest` pins the behavior.
+
 ### Injected time and IDs
 
 Editor ViewModels receive a `java.time.Clock` and an `IdGenerator` from Hilt instead of calling `System.currentTimeMillis()` and `UUID.randomUUID()` directly. Tests use a fixed clock and a predictable ID, which matters for upcoming sync and conflict logic that depends on timestamps.
@@ -328,6 +335,7 @@ Tests are split by what they need. Logic that runs on the JVM is covered by fast
 - **Editor ViewModels:** `FieldNoteEditorViewModelTest` and `SiteEditorViewModelTest` cover load, create, edit, delete, and discard flows, exact generated IDs and timestamps, site assignment and reassignment, site preselection from Site Detail, site name trimming and the required-name hint, unsaved input surviving process death (including a restored draft winning over the reloaded record), and typed save, delete, and load errors
 - **Site Detail:** `SiteDetailViewModelTest` covers loading a site and its notes, the site name on note rows (including renames, with unchanged rows reused across other site edits), live updates, the site being deleted while open, and site and note load errors
 - **UI state models:** list, editor, and detail UI state tests cover derived flags such as `canSave`, `isBusy`, empty and no-match states, active criteria, and the required-name hint
+- **Shared helpers:** `SuspendRunCatchingTest` covers turning failures into results while rethrowing cancellation and leaving errors uncaught
 - **Navigation:** `NavigatorTest` covers opening screens on the current tab, switching tabs without losing each tab's screens, returning to the start tab from another tab's root, and skipping a deleted site's detail screen
 - **Formatting:** `AbsoluteDateTimeLabelTest` covers the shared date pattern, formatting in the formatter's zone and locale, and empty labels for unset timestamps; `MinuteTicksTest` covers emitting the clock time immediately and then on each minute boundary
 - **Simulated backend:** `RemoteWireFormatTest` pins the JSON format with literal JSON (field names, ISO timestamps, lowercase enums, explicit null site links, ignored unknown fields, rejected malformed values); `RemoteMappersTest` covers domain → remote mapping; `FakeGroundWorkServerTest` covers revisions, idempotent retries and deletes, server-side validation and ordering rules, and simulated failures; `SyncRemoteDataSourceTest` covers mapping every outcome to success, transient failure, or rejection, and that cancellation is not swallowed
@@ -398,7 +406,7 @@ Sites were implemented as their own local foundation before the relationship bet
 
 ### Avoiding premature modularization
 
-The project starts with a simple feature-oriented package structure instead of a large multi-module setup. Additional modules or core packages will be introduced only when shared code or build boundaries justify them.
+The project starts with a simple feature-oriented package structure instead of a large multi-module setup. Additional modules will be introduced only when shared code or build boundaries justify them. The first shared package, `core/common`, holds small helpers used by more than one layer or feature (currently `suspendRunCatching`), mirroring the common (core) module in Android's [modularization guidance](https://developer.android.com/topic/modularization/patterns#common-modules) so it can become a module if the app is split later. A helper stays private next to its caller until a second one needs it.
 
 ### Repository contracts in the domain layer
 

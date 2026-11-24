@@ -3,6 +3,7 @@ package com.nabadi.groundwork.feature.sites.editor
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nabadi.groundwork.core.common.suspendRunCatching
 import com.nabadi.groundwork.domain.IdGenerator
 import com.nabadi.groundwork.domain.model.Site
 import com.nabadi.groundwork.domain.model.SiteId
@@ -103,7 +104,7 @@ class SiteEditorViewModel @AssistedInject constructor(
         viewModelScope.launch {
             updateSavingState(isSaving = true)
 
-            runCatching {
+            suspendRunCatching {
                 val existingSite = existingSite
                 val now = clock.millis()
 
@@ -137,7 +138,7 @@ class SiteEditorViewModel @AssistedInject constructor(
 
         viewModelScope.launch {
             updateDeletingState(isDeleting = true)
-            runCatching {
+            suspendRunCatching {
                 siteRepository.deleteSite(id = siteToDelete.id)
             }.onSuccess {
                 complete(SiteEditorCompletion.DELETED)
@@ -170,7 +171,7 @@ class SiteEditorViewModel @AssistedInject constructor(
         viewModelScope.launch {
             updateLoadingState(isLoading = true)
 
-            runCatching {
+            suspendRunCatching {
                 siteRepository.getSite(id)
             }.onSuccess { site ->
                 if (site == null) {
