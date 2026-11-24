@@ -73,8 +73,10 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
 
-    // Hilt/ Navigation  / Hilt Compose
-    implementation(libs.androidx.navigation.compose)
+    // Hilt/ Navigation 3 / Hilt Compose
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
     ksp(libs.hilt.compiler)
@@ -93,7 +95,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.room.testing)
-    androidTestImplementation(libs.androidx.navigation.testing)
 
     // Debug
     debugImplementation(libs.androidx.compose.ui.test.manifest)

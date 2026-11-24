@@ -4,58 +4,48 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import com.nabadi.groundwork.navigation.GroundWorkNavHost
+import com.nabadi.groundwork.navigation.GroundWorkNavDisplay
 import com.nabadi.groundwork.navigation.GroundWorkRoute
+import com.nabadi.groundwork.navigation.Navigator
+import com.nabadi.groundwork.navigation.rememberNavigationState
+
+private val TopLevelRoutes = setOf(
+    GroundWorkRoute.SitesList,
+    GroundWorkRoute.FieldNotesList,
+)
 
 @Composable
 fun GroundWorkApp(
     modifier: Modifier = Modifier,
 ) {
-    val navController = rememberNavController()
-    val currentBackStack by navController.currentBackStackEntryAsState()
-    val currentDestination = currentBackStack?.destination
-    val selectedTopLevelRoute = when {
-        currentDestination?.hasRoute<GroundWorkRoute.SitesList>() == true -> GroundWorkRoute.SitesList
-        currentDestination?.hasRoute<GroundWorkRoute.FieldNotesList>() == true -> GroundWorkRoute.FieldNotesList
-        else -> null
-    }
+    val navigationState = rememberNavigationState(
+        startRoute = GroundWorkRoute.SitesList,
+        topLevelRoutes = TopLevelRoutes,
+    )
+    val navigator = remember(navigationState) { Navigator(navigationState) }
+
+    // The bar only shows on a tab's root screen, so tabs can't change mid-flow.
+    val showBottomBar = navigationState.currentRoute in TopLevelRoutes
 
     Scaffold(
         modifier = modifier,
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
-            if (selectedTopLevelRoute != null) {
+            if (showBottomBar) {
                 GroundWorkBottomBar(
-                    selectedRoute = selectedTopLevelRoute,
-                    onSitesClick = {
-                        navController.navigateToTopLevelDestination(GroundWorkRoute.SitesList)
-                    },
-                    onFieldNotesClick = {
-                        navController.navigateToTopLevelDestination(GroundWorkRoute.FieldNotesList)
-                    },
+                    selectedRoute = navigationState.topLevelRoute as? GroundWorkRoute,
+                    onSitesClick = { navigator.navigate(GroundWorkRoute.SitesList) },
+                    onFieldNotesClick = { navigator.navigate(GroundWorkRoute.FieldNotesList) },
                 )
             }
         },
     ) { innerPadding ->
-        GroundWorkNavHost(
-            navController = navController,
+        GroundWorkNavDisplay(
+            navigationState = navigationState,
+            navigator = navigator,
             modifier = Modifier.padding(innerPadding),
         )
-    }
-}
-
-private fun NavHostController.navigateToTopLevelDestination(route: GroundWorkRoute) {
-    navigate(route) {
-        launchSingleTop = true
-        restoreState = true
-        popUpTo(graph.startDestinationId) {
-            saveState = true
-        }
     }
 }

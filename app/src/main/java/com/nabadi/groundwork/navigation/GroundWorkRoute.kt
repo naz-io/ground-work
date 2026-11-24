@@ -1,8 +1,9 @@
 package com.nabadi.groundwork.navigation
 
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
-sealed interface GroundWorkRoute {
+sealed interface GroundWorkRoute : NavKey {
     @Serializable
     data object SitesList : GroundWorkRoute
 
