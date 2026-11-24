@@ -396,3 +396,7 @@ Sites were implemented as their own local foundation before the relationship bet
 ### Avoiding premature modularization
 
 The project starts with a simple feature-oriented package structure instead of a large multi-module setup. Additional modules or core packages will be introduced only when shared code or build boundaries justify them.
+
+### Repository contracts in the domain layer
+
+The Android architecture guide places repositories in the [data layer](https://developer.android.com/topic/architecture/data-layer) and reserves the optional [domain layer](https://developer.android.com/topic/architecture/domain-layer) for use cases, with the domain layer depending on data. GroundWork inverts that dependency: repository interfaces live in `domain` next to the models and `SyncMetadata`, and `data` provides the Room-backed `OfflineFirst*Repository` implementations. Dependencies point inward, so ViewModels see only domain types and never Room, and the fakes and the coming sync engine sit behind the same contracts. There are no use cases yet because no business logic is shared across ViewModels; they will be added to `domain` when sync or conflict handling produces logic that several screens need.
