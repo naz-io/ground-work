@@ -1,5 +1,6 @@
 package com.nabadi.groundwork.feature.fieldnotes.editor
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nabadi.groundwork.domain.IdGenerator
@@ -24,12 +25,14 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.updateAndGet
 import kotlinx.coroutines.launch
 import java.time.Clock
 
 @HiltViewModel(assistedFactory = FieldNoteEditorViewModel.Factory::class)
 class FieldNoteEditorViewModel @AssistedInject constructor(
     @Assisted route: GroundWorkRoute.FieldNoteEditor,
+    private val savedStateHandle: SavedStateHandle,
     private val fieldNoteRepository: FieldNoteRepository,
     siteRepository: SiteRepository,
     private val clock: Clock,
@@ -42,8 +45,12 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
 
     // The form is state this ViewModel writes itself. The site options are a repository
     // stream, collected only while the screen is subscribed.
+    // Set when the process was recreated with unsaved input in progress.
+    private val hasSavedDraft: Boolean = savedStateHandle.get<Boolean>(KEY_HAS_DRAFT) == true
+
     private val formState = MutableStateFlow(
-        FieldNoteEditorUiState(siteId = initialSiteId, isEditing = fieldNoteId != null),
+        FieldNoteEditorUiState(siteId = initialSiteId, isEditing = fieldNoteId != null)
+            .withSavedDraft(),
     )
 
     private val siteOptions: Flow<SiteOptions> = siteRepository.getSitesStream()
@@ -72,39 +79,42 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
     }
 
     fun updateTitle(title: String) {
-        formState.update { currentState ->
-            currentState.copy(
-                title = title,
-                error = null,
-            )
-        }
+        editForm { it.copy(title = title, error = null) }
     }
 
     fun updateAssociatedSite(siteId: SiteId?) {
-        formState.update { currentState ->
-            currentState.copy(
-                siteId = siteId,
-                error = null,
-            )
-        }
+        editForm { it.copy(siteId = siteId, error = null) }
     }
 
     fun updateBody(body: String) {
-        formState.update { currentState ->
-            currentState.copy(
-                body = body,
-                error = null,
-            )
-        }
+        editForm { it.copy(body = body, error = null) }
     }
 
     fun updateStatus(status: FieldNoteStatus) {
-        formState.update {
-            it.copy(
-                status = status,
-                error = null,
-            )
-        }
+        editForm { it.copy(status = status, error = null) }
+    }
+
+    // A ViewModel outlives configuration changes but not process death, so user input is
+    // also kept in the SavedStateHandle.
+    private fun editForm(transform: (FieldNoteEditorUiState) -> FieldNoteEditorUiState) {
+        val form = formState.updateAndGet(transform)
+        savedStateHandle[KEY_HAS_DRAFT] = true
+        savedStateHandle[KEY_TITLE] = form.title
+        savedStateHandle[KEY_BODY] = form.body
+        savedStateHandle[KEY_STATUS] = form.status.name
+        savedStateHandle[KEY_SITE_ID] = form.siteId?.value
+    }
+
+    private fun FieldNoteEditorUiState.withSavedDraft(): FieldNoteEditorUiState {
+        if (!hasSavedDraft) return this
+        return copy(
+            title = savedStateHandle[KEY_TITLE] ?: title,
+            body = savedStateHandle[KEY_BODY] ?: body,
+            status = savedStateHandle.get<String>(KEY_STATUS)
+                ?.let { name -> FieldNoteStatus.entries.firstOrNull { it.name == name } }
+                ?: status,
+            siteId = savedStateHandle.get<String>(KEY_SITE_ID)?.let(::SiteId),
+        )
     }
 
     fun saveFieldNote() {
@@ -195,11 +205,18 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
                 } else {
                     existingFieldNote = fieldNote
                     formState.update {
-                        it.copy(
-                            title = fieldNote.title,
-                            siteId = fieldNote.siteId,
-                            body = fieldNote.body,
-                            status = fieldNote.status,
+                        // A restored draft holds edits that aren't saved yet, so keep them.
+                        val form = if (hasSavedDraft) {
+                            it
+                        } else {
+                            it.copy(
+                                title = fieldNote.title,
+                                siteId = fieldNote.siteId,
+                                body = fieldNote.body,
+                                status = fieldNote.status,
+                            )
+                        }
+                        form.copy(
                             updatedAt = fieldNote.updatedAt,
                             isEditing = true,
                             isLoading = false,
@@ -250,6 +267,14 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
                 error = error,
             )
         }
+    }
+
+    private companion object {
+        const val KEY_HAS_DRAFT = "draft_saved"
+        const val KEY_TITLE = "draft_title"
+        const val KEY_BODY = "draft_body"
+        const val KEY_STATUS = "draft_status"
+        const val KEY_SITE_ID = "draft_site_id"
     }
 
     private data class SiteOptions(

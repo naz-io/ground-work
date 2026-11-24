@@ -160,6 +160,7 @@ Simulated backend:
 Architecture and quality:
 - Moved navigation to type-safe `@Serializable` routes; Site Detail now always has a site ID
 - Migrated from Navigation Compose to Navigation 3: each bottom-bar tab keeps its own back stack in `NavigationState`, changed only through `Navigator`, and the stacks survive process death
+- Kept unsaved editor input across process death through each editor's `SavedStateHandle`; when editing an existing record, a restored draft wins over the record reloaded from the database
 - Passed typed routes into editor and detail ViewModels through Hilt assisted injection instead of `SavedStateHandle` lookups
 - Replaced hard-coded ViewModel error strings with per-screen error types resolved from string resources
 - Injected `java.time.Clock` and an `IdGenerator` into the editor ViewModels
@@ -324,7 +325,7 @@ Tests are split by what they need. Logic that runs on the JVM is covered by fast
 - **Domain:** `SyncMetadataTest` covers every sync state transition, including keeping unsynced creates as creates, retrying failed creates, rejecting updates to deleted records, and recording failures with their operation
 - **Mappers:** `FieldNoteMapperTest`, `SiteMapperTest`, `SyncMetadataMapperTest`, and `PersistedEnumMapperTest` cover entity ↔ domain conversion, sync metadata round trips, nullable site links, and safe defaults for unknown persisted values
 - **List ViewModels:** `FieldNotesListViewModelTest` and `SitesListViewModelTest` cover repository updates, search by title, body, description, location, and site name, status and priority filters, combined and cleared criteria, per-site note counts, the Sites list's clock time and its refresh at each minute boundary without refiltering, and load errors
-- **Editor ViewModels:** `FieldNoteEditorViewModelTest` and `SiteEditorViewModelTest` cover load, create, edit, delete, and discard flows, exact generated IDs and timestamps, site assignment and reassignment, site preselection from Site Detail, site name trimming and the required-name hint, and typed save, delete, and load errors
+- **Editor ViewModels:** `FieldNoteEditorViewModelTest` and `SiteEditorViewModelTest` cover load, create, edit, delete, and discard flows, exact generated IDs and timestamps, site assignment and reassignment, site preselection from Site Detail, site name trimming and the required-name hint, unsaved input surviving process death (including a restored draft winning over the reloaded record), and typed save, delete, and load errors
 - **Site Detail:** `SiteDetailViewModelTest` covers loading a site and its notes, the site name on note rows (including renames, with unchanged rows reused across other site edits), live updates, the site being deleted while open, and site and note load errors
 - **UI state models:** list, editor, and detail UI state tests cover derived flags such as `canSave`, `isBusy`, empty and no-match states, active criteria, and the required-name hint
 - **Navigation:** `NavigatorTest` covers opening screens on the current tab, switching tabs without losing each tab's screens, returning to the start tab from another tab's root, and skipping a deleted site's detail screen
