@@ -148,7 +148,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
 
     private fun observeAvailableSites() {
         viewModelScope.launch {
-            siteRepository.observeSites()
+            siteRepository.getSitesStream()
                 .catch {
                     _uiState.update { currentState ->
                         currentState.copy(

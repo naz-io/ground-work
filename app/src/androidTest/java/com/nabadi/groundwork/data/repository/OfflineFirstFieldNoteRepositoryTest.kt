@@ -102,7 +102,7 @@ class OfflineFirstFieldNoteRepositoryTest {
         repository.saveFieldNote(updatedFieldNote)
 
         val savedFieldNote = repository.getFieldNote(updatedFieldNote.id)
-        val fieldNotes = repository.observeFieldNotes().first()
+        val fieldNotes = repository.getFieldNotesStream().first()
 
         assertEquals(updatedFieldNote, savedFieldNote)
         assertEquals(listOf(updatedFieldNote), fieldNotes)
@@ -125,7 +125,7 @@ class OfflineFirstFieldNoteRepositoryTest {
     }
 
     @Test
-    fun `observeFieldNotes emits saved field notes ordered by updatedAt descending`() = runTest {
+    fun `getFieldNotesStream emits saved field notes ordered by updatedAt descending`() = runTest {
         val olderFieldNote = fieldNote(
             id = "1",
             title = "Older field note",
@@ -140,13 +140,13 @@ class OfflineFirstFieldNoteRepositoryTest {
         repository.saveFieldNote(olderFieldNote)
         repository.saveFieldNote(newerFieldNote)
 
-        val fieldNotes = repository.observeFieldNotes().first()
+        val fieldNotes = repository.getFieldNotesStream().first()
 
         assertEquals(listOf(newerFieldNote, olderFieldNote), fieldNotes)
     }
 
     @Test
-    fun `observeFieldNotesForSite emits field notes assigned to site ordered by updatedAt descending`() = runTest {
+    fun `getFieldNotesForSiteStream emits field notes assigned to site ordered by updatedAt descending`() = runTest {
         database.siteDao().upsertSite(siteEntity(id = "site-1"))
         database.siteDao().upsertSite(siteEntity(id = "site-2"))
 
@@ -180,26 +180,26 @@ class OfflineFirstFieldNoteRepositoryTest {
         repository.saveFieldNote(otherSiteFieldNote)
         repository.saveFieldNote(unassignedFieldNote)
 
-        val fieldNotes = repository.observeFieldNotesForSite(SiteId("site-1")).first()
+        val fieldNotes = repository.getFieldNotesForSiteStream(SiteId("site-1")).first()
 
         assertEquals(listOf(newerAssignedFieldNote, olderAssignedFieldNote), fieldNotes)
     }
 
     @Test
-    fun `observeFieldNotesForSite emits empty list for site with no field notes`() = runTest {
+    fun `getFieldNotesForSiteStream emits empty list for site with no field notes`() = runTest {
         val fieldNote = fieldNote(
             id = "1",
             siteId = null,
         )
         repository.saveFieldNote(fieldNote)
 
-        val fieldNotes = repository.observeFieldNotesForSite(SiteId("missing-site")).first()
+        val fieldNotes = repository.getFieldNotesForSiteStream(SiteId("missing-site")).first()
 
         assertEquals(emptyList<FieldNote>(), fieldNotes)
     }
 
     @Test
-    fun `observeUnassignedFieldNotes emits unassigned field notes ordered by updatedAt descending`() = runTest {
+    fun `getUnassignedFieldNotesStream emits unassigned field notes ordered by updatedAt descending`() = runTest {
         database.siteDao().upsertSite(siteEntity(id = "site-1"))
 
         val olderUnassignedFieldNote = fieldNote(
@@ -225,7 +225,7 @@ class OfflineFirstFieldNoteRepositoryTest {
         repository.saveFieldNote(newerUnassignedFieldNote)
         repository.saveFieldNote(assignedFieldNote)
 
-        val fieldNotes = repository.observeUnassignedFieldNotes().first()
+        val fieldNotes = repository.getUnassignedFieldNotesStream().first()
 
         assertEquals(listOf(newerUnassignedFieldNote, olderUnassignedFieldNote), fieldNotes)
     }
@@ -310,7 +310,7 @@ class OfflineFirstFieldNoteRepositoryTest {
         database.fieldNoteDao().upsertFieldNote(failedDelete.toEntity())
 
         assertNull(repository.getFieldNote(failedDelete.id))
-        assertEquals(emptyList<FieldNote>(), repository.observeFieldNotes().first())
+        assertEquals(emptyList<FieldNote>(), repository.getFieldNotesStream().first())
         assertEquals(
             SyncOperation.DELETE,
             database.fieldNoteDao().getFieldNoteForSync(failedDelete.id.value)
@@ -332,7 +332,7 @@ class OfflineFirstFieldNoteRepositoryTest {
         repository.deleteFieldNote(syncedFieldNote.id)
 
         assertNull(repository.getFieldNote(syncedFieldNote.id))
-        assertEquals(emptyList<FieldNote>(), repository.observeFieldNotes().first())
+        assertEquals(emptyList<FieldNote>(), repository.getFieldNotesStream().first())
         assertEquals(
             SyncState.PENDING_DELETE,
             database.fieldNoteDao()
@@ -350,19 +350,19 @@ class OfflineFirstFieldNoteRepositoryTest {
 
         repository.deleteFieldNote(FieldNoteId("missing-id"))
 
-        val fieldNotes = repository.observeFieldNotes().first()
+        val fieldNotes = repository.getFieldNotesStream().first()
 
         assertEquals(listOf(fieldNote), fieldNotes)
     }
 
     @Test
-    fun `observeFieldNotes emits empty list after saved field note is deleted`() = runTest {
+    fun `getFieldNotesStream emits empty list after saved field note is deleted`() = runTest {
         val fieldNote = fieldNote(id = "1")
         repository.saveFieldNote(fieldNote)
 
         repository.deleteFieldNote(fieldNote.id)
 
-        val fieldNotes = repository.observeFieldNotes().first()
+        val fieldNotes = repository.getFieldNotesStream().first()
 
         assertEquals(emptyList<FieldNote>(), fieldNotes)
     }

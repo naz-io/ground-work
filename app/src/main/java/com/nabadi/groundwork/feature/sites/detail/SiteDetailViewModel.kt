@@ -32,13 +32,13 @@ class SiteDetailViewModel @AssistedInject constructor(
 
     private val siteId: SiteId = SiteId(route.siteId)
 
-    private val site: Flow<Site?> = siteRepository.observeSites()
+    private val site: Flow<Site?> = siteRepository.getSitesStream()
         .map { sites -> sites.firstOrNull { it.id == siteId } }
         .distinctUntilChanged()
 
     // Caught here rather than downstream so a notes failure keeps the site details on screen.
     private val fieldNotes: Flow<Result<List<FieldNote>>> =
-        fieldNoteRepository.observeFieldNotesForSite(siteId)
+        fieldNoteRepository.getFieldNotesForSiteStream(siteId)
             .map { Result.success(it) }
             .catch { emit(Result.failure(it)) }
 

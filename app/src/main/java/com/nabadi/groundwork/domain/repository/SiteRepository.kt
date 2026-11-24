@@ -5,7 +5,7 @@ import com.nabadi.groundwork.domain.model.SiteId
 import kotlinx.coroutines.flow.Flow
 
 interface SiteRepository {
-    fun observeSites(): Flow<List<Site>>
+    fun getSitesStream(): Flow<List<Site>>
 
     suspend fun getSite(id: SiteId): Site?
 

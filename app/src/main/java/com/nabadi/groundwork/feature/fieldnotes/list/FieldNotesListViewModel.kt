@@ -24,8 +24,8 @@ class FieldNotesListViewModel @Inject constructor(
     private val selectedStatus = MutableStateFlow<FieldNoteStatus?>(null)
 
     val uiState: StateFlow<FieldNotesListUiState> = combine(
-        fieldNoteRepository.observeFieldNotes(),
-        siteRepository.observeSites(),
+        fieldNoteRepository.getFieldNotesStream(),
+        siteRepository.getSitesStream(),
         searchQuery,
         selectedStatus,
     ) { fieldNotes, sites, searchQuery, selectedStatus ->

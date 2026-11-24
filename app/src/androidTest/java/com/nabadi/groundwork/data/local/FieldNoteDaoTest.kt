@@ -39,7 +39,7 @@ class FieldNoteDaoTest {
     }
 
     @Test
-    fun `observeFieldNotes emits saved notes ordered by updatedAt descending`() = runTest {
+    fun `getFieldNotesStream emits saved notes ordered by updatedAt descending`() = runTest {
         val olderEntity = fieldNoteEntity(
             id = "1",
             title = "Older field note",
@@ -53,12 +53,12 @@ class FieldNoteDaoTest {
         dao.upsertFieldNote(olderEntity)
         dao.upsertFieldNote(newerEntity)
 
-        val fieldNotes = dao.observeFieldNotes().first()
+        val fieldNotes = dao.getFieldNotesStream().first()
         assertEquals(listOf(newerEntity, olderEntity), fieldNotes)
     }
 
     @Test
-    fun `observeFieldNotesForSite emits notes assigned to site ordered by updatedAt descending`() = runTest {
+    fun `getFieldNotesForSiteStream emits notes assigned to site ordered by updatedAt descending`() = runTest {
         siteDao.upsertSite(siteEntity(id = "site-1"))
         siteDao.upsertSite(siteEntity(id = "site-2"))
 
@@ -91,26 +91,26 @@ class FieldNoteDaoTest {
         dao.upsertFieldNote(otherSiteNote)
         dao.upsertFieldNote(unassignedNote)
 
-        val fieldNotes = dao.observeFieldNotesForSite("site-1").first()
+        val fieldNotes = dao.getFieldNotesForSiteStream("site-1").first()
 
         assertEquals(listOf(newerAssignedNote, olderAssignedNote), fieldNotes)
     }
 
     @Test
-    fun `observeFieldNotesForSite emits empty list for site with no notes`() = runTest {
+    fun `getFieldNotesForSiteStream emits empty list for site with no notes`() = runTest {
         val entity = fieldNoteEntity(
             id = "1",
             siteId = null,
         )
         dao.upsertFieldNote(entity)
 
-        val fieldNotes = dao.observeFieldNotesForSite("missing-site").first()
+        val fieldNotes = dao.getFieldNotesForSiteStream("missing-site").first()
 
         assertEquals(emptyList<FieldNoteEntity>(), fieldNotes)
     }
 
     @Test
-    fun `observeUnassignedFieldNotes emits unassigned notes ordered by updatedAt descending`() = runTest {
+    fun `getUnassignedFieldNotesStream emits unassigned notes ordered by updatedAt descending`() = runTest {
         siteDao.upsertSite(siteEntity(id = "site-1"))
 
         val olderUnassignedNote = fieldNoteEntity(
@@ -135,7 +135,7 @@ class FieldNoteDaoTest {
         dao.upsertFieldNote(newerUnassignedNote)
         dao.upsertFieldNote(assignedNote)
 
-        val fieldNotes = dao.observeUnassignedFieldNotes().first()
+        val fieldNotes = dao.getUnassignedFieldNotesStream().first()
 
         assertEquals(listOf(newerUnassignedNote, olderUnassignedNote), fieldNotes)
     }
@@ -227,18 +227,18 @@ class FieldNoteDaoTest {
 
         dao.deleteFieldNote("missing-id")
 
-        val fieldNotes = dao.observeFieldNotes().first()
+        val fieldNotes = dao.getFieldNotesStream().first()
         assertEquals(listOf(entity), fieldNotes)
     }
 
     @Test
-    fun `observeFieldNotes emits empty list after saved note is deleted`() = runTest {
+    fun `getFieldNotesStream emits empty list after saved note is deleted`() = runTest {
         val entity = fieldNoteEntity(id = "1")
         dao.upsertFieldNote(entity)
 
         dao.deleteFieldNote(entity.id)
 
-        val fieldNotes = dao.observeFieldNotes().first()
+        val fieldNotes = dao.getFieldNotesStream().first()
         assertEquals(emptyList<FieldNoteEntity>(), fieldNotes)
     }
 }

@@ -18,16 +18,16 @@ class OfflineFirstFieldNoteRepository @Inject constructor(
     private val fieldNoteDao: FieldNoteDao,
 ) : FieldNoteRepository {
 
-    override fun observeFieldNotes(): Flow<List<FieldNote>> =
-        fieldNoteDao.observeFieldNotes()
+    override fun getFieldNotesStream(): Flow<List<FieldNote>> =
+        fieldNoteDao.getFieldNotesStream()
             .toDomainFlow()
 
-    override fun observeFieldNotesForSite(siteId: SiteId): Flow<List<FieldNote>> =
-        fieldNoteDao.observeFieldNotesForSite(siteId.value)
+    override fun getFieldNotesForSiteStream(siteId: SiteId): Flow<List<FieldNote>> =
+        fieldNoteDao.getFieldNotesForSiteStream(siteId.value)
             .toDomainFlow()
 
-    override fun observeUnassignedFieldNotes(): Flow<List<FieldNote>> =
-        fieldNoteDao.observeUnassignedFieldNotes()
+    override fun getUnassignedFieldNotesStream(): Flow<List<FieldNote>> =
+        fieldNoteDao.getUnassignedFieldNotesStream()
             .toDomainFlow()
 
     override suspend fun getFieldNote(id: FieldNoteId): FieldNote? =

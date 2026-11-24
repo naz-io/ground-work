@@ -6,11 +6,11 @@ import com.nabadi.groundwork.domain.model.SiteId
 import kotlinx.coroutines.flow.Flow
 
 interface FieldNoteRepository {
-    fun observeFieldNotes(): Flow<List<FieldNote>>
+    fun getFieldNotesStream(): Flow<List<FieldNote>>
 
-    fun observeFieldNotesForSite(siteId: SiteId): Flow<List<FieldNote>>
+    fun getFieldNotesForSiteStream(siteId: SiteId): Flow<List<FieldNote>>
 
-    fun observeUnassignedFieldNotes(): Flow<List<FieldNote>>
+    fun getUnassignedFieldNotesStream(): Flow<List<FieldNote>>
 
     suspend fun getFieldNote(id: FieldNoteId): FieldNote?
 

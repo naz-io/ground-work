@@ -14,13 +14,13 @@ class FakeFieldNoteRepository : FieldNoteRepository {
     private val fieldNotesFlow = MutableStateFlow<Map<FieldNoteId, FieldNote>>(emptyMap())
     private var shouldThrowError = false
 
-    override fun observeFieldNotes(): Flow<List<FieldNote>> =
+    override fun getFieldNotesStream(): Flow<List<FieldNote>> =
         fieldNotesFlow.map { fieldNotes ->
             if (shouldThrowError) throw IllegalStateException("Test Error")
             fieldNotes.values.sortedByDescending { it.updatedAt }
         }
 
-    override fun observeFieldNotesForSite(siteId: SiteId): Flow<List<FieldNote>> =
+    override fun getFieldNotesForSiteStream(siteId: SiteId): Flow<List<FieldNote>> =
         fieldNotesFlow.map { fieldNotes ->
             if (shouldThrowError) throw IllegalStateException("Test Error")
             fieldNotes.values
@@ -28,7 +28,7 @@ class FakeFieldNoteRepository : FieldNoteRepository {
                 .sortedByDescending { it.updatedAt }
         }
 
-    override fun observeUnassignedFieldNotes(): Flow<List<FieldNote>> =
+    override fun getUnassignedFieldNotesStream(): Flow<List<FieldNote>> =
         fieldNotesFlow.map { fieldNotes ->
             if (shouldThrowError) throw IllegalStateException("Test Error")
             fieldNotes.values

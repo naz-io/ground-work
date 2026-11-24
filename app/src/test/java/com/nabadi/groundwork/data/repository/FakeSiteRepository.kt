@@ -13,7 +13,7 @@ class FakeSiteRepository : SiteRepository {
     private val sitesFlow = MutableStateFlow<Map<SiteId, Site>>(emptyMap())
     private var shouldThrowError = false
 
-    override fun observeSites(): Flow<List<Site>> =
+    override fun getSitesStream(): Flow<List<Site>> =
         sitesFlow.map { sites ->
             if (shouldThrowError) throw IllegalStateException("Test Error")
             sites.values.sortedByDescending { it.updatedAt }

@@ -162,7 +162,7 @@ class SiteEditorViewModelTest {
         viewModel.onDescriptionChange("Main storage facility.\n")
         viewModel.saveSite(onSaved = {})
 
-        val savedSite = repository.observeSites().first().single()
+        val savedSite = repository.getSitesStream().first().single()
         assertEquals("North Warehouse", savedSite.name)
         assertEquals("Sector A", savedSite.location)
         assertEquals("Main storage facility.", savedSite.description)
@@ -245,7 +245,7 @@ class SiteEditorViewModelTest {
         viewModel.onStatusChange(SiteStatus.ACTIVE)
         viewModel.saveSite(onSaved = { onSavedCalled = true })
 
-        val savedSite = repository.observeSites().first().single()
+        val savedSite = repository.getSitesStream().first().single()
         assertEquals("North Warehouse", savedSite.name)
         assertEquals("Sector A", savedSite.location)
         assertEquals("Main storage facility.", savedSite.description)
@@ -273,7 +273,7 @@ class SiteEditorViewModelTest {
         viewModel.onDescriptionChange("Description without a site name.")
         viewModel.saveSite(onSaved = { onSavedCalled = true })
 
-        assertTrue(repository.observeSites().first().isEmpty())
+        assertTrue(repository.getSitesStream().first().isEmpty())
         assertFalse(onSavedCalled)
     }
 
@@ -310,7 +310,7 @@ class SiteEditorViewModelTest {
             viewModel.onStatusChange(SiteStatus.ARCHIVED)
             viewModel.saveSite(onSaved = { onSavedCalled = true })
 
-            val savedSite = repository.observeSites().first().single()
+            val savedSite = repository.getSitesStream().first().single()
             assertEquals(existingSite.id, savedSite.id)
             assertEquals("Updated site", savedSite.name)
             assertEquals("Updated location", savedSite.location)
@@ -343,7 +343,7 @@ class SiteEditorViewModelTest {
 
             viewModel.deleteSite(onDeleted = { onDeletedCalled = true })
 
-            assertTrue(repository.observeSites().first().isEmpty())
+            assertTrue(repository.getSitesStream().first().isEmpty())
             assertTrue(onDeletedCalled)
             assertEquals(SiteEditorUiState(), viewModel.uiState.value)
             cancelAndIgnoreRemainingEvents()
@@ -364,7 +364,7 @@ class SiteEditorViewModelTest {
         viewModel.deleteSite(onDeleted = { onDeletedCalled = true })
 
         assertFalse(onDeletedCalled)
-        assertTrue(repository.observeSites().first().isEmpty())
+        assertTrue(repository.getSitesStream().first().isEmpty())
         assertEquals(SiteEditorUiState(), viewModel.uiState.value)
     }
 
@@ -386,7 +386,7 @@ class SiteEditorViewModelTest {
 
         assertEquals(SiteEditorUiState(), viewModel.uiState.value)
         assertTrue(onDiscardedCalled)
-        assertTrue(repository.observeSites().first().isEmpty())
+        assertTrue(repository.getSitesStream().first().isEmpty())
     }
 
     @Test

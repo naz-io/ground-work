@@ -67,7 +67,7 @@ class FieldNoteEditorViewModelTest {
         viewModel.onTitleChange("North gate issue")
         viewModel.saveFieldNote(onSaved = {})
 
-        assertEquals(siteId, repository.observeFieldNotes().first().single().siteId)
+        assertEquals(siteId, repository.getFieldNotesStream().first().single().siteId)
     }
 
     @Test
@@ -242,7 +242,7 @@ class FieldNoteEditorViewModelTest {
         viewModel.onStatusChange(FieldNoteStatus.ACTIVE)
         viewModel.saveFieldNote(onSaved = { onSavedCalled = true })
 
-        val savedFieldNote = repository.observeFieldNotes().first().single()
+        val savedFieldNote = repository.getFieldNotesStream().first().single()
         assertEquals("North gate issue", savedFieldNote.title)
         assertEquals("Loose fencing near the north access point.", savedFieldNote.body)
         assertEquals(FieldNoteStatus.ACTIVE, savedFieldNote.status)
@@ -268,7 +268,7 @@ class FieldNoteEditorViewModelTest {
         viewModel.onBodyChange("Observation without title.")
         viewModel.saveFieldNote(onSaved = {})
 
-        val savedFieldNote = repository.observeFieldNotes().first().single()
+        val savedFieldNote = repository.getFieldNotesStream().first().single()
         assertEquals("", savedFieldNote.title)
         assertEquals("Observation without title.", savedFieldNote.body)
     }
@@ -288,7 +288,7 @@ class FieldNoteEditorViewModelTest {
         viewModel.onBodyChange("\nLoose fencing near the north access point.  \n")
         viewModel.saveFieldNote(onSaved = {})
 
-        val savedFieldNote = repository.observeFieldNotes().first().single()
+        val savedFieldNote = repository.getFieldNotesStream().first().single()
         assertEquals("North gate issue", savedFieldNote.title)
         assertEquals("Loose fencing near the north access point.", savedFieldNote.body)
     }
@@ -322,7 +322,7 @@ class FieldNoteEditorViewModelTest {
             viewModel.onBodyChange("Updated body")
             viewModel.saveFieldNote(onSaved = { onSavedCalled = true })
 
-            val savedFieldNote = repository.observeFieldNotes().first().single()
+            val savedFieldNote = repository.getFieldNotesStream().first().single()
             assertEquals(existingFieldNote.id, savedFieldNote.id)
             assertEquals("Updated title", savedFieldNote.title)
             assertEquals("Updated body", savedFieldNote.body)
@@ -359,7 +359,7 @@ class FieldNoteEditorViewModelTest {
 
             assertEquals(
                 SiteId("site-002"),
-                repository.observeFieldNotes().first().single().siteId,
+                repository.getFieldNotesStream().first().single().siteId,
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -388,7 +388,7 @@ class FieldNoteEditorViewModelTest {
             viewModel.onAssociatedSiteChange(null)
             viewModel.saveFieldNote(onSaved = {})
 
-            assertNull(repository.observeFieldNotes().first().single().siteId)
+            assertNull(repository.getFieldNotesStream().first().single().siteId)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -413,7 +413,7 @@ class FieldNoteEditorViewModelTest {
 
             viewModel.deleteFieldNote(onDeleted = { onDeletedCalled = true })
 
-            assertTrue(repository.observeFieldNotes().first().isEmpty())
+            assertTrue(repository.getFieldNotesStream().first().isEmpty())
             assertTrue(onDeletedCalled)
             assertEquals(FieldNoteEditorUiState(), viewModel.uiState.value)
             cancelAndIgnoreRemainingEvents()
@@ -438,7 +438,7 @@ class FieldNoteEditorViewModelTest {
 
         assertEquals(FieldNoteEditorUiState(), viewModel.uiState.value)
         assertTrue(onDiscardedCalled)
-        assertTrue(repository.observeFieldNotes().first().isEmpty())
+        assertTrue(repository.getFieldNotesStream().first().isEmpty())
     }
 
     @Test

@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface SiteDao {
     @Query("SELECT * FROM sites WHERE $NOT_DELETED ORDER BY updatedAt DESC")
-    fun observeSites(): Flow<List<SiteEntity>>
+    fun getSitesStream(): Flow<List<SiteEntity>>
 
     @Query("SELECT * FROM sites WHERE id = :id AND $NOT_DELETED")
     suspend fun getSite(id: String): SiteEntity?

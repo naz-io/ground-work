@@ -8,13 +8,13 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface FieldNoteDao {
     @Query("SELECT * FROM field_notes WHERE $NOT_DELETED ORDER BY updatedAt DESC")
-    fun observeFieldNotes(): Flow<List<FieldNoteEntity>>
+    fun getFieldNotesStream(): Flow<List<FieldNoteEntity>>
 
     @Query(
         "SELECT * FROM field_notes WHERE siteId = :siteId AND $NOT_DELETED " +
             "ORDER BY updatedAt DESC"
     )
-    fun observeFieldNotesForSite(siteId: String): Flow<List<FieldNoteEntity>>
+    fun getFieldNotesForSiteStream(siteId: String): Flow<List<FieldNoteEntity>>
 
     @Query("SELECT * FROM field_notes WHERE siteId = :siteId AND $NOT_DELETED")
     suspend fun getFieldNotesForSite(siteId: String): List<FieldNoteEntity>
@@ -23,7 +23,7 @@ interface FieldNoteDao {
         "SELECT * FROM field_notes WHERE siteId IS NULL AND $NOT_DELETED " +
             "ORDER BY updatedAt DESC"
     )
-    fun observeUnassignedFieldNotes(): Flow<List<FieldNoteEntity>>
+    fun getUnassignedFieldNotesStream(): Flow<List<FieldNoteEntity>>
 
     @Query("SELECT * FROM field_notes WHERE id = :id AND $NOT_DELETED")
     suspend fun getFieldNote(id: String): FieldNoteEntity?

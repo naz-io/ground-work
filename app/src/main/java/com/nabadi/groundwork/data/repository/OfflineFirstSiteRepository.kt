@@ -20,8 +20,8 @@ class OfflineFirstSiteRepository @Inject constructor(
     private val fieldNoteDao: FieldNoteDao,
     private val clock: Clock,
 ) : SiteRepository {
-    override fun observeSites(): Flow<List<Site>> =
-        siteDao.observeSites().toDomainFlow()
+    override fun getSitesStream(): Flow<List<Site>> =
+        siteDao.getSitesStream().toDomainFlow()
 
     override suspend fun getSite(id: SiteId): Site? =
         siteDao.getSite(id.value)?.toDomain()

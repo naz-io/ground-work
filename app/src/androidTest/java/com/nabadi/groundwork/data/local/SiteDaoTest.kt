@@ -39,7 +39,7 @@ class SiteDaoTest {
     }
 
     @Test
-    fun `observeSites emits saved sites ordered by updatedAt descending`() = runTest {
+    fun `getSitesStream emits saved sites ordered by updatedAt descending`() = runTest {
         val olderEntity = siteEntity(
             id = "1",
             name = "Older site",
@@ -54,7 +54,7 @@ class SiteDaoTest {
         dao.upsertSite(olderEntity)
         dao.upsertSite(newerEntity)
 
-        val sites = dao.observeSites().first()
+        val sites = dao.getSitesStream().first()
         assertEquals(listOf(newerEntity, olderEntity), sites)
     }
 
@@ -147,18 +147,18 @@ class SiteDaoTest {
 
         dao.deleteSite("missing-id")
 
-        val sites = dao.observeSites().first()
+        val sites = dao.getSitesStream().first()
         assertEquals(listOf(entity), sites)
     }
 
     @Test
-    fun `observeSites emits empty list after saved site is deleted`() = runTest {
+    fun `getSitesStream emits empty list after saved site is deleted`() = runTest {
         val entity = siteEntity(id = "1")
         dao.upsertSite(entity)
 
         dao.deleteSite(entity.id)
 
-        val sites = dao.observeSites().first()
+        val sites = dao.getSitesStream().first()
         assertEquals(emptyList<SiteEntity>(), sites)
     }
 
@@ -176,7 +176,7 @@ class SiteDaoTest {
         assertNull(savedFieldNote?.siteId)
         assertEquals(
             listOf(fieldNote.copy(siteId = null)),
-            fieldNoteDao.observeUnassignedFieldNotes().first(),
+            fieldNoteDao.getUnassignedFieldNotesStream().first(),
         )
     }
 }

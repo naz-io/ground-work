@@ -103,7 +103,7 @@ class OfflineFirstSiteRepositoryTest {
         repository.saveSite(updatedSite)
 
         val savedSite = repository.getSite(updatedSite.id)
-        val sites = repository.observeSites().first()
+        val sites = repository.getSitesStream().first()
 
         assertEquals(updatedSite, savedSite)
         assertEquals(listOf(updatedSite), sites)
@@ -143,7 +143,7 @@ class OfflineFirstSiteRepositoryTest {
     }
 
     @Test
-    fun `observeSites emits saved sites ordered by updatedAt descending`() = runTest {
+    fun `getSitesStream emits saved sites ordered by updatedAt descending`() = runTest {
         val olderSite = site(
             id = "1",
             name = "Older site",
@@ -158,7 +158,7 @@ class OfflineFirstSiteRepositoryTest {
         repository.saveSite(olderSite)
         repository.saveSite(newerSite)
 
-        val sites = repository.observeSites().first()
+        val sites = repository.getSitesStream().first()
 
         assertEquals(listOf(newerSite, olderSite), sites)
     }
@@ -220,7 +220,7 @@ class OfflineFirstSiteRepositoryTest {
         repository.deleteSite(syncedSite.id)
 
         assertNull(repository.getSite(syncedSite.id))
-        assertEquals(emptyList<Site>(), repository.observeSites().first())
+        assertEquals(emptyList<Site>(), repository.getSitesStream().first())
         assertEquals(
             SyncState.PENDING_DELETE,
             database.siteDao().getSiteForSync(syncedSite.id.value)?.toDomain()?.syncMetadata?.state,
@@ -250,11 +250,11 @@ class OfflineFirstSiteRepositoryTest {
         )
         assertEquals(
             listOf(expectedNote),
-            database.fieldNoteDao().observeUnassignedFieldNotes().first().map { it.toDomain() },
+            database.fieldNoteDao().getUnassignedFieldNotesStream().first().map { it.toDomain() },
         )
         assertEquals(
             emptyList<FieldNote>(),
-            database.fieldNoteDao().observeFieldNotesForSite(syncedSite.id.value).first(),
+            database.fieldNoteDao().getFieldNotesForSiteStream(syncedSite.id.value).first(),
         )
     }
 
@@ -333,19 +333,19 @@ class OfflineFirstSiteRepositoryTest {
 
         repository.deleteSite(SiteId("missing-id"))
 
-        val sites = repository.observeSites().first()
+        val sites = repository.getSitesStream().first()
 
         assertEquals(listOf(site), sites)
     }
 
     @Test
-    fun `observeSites emits empty list after saved site is deleted`() = runTest {
+    fun `getSitesStream emits empty list after saved site is deleted`() = runTest {
         val site = site(id = "1")
         repository.saveSite(site)
 
         repository.deleteSite(site.id)
 
-        val sites = repository.observeSites().first()
+        val sites = repository.getSitesStream().first()
 
         assertEquals(emptyList<Site>(), sites)
     }

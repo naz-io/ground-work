@@ -29,8 +29,8 @@ class SitesListViewModel @Inject constructor(
 
     val uiState: StateFlow<SitesListUiState> =
         combine(
-            siteRepository.observeSites(),
-            fieldNoteRepository.observeFieldNotes(),
+            siteRepository.getSitesStream(),
+            fieldNoteRepository.getFieldNotesStream(),
             searchQuery,
             selectedStatus,
             selectedPriority,
