@@ -87,7 +87,7 @@ class SiteEditorViewModel @AssistedInject constructor(
         }
     }
 
-    fun saveSite(onSaved: () -> Unit) {
+    fun saveSite() {
         val currentState = _uiState.value
         if (currentState.isBusy || currentState.name.isBlank()) return
 
@@ -111,9 +111,7 @@ class SiteEditorViewModel @AssistedInject constructor(
                     )
                 )
             }.onSuccess {
-                existingSite = null
-                _uiState.update { SiteEditorUiState() }
-                onSaved()
+                complete(SiteEditorCompletion.SAVED)
             }.onFailure {
                 updateSavingState(
                     isSaving = false,
@@ -123,7 +121,7 @@ class SiteEditorViewModel @AssistedInject constructor(
         }
     }
 
-    fun deleteSite(onDeleted: () -> Unit) {
+    fun deleteSite() {
         val currentState = _uiState.value
         val siteToDelete = existingSite
         if (currentState.isBusy || siteToDelete == null) return
@@ -133,9 +131,7 @@ class SiteEditorViewModel @AssistedInject constructor(
             runCatching {
                 siteRepository.deleteSite(id = siteToDelete.id)
             }.onSuccess {
-                existingSite = null
-                _uiState.update { SiteEditorUiState() }
-                onDeleted()
+                complete(SiteEditorCompletion.DELETED)
             }.onFailure {
                 updateDeletingState(
                     isDeleting = false,
@@ -145,11 +141,20 @@ class SiteEditorViewModel @AssistedInject constructor(
         }
     }
 
-    fun discardSite(onDiscarded: () -> Unit) {
+    fun discardSite() {
         if (_uiState.value.isBusy) return
-        existingSite = null
-        _uiState.update { SiteEditorUiState() }
-        onDiscarded()
+        complete(SiteEditorCompletion.DISCARDED)
+    }
+
+    // The form keeps its values while the screen leaves, so it doesn't flash empty.
+    private fun complete(completion: SiteEditorCompletion) {
+        _uiState.update {
+            it.copy(
+                isSaving = false,
+                isDeleting = false,
+                completion = completion,
+            )
+        }
     }
 
     private fun loadSite(id: SiteId) {

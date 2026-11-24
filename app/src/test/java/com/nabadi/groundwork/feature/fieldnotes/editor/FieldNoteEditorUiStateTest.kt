@@ -35,6 +35,29 @@ class FieldNoteEditorUiStateTest {
     }
 
     @Test
+    fun `isClosing is false by default`() {
+        assertFalse(FieldNoteEditorUiState().isClosing)
+    }
+
+    @Test
+    fun `isClosing is true once a completion is set`() {
+        val state = FieldNoteEditorUiState(completion = FieldNoteEditorCompletion.DELETED)
+
+        assertTrue(state.isClosing)
+    }
+
+    @Test
+    fun `isBusy is true while the editor is closing`() {
+        val state = FieldNoteEditorUiState(
+            body = "Loose fencing near the north access point.",
+            completion = FieldNoteEditorCompletion.SAVED,
+        )
+
+        assertTrue(state.isBusy)
+        assertFalse(state.canSave)
+    }
+
+    @Test
     fun `canSave is false by default`() {
         val state = FieldNoteEditorUiState()
 

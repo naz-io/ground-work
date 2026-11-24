@@ -17,15 +17,29 @@ data class SiteEditorUiState(
     val isSaving: Boolean = false,
     val isDeleting: Boolean = false,
     val error: SiteEditorError? = null,
+    val completion: SiteEditorCompletion? = null,
 ){
+    /** True after a save, delete, or discard succeeds, while the editor navigates away. */
+    val isClosing: Boolean
+        get() = completion != null
+
+    // A closing editor is still on screen, so it counts as busy:
+    // no second save, delete, or discard can start meanwhile.
     val isBusy: Boolean
-        get() = isLoading || isSaving || isDeleting
+        get() = isLoading || isSaving || isDeleting || isClosing
 
     val canSave: Boolean
         get() = !isBusy && name.isNotBlank()
 
     val showNameRequiredError: Boolean
         get() = isNameEdited && name.isBlank()
+}
+
+/** How the editor finished; the Route navigates when this is set. */
+enum class SiteEditorCompletion {
+    SAVED,
+    DELETED,
+    DISCARDED,
 }
 
 enum class SiteEditorError(@StringRes val messageRes: Int) {

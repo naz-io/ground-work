@@ -83,7 +83,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
         }
     }
 
-    fun saveFieldNote(onSaved: () -> Unit) {
+    fun saveFieldNote() {
         if (_uiState.value.isBusy) return
         val currentState = _uiState.value
 
@@ -106,8 +106,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
                     )
                 )
             }.onSuccess {
-                _uiState.update { FieldNoteEditorUiState() }
-                onSaved()
+                complete(FieldNoteEditorCompletion.SAVED)
             }.onFailure {
                 updateSavingState(
                     isSaving = false,
@@ -117,7 +116,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
         }
     }
 
-    fun deleteFieldNote(onDeleted: () -> Unit) {
+    fun deleteFieldNote() {
         if (_uiState.value.isBusy) return
 
         viewModelScope.launch {
@@ -128,8 +127,7 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
                     ?: error("Cannot delete a field note that has not been saved.")
                 fieldNoteRepository.deleteFieldNote(id = existingNote.id)
             }.onSuccess {
-                _uiState.update { FieldNoteEditorUiState() }
-                onDeleted()
+                complete(FieldNoteEditorCompletion.DELETED)
             }.onFailure {
                 updateDeletingState(
                     isDeleting = false,
@@ -139,11 +137,20 @@ class FieldNoteEditorViewModel @AssistedInject constructor(
         }
     }
 
-    fun discardChanges(onDiscarded: () -> Unit) {
+    fun discardChanges() {
         if (_uiState.value.isBusy) return
+        complete(FieldNoteEditorCompletion.DISCARDED)
+    }
 
-        _uiState.update { FieldNoteEditorUiState() }
-        onDiscarded()
+    // The form keeps its values while the screen leaves, so it doesn't flash empty.
+    private fun complete(completion: FieldNoteEditorCompletion) {
+        _uiState.update {
+            it.copy(
+                isSaving = false,
+                isDeleting = false,
+                completion = completion,
+            )
+        }
     }
 
     private fun observeAvailableSites() {

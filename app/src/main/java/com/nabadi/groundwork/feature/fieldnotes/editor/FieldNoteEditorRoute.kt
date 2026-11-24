@@ -1,7 +1,9 @@
 package com.nabadi.groundwork.feature.fieldnotes.editor
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -18,15 +20,24 @@ fun FieldNoteEditorRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    // Navigation reacts to the finished state rather than being called by the
+    // ViewModel, so it always uses this composition's callback and only runs
+    // while the screen is started.
+    val currentOnEditorFinished by rememberUpdatedState(onEditorFinished)
+    val completion = uiState.completion
+    LaunchedEffect(completion) {
+        if (completion != null) currentOnEditorFinished()
+    }
+
     FieldNoteEditorScreen(
         uiState = uiState,
         onTitleChange = viewModel::onTitleChange,
         onAssociatedSiteChange = viewModel::onAssociatedSiteChange,
         onStatusChange = viewModel::onStatusChange,
         onBodyChange = viewModel::onBodyChange,
-        onSaveClick = { viewModel.saveFieldNote(onSaved = onEditorFinished) },
-        onDeleteClick = { viewModel.deleteFieldNote(onDeleted = onEditorFinished) },
-        onDiscardClick = { viewModel.discardChanges(onDiscarded = onEditorFinished) },
+        onSaveClick = viewModel::saveFieldNote,
+        onDeleteClick = viewModel::deleteFieldNote,
+        onDiscardClick = viewModel::discardChanges,
         onBackClick = onEditorFinished,
         modifier = modifier,
     )

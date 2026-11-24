@@ -35,6 +35,29 @@ class SiteEditorUiStateTest {
     }
 
     @Test
+    fun `isClosing is false by default`() {
+        assertFalse(SiteEditorUiState().isClosing)
+    }
+
+    @Test
+    fun `isClosing is true once a completion is set`() {
+        val state = SiteEditorUiState(completion = SiteEditorCompletion.DELETED)
+
+        assertTrue(state.isClosing)
+    }
+
+    @Test
+    fun `isBusy is true while the editor is closing`() {
+        val state = SiteEditorUiState(
+            name = "North Warehouse",
+            completion = SiteEditorCompletion.SAVED,
+        )
+
+        assertTrue(state.isBusy)
+        assertFalse(state.canSave)
+    }
+
+    @Test
     fun `canSave is false when name is blank`() {
         val state = SiteEditorUiState(name = "")
 

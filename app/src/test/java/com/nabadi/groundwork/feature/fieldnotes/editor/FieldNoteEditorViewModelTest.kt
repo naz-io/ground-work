@@ -65,7 +65,7 @@ class FieldNoteEditorViewModelTest {
         assertEquals(siteId, viewModel.uiState.value.siteId)
 
         viewModel.onTitleChange("North gate issue")
-        viewModel.saveFieldNote(onSaved = {})
+        viewModel.saveFieldNote()
 
         assertEquals(siteId, repository.getFieldNotesStream().first().single().siteId)
     }
@@ -235,12 +235,11 @@ class FieldNoteEditorViewModelTest {
             idGenerator = idGenerator,
             route = GroundWorkRoute.FieldNoteEditor(),
         )
-        var onSavedCalled = false
 
         viewModel.onTitleChange("North gate issue")
         viewModel.onBodyChange("Loose fencing near the north access point.")
         viewModel.onStatusChange(FieldNoteStatus.ACTIVE)
-        viewModel.saveFieldNote(onSaved = { onSavedCalled = true })
+        viewModel.saveFieldNote()
 
         val savedFieldNote = repository.getFieldNotesStream().first().single()
         assertEquals("North gate issue", savedFieldNote.title)
@@ -250,8 +249,7 @@ class FieldNoteEditorViewModelTest {
         assertEquals(FieldNoteId(GENERATED_ID), savedFieldNote.id)
         assertEquals(NOW, savedFieldNote.createdAt)
         assertEquals(NOW, savedFieldNote.updatedAt)
-        assertTrue(onSavedCalled)
-        assertEquals(FieldNoteEditorUiState(), viewModel.uiState.value)
+        assertEquals(FieldNoteEditorCompletion.SAVED, viewModel.uiState.value.completion)
     }
 
     @Test
@@ -266,7 +264,7 @@ class FieldNoteEditorViewModelTest {
         )
 
         viewModel.onBodyChange("Observation without title.")
-        viewModel.saveFieldNote(onSaved = {})
+        viewModel.saveFieldNote()
 
         val savedFieldNote = repository.getFieldNotesStream().first().single()
         assertEquals("", savedFieldNote.title)
@@ -286,7 +284,7 @@ class FieldNoteEditorViewModelTest {
 
         viewModel.onTitleChange("  North gate issue ")
         viewModel.onBodyChange("\nLoose fencing near the north access point.  \n")
-        viewModel.saveFieldNote(onSaved = {})
+        viewModel.saveFieldNote()
 
         val savedFieldNote = repository.getFieldNotesStream().first().single()
         assertEquals("North gate issue", savedFieldNote.title)
@@ -313,14 +311,13 @@ class FieldNoteEditorViewModelTest {
             idGenerator = idGenerator,
             route = GroundWorkRoute.FieldNoteEditor(fieldNoteId = existingFieldNote.id.value),
         )
-        var onSavedCalled = false
 
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
             viewModel.onTitleChange("Updated title")
             viewModel.onBodyChange("Updated body")
-            viewModel.saveFieldNote(onSaved = { onSavedCalled = true })
+            viewModel.saveFieldNote()
 
             val savedFieldNote = repository.getFieldNotesStream().first().single()
             assertEquals(existingFieldNote.id, savedFieldNote.id)
@@ -329,7 +326,7 @@ class FieldNoteEditorViewModelTest {
             assertEquals(FieldNoteStatus.DRAFT, savedFieldNote.status)
             assertEquals(existingFieldNote.createdAt, savedFieldNote.createdAt)
             assertEquals(NOW, savedFieldNote.updatedAt)
-            assertTrue(onSavedCalled)
+            assertEquals(FieldNoteEditorCompletion.SAVED, viewModel.uiState.value.completion)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -355,7 +352,7 @@ class FieldNoteEditorViewModelTest {
             skipItemsUntilLoaded()
 
             viewModel.onAssociatedSiteChange(SiteId("site-002"))
-            viewModel.saveFieldNote(onSaved = {})
+            viewModel.saveFieldNote()
 
             assertEquals(
                 SiteId("site-002"),
@@ -386,7 +383,7 @@ class FieldNoteEditorViewModelTest {
             skipItemsUntilLoaded()
 
             viewModel.onAssociatedSiteChange(null)
-            viewModel.saveFieldNote(onSaved = {})
+            viewModel.saveFieldNote()
 
             assertNull(repository.getFieldNotesStream().first().single().siteId)
             cancelAndIgnoreRemainingEvents()
@@ -406,22 +403,20 @@ class FieldNoteEditorViewModelTest {
             idGenerator = idGenerator,
             route = GroundWorkRoute.FieldNoteEditor(fieldNoteId = existingFieldNote.id.value),
         )
-        var onDeletedCalled = false
 
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.deleteFieldNote(onDeleted = { onDeletedCalled = true })
+            viewModel.deleteFieldNote()
 
             assertTrue(repository.getFieldNotesStream().first().isEmpty())
-            assertTrue(onDeletedCalled)
-            assertEquals(FieldNoteEditorUiState(), viewModel.uiState.value)
+            assertEquals(FieldNoteEditorCompletion.DELETED, viewModel.uiState.value.completion)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `discardDraft clears state and does not save field note`() = runTest {
+    fun `discardChanges finishes without saving the field note`() = runTest {
         val repository = FakeFieldNoteRepository()
         val viewModel = FieldNoteEditorViewModel(
             fieldNoteRepository = repository,
@@ -430,14 +425,11 @@ class FieldNoteEditorViewModelTest {
             idGenerator = idGenerator,
             route = GroundWorkRoute.FieldNoteEditor(),
         )
-        var onDiscardedCalled = false
-
         viewModel.onTitleChange("Draft title")
         viewModel.onBodyChange("Draft body")
-        viewModel.discardChanges(onDiscarded = { onDiscardedCalled = true })
+        viewModel.discardChanges()
 
-        assertEquals(FieldNoteEditorUiState(), viewModel.uiState.value)
-        assertTrue(onDiscardedCalled)
+        assertEquals(FieldNoteEditorCompletion.DISCARDED, viewModel.uiState.value.completion)
         assertTrue(repository.getFieldNotesStream().first().isEmpty())
     }
 
@@ -453,15 +445,36 @@ class FieldNoteEditorViewModelTest {
             idGenerator = idGenerator,
             route = GroundWorkRoute.FieldNoteEditor(),
         )
-        var onSavedCalled = false
 
         viewModel.onTitleChange("Title")
-        viewModel.saveFieldNote(onSaved = { onSavedCalled = true })
+        viewModel.saveFieldNote()
 
         val state = viewModel.uiState.value
         assertFalse(state.isSaving)
         assertEquals(FieldNoteEditorError.SAVE_FAILED, state.error)
-        assertFalse(onSavedCalled)
+        assertNull(viewModel.uiState.value.completion)
+    }
+
+    @Test
+    fun `a closing editor ignores further actions`() = runTest {
+        val repository = FakeFieldNoteRepository()
+        // Fresh IDs, so a second save would show up as a second note.
+        var nextId = 0
+        val viewModel = FieldNoteEditorViewModel(
+            fieldNoteRepository = repository,
+            siteRepository = FakeSiteRepository(),
+            clock = clock,
+            idGenerator = IdGenerator { "note-${nextId++}" },
+            route = GroundWorkRoute.FieldNoteEditor(),
+        )
+
+        viewModel.onBodyChange("Loose fencing near the north access point.")
+        viewModel.saveFieldNote()
+        viewModel.discardChanges()
+        viewModel.saveFieldNote()
+
+        assertEquals(FieldNoteEditorCompletion.SAVED, viewModel.uiState.value.completion)
+        assertEquals(1, repository.getFieldNotesStream().first().size)
     }
 
     @Test
@@ -478,7 +491,7 @@ class FieldNoteEditorViewModelTest {
         )
 
         viewModel.onBodyChange("Body")
-        viewModel.saveFieldNote(onSaved = {})
+        viewModel.saveFieldNote()
         viewModel.onTitleChange("Updated title")
 
         assertEquals("Updated title", viewModel.uiState.value.title)

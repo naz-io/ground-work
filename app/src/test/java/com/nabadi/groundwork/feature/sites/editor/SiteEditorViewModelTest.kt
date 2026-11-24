@@ -160,7 +160,7 @@ class SiteEditorViewModelTest {
         viewModel.onNameChange("  North Warehouse  ")
         viewModel.onLocationChange(" Sector A ")
         viewModel.onDescriptionChange("Main storage facility.\n")
-        viewModel.saveSite(onSaved = {})
+        viewModel.saveSite()
 
         val savedSite = repository.getSitesStream().first().single()
         assertEquals("North Warehouse", savedSite.name)
@@ -236,14 +236,13 @@ class SiteEditorViewModelTest {
             idGenerator = idGenerator,
             route = GroundWorkRoute.SiteEditor(),
         )
-        var onSavedCalled = false
 
         viewModel.onNameChange("North Warehouse")
         viewModel.onLocationChange("Sector A")
         viewModel.onDescriptionChange("Main storage facility.")
         viewModel.onPriorityChange(SitePriority.HIGH)
         viewModel.onStatusChange(SiteStatus.ACTIVE)
-        viewModel.saveSite(onSaved = { onSavedCalled = true })
+        viewModel.saveSite()
 
         val savedSite = repository.getSitesStream().first().single()
         assertEquals("North Warehouse", savedSite.name)
@@ -254,8 +253,7 @@ class SiteEditorViewModelTest {
         assertEquals(SiteId(GENERATED_ID), savedSite.id)
         assertEquals(NOW, savedSite.createdAt)
         assertEquals(NOW, savedSite.updatedAt)
-        assertTrue(onSavedCalled)
-        assertEquals(SiteEditorUiState(), viewModel.uiState.value)
+        assertEquals(SiteEditorCompletion.SAVED, viewModel.uiState.value.completion)
     }
 
     @Test
@@ -267,14 +265,13 @@ class SiteEditorViewModelTest {
             idGenerator = idGenerator,
             route = GroundWorkRoute.SiteEditor(),
         )
-        var onSavedCalled = false
 
         viewModel.onLocationChange("Sector A")
         viewModel.onDescriptionChange("Description without a site name.")
-        viewModel.saveSite(onSaved = { onSavedCalled = true })
+        viewModel.saveSite()
 
         assertTrue(repository.getSitesStream().first().isEmpty())
-        assertFalse(onSavedCalled)
+        assertNull(viewModel.uiState.value.completion)
     }
 
     @Test
@@ -298,7 +295,6 @@ class SiteEditorViewModelTest {
             idGenerator = idGenerator,
             route = GroundWorkRoute.SiteEditor(siteId = existingSite.id.value),
         )
-        var onSavedCalled = false
 
         viewModel.uiState.test {
             skipItemsUntilLoaded()
@@ -308,7 +304,7 @@ class SiteEditorViewModelTest {
             viewModel.onDescriptionChange("Updated description")
             viewModel.onPriorityChange(SitePriority.HIGH)
             viewModel.onStatusChange(SiteStatus.ARCHIVED)
-            viewModel.saveSite(onSaved = { onSavedCalled = true })
+            viewModel.saveSite()
 
             val savedSite = repository.getSitesStream().first().single()
             assertEquals(existingSite.id, savedSite.id)
@@ -319,7 +315,7 @@ class SiteEditorViewModelTest {
             assertEquals(SiteStatus.ARCHIVED, savedSite.status)
             assertEquals(existingSite.createdAt, savedSite.createdAt)
             assertEquals(NOW, savedSite.updatedAt)
-            assertTrue(onSavedCalled)
+            assertEquals(SiteEditorCompletion.SAVED, viewModel.uiState.value.completion)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -336,16 +332,14 @@ class SiteEditorViewModelTest {
             idGenerator = idGenerator,
             route = GroundWorkRoute.SiteEditor(siteId = existingSite.id.value),
         )
-        var onDeletedCalled = false
 
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
-            viewModel.deleteSite(onDeleted = { onDeletedCalled = true })
+            viewModel.deleteSite()
 
             assertTrue(repository.getSitesStream().first().isEmpty())
-            assertTrue(onDeletedCalled)
-            assertEquals(SiteEditorUiState(), viewModel.uiState.value)
+            assertEquals(SiteEditorCompletion.DELETED, viewModel.uiState.value.completion)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -359,17 +353,16 @@ class SiteEditorViewModelTest {
             idGenerator = idGenerator,
             route = GroundWorkRoute.SiteEditor(),
         )
-        var onDeletedCalled = false
 
-        viewModel.deleteSite(onDeleted = { onDeletedCalled = true })
+        viewModel.deleteSite()
 
-        assertFalse(onDeletedCalled)
+        assertNull(viewModel.uiState.value.completion)
         assertTrue(repository.getSitesStream().first().isEmpty())
         assertEquals(SiteEditorUiState(), viewModel.uiState.value)
     }
 
     @Test
-    fun `discardDraft clears state and does not save site`() = runTest {
+    fun `discardSite finishes without saving the site`() = runTest {
         val repository = FakeSiteRepository()
         val viewModel = SiteEditorViewModel(
             siteRepository = repository,
@@ -377,15 +370,12 @@ class SiteEditorViewModelTest {
             idGenerator = idGenerator,
             route = GroundWorkRoute.SiteEditor(),
         )
-        var onDiscardedCalled = false
-
         viewModel.onNameChange("Draft site")
         viewModel.onLocationChange("Draft location")
         viewModel.onDescriptionChange("Draft description")
-        viewModel.discardSite(onDiscarded = { onDiscardedCalled = true })
+        viewModel.discardSite()
 
-        assertEquals(SiteEditorUiState(), viewModel.uiState.value)
-        assertTrue(onDiscardedCalled)
+        assertEquals(SiteEditorCompletion.DISCARDED, viewModel.uiState.value.completion)
         assertTrue(repository.getSitesStream().first().isEmpty())
     }
 
@@ -400,15 +390,14 @@ class SiteEditorViewModelTest {
             idGenerator = idGenerator,
             route = GroundWorkRoute.SiteEditor(),
         )
-        var onSavedCalled = false
 
         viewModel.onNameChange("North Warehouse")
-        viewModel.saveSite(onSaved = { onSavedCalled = true })
+        viewModel.saveSite()
 
         val state = viewModel.uiState.value
         assertFalse(state.isSaving)
         assertEquals(SiteEditorError.SAVE_FAILED, state.error)
-        assertFalse(onSavedCalled)
+        assertNull(viewModel.uiState.value.completion)
     }
 
     @Test
@@ -423,20 +412,40 @@ class SiteEditorViewModelTest {
             idGenerator = idGenerator,
             route = GroundWorkRoute.SiteEditor(siteId = existingSite.id.value),
         )
-        var onDeletedCalled = false
 
         viewModel.uiState.test {
             skipItemsUntilLoaded()
 
             repository.setShouldThrowError(true)
-            viewModel.deleteSite(onDeleted = { onDeletedCalled = true })
+            viewModel.deleteSite()
 
             val state = viewModel.uiState.value
             assertFalse(state.isDeleting)
             assertEquals(SiteEditorError.DELETE_FAILED, state.error)
-            assertFalse(onDeletedCalled)
+            assertNull(viewModel.uiState.value.completion)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `a closing editor ignores further actions`() = runTest {
+        val repository = FakeSiteRepository()
+        // Fresh IDs, so a second save would show up as a second site.
+        var nextId = 0
+        val viewModel = SiteEditorViewModel(
+            siteRepository = repository,
+            clock = clock,
+            idGenerator = IdGenerator { "site-${nextId++}" },
+            route = GroundWorkRoute.SiteEditor(),
+        )
+
+        viewModel.onNameChange("North Warehouse")
+        viewModel.saveSite()
+        viewModel.discardSite()
+        viewModel.saveSite()
+
+        assertEquals(SiteEditorCompletion.SAVED, viewModel.uiState.value.completion)
+        assertEquals(1, repository.getSitesStream().first().size)
     }
 
     @Test
@@ -452,7 +461,7 @@ class SiteEditorViewModelTest {
         )
 
         viewModel.onNameChange("North Warehouse")
-        viewModel.saveSite(onSaved = {})
+        viewModel.saveSite()
         viewModel.onNameChange("Updated site")
 
         assertEquals("Updated site", viewModel.uiState.value.name)
