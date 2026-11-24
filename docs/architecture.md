@@ -18,13 +18,13 @@ sequenceDiagram
     participant List as List ViewModel and UI
     User->>UI: Tap Save
     UI->>VM: saveFieldNote()
-    VM->>VM: Set saving state; use Clock and IdGenerator
+    VM->>VM: Set saving state and use Clock and IdGenerator
     VM->>Repo: saveFieldNote(domain note)
     rect rgb(235, 242, 250)
         Note over Repo,DB: Room transaction
         Repo->>DB: Read existing record including hidden deletes
         DB-->>Repo: Existing record or null
-        Repo->>Repo: Derive pending create/update; reject deleted record
+        Repo->>Repo: Derive pending create/update or reject deleted record
         Repo->>DB: Upsert mapped entity
     end
     Repo-->>VM: Save completed
