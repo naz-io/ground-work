@@ -1,5 +1,7 @@
 # GroundWork
 
+[![Android CI](https://github.com/naz-io/ground-work/actions/workflows/android-ci.yml/badge.svg?branch=main&event=push)](https://github.com/naz-io/ground-work/actions/workflows/android-ci.yml?query=branch%3Amain+event%3Apush)
+
 GroundWork is an offline-first Android app for field operations teams working in low-connectivity environments.
 
 The long-term product direction includes site management, field notes, reports, local sync visibility, and conflict-aware offline workflows. The current implementation provides a local-first foundation in which field notes can optionally belong to sites while remaining available for fast unassigned capture, and every local change is already tracked with sync metadata so a sync layer can be added behind the repositories.
