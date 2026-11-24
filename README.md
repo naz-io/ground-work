@@ -155,7 +155,7 @@ Simulated backend:
 - Defined the backend's own JSON wire format (snake_case fields, ISO-8601 UTC timestamps, lowercase enums, no local sync metadata) with separate remote models, mapped from the domain
 - Put the backend behind an HTTP-shaped `RemoteTransport` (method, path, JSON body in; status, JSON body out; `IOException` for network failures) so a real HTTP client can replace the fake later
 - Added an in-memory `FakeGroundWorkServer` that stores records as JSON, numbers revisions per record, makes retries and deletes idempotent, enforces server-side rules (required fields, notes only for known sites, no deleting a site in use), and can simulate latency, network errors, server errors, and rejections
-- Added `RemoteSyncDataSource`, which reports every call as success, transient failure (retry later), or rejection (give up), so the sync engine never handles JSON or status codes
+- Added `SyncRemoteDataSource`, which reports every call as success, transient failure (retry later), or rejection (give up), so the sync engine never handles JSON or status codes
 
 Architecture and quality:
 - Moved navigation to type-safe `@Serializable` routes; Site Detail now always has a site ID
@@ -241,7 +241,7 @@ Saves and deletes read the current sync state and then write. Each of these path
 
 ### A simulated backend with its own wire format
 
-The sync backend is simulated, but it is treated as a separate system. Remote models use the backend's conventions rather than the domain's or Room's, so the API does not change when a domain field is renamed. Requests go through an HTTP-shaped `RemoteTransport`; the app binds it to `FakeGroundWorkServer` in `RemoteModule`, and a real backend would replace only that binding. The fake parses and stores JSON and enforces the rules a real server would, so wire-format mistakes and wrong sync ordering fail in tests instead of being hidden. `RemoteSyncDataSource` reduces every outcome to success, transient failure, or rejection: network errors, timeouts, rate limits, and server errors are retried, other 4xx responses are not, and an unreadable success response is treated as a server problem rather than a reason to mark local data failed. The fake keeps its data in memory, so it resets when the process dies.
+The sync backend is simulated, but it is treated as a separate system. Remote models use the backend's conventions rather than the domain's or Room's, so the API does not change when a domain field is renamed. Requests go through an HTTP-shaped `RemoteTransport`; the app binds it to `FakeGroundWorkServer` in `RemoteModule`, and a real backend would replace only that binding. The fake parses and stores JSON and enforces the rules a real server would, so wire-format mistakes and wrong sync ordering fail in tests instead of being hidden. `SyncRemoteDataSource` reduces every outcome to success, transient failure, or rejection: network errors, timeouts, rate limits, and server errors are retried, other 4xx responses are not, and an unreadable success response is treated as a server problem rather than a reason to mark local data failed. The fake keeps its data in memory, so it resets when the process dies.
 
 ### Type-safe navigation and route-scoped ViewModels
 
@@ -327,7 +327,7 @@ Tests are split by what they need. Logic that runs on the JVM is covered by fast
 - **Site Detail:** `SiteDetailViewModelTest` covers loading a site and its notes, the site name on note rows (including renames, with unchanged rows reused across other site edits), live updates, the site being deleted while open, and site and note load errors
 - **UI state models:** list, editor, and detail UI state tests cover derived flags such as `canSave`, `isBusy`, empty and no-match states, active criteria, and the required-name hint
 - **Formatting:** `AbsoluteDateTimeLabelTest` covers the shared date pattern, formatting in the formatter's zone and locale, and empty labels for unset timestamps; `MinuteTicksTest` covers emitting the clock time immediately and then on each minute boundary
-- **Simulated backend:** `RemoteWireFormatTest` pins the JSON format with literal JSON (field names, ISO timestamps, lowercase enums, explicit null site links, ignored unknown fields, rejected malformed values); `RemoteMappersTest` covers domain → remote mapping; `FakeGroundWorkServerTest` covers revisions, idempotent retries and deletes, server-side validation and ordering rules, and simulated failures; `RemoteSyncDataSourceTest` covers mapping every outcome to success, transient failure, or rejection, and that cancellation is not swallowed
+- **Simulated backend:** `RemoteWireFormatTest` pins the JSON format with literal JSON (field names, ISO timestamps, lowercase enums, explicit null site links, ignored unknown fields, rejected malformed values); `RemoteMappersTest` covers domain → remote mapping; `FakeGroundWorkServerTest` covers revisions, idempotent retries and deletes, server-side validation and ordering rules, and simulated failures; `SyncRemoteDataSourceTest` covers mapping every outcome to success, transient failure, or rejection, and that cancellation is not swallowed
 
 ### Instrumented tests (`app/src/androidTest`)
 

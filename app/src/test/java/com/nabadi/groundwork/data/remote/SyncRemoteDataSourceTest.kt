@@ -13,10 +13,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class RemoteSyncDataSourceTest {
+class SyncRemoteDataSourceTest {
 
     private val server = FakeGroundWorkServer()
-    private val dataSource = RemoteSyncDataSource(server)
+    private val dataSource = SyncRemoteDataSource(server)
 
     // Against the fake server: the real JSON path end to end.
 
@@ -142,7 +142,7 @@ class RemoteSyncDataSourceTest {
 
     @Test
     fun `cancellation is not swallowed as a failure`() = runTest {
-        val source = RemoteSyncDataSource(
+        val source = SyncRemoteDataSource(
             object : RemoteTransport {
                 override suspend fun execute(request: RemoteRequest): RemoteResponse =
                     throw CancellationException("Sync cancelled")
@@ -159,7 +159,7 @@ class RemoteSyncDataSourceTest {
         assertTrue(thrown is CancellationException)
     }
 
-    private fun stubbed(response: RemoteResponse) = RemoteSyncDataSource(
+    private fun stubbed(response: RemoteResponse) = SyncRemoteDataSource(
         object : RemoteTransport {
             override suspend fun execute(request: RemoteRequest): RemoteResponse = response
         },

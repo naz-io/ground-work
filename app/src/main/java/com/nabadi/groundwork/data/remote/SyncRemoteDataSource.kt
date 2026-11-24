@@ -17,7 +17,7 @@ import javax.inject.Inject
  * [RemoteResult], so the sync engine never handles JSON, status codes, or
  * transport exceptions itself.
  */
-internal class RemoteSyncDataSource @Inject constructor(
+internal class SyncRemoteDataSource @Inject constructor(
     private val transport: RemoteTransport,
 ) {
 
